@@ -1,0 +1,20 @@
+{
+  "name": "default configuration",
+  "resolution": "1920x1080",
+  "screens": [
+    {
+      "id": "welcome",
+      "src": "screens/welcome.json"
+    }
+  ],
+  "buttons": 6,
+  "relays": 6,
+  "endpoint": "http://app.diae.ru/v0/gql/",
+  "programs": [
+    {
+      "id": "soap",
+      "src": "programs/soap.json"
+    }
+  ],
+  "script": "script.lua"
+}

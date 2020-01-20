@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"848;480",
+      "src":"1.png",
+      "visible":"true"
+    },
+    {
+      "id":"version",
+      "type": "digits",
+      "position": "1;1",
+      "font": "standard_number",
+      "symbol_size":"5;8",
+      "padding": "1",
+      "length": "1",
+      "visible":"true"
+    }
+  ]
+}
