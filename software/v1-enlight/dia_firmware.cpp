@@ -382,7 +382,10 @@ int RecoverRegistry() {
             registry->SetValue((*it).first.c_str(),(*it).second.c_str());
             fprintf(stderr, "%s:%s; \n",(*it).first.c_str(),(*it).second.c_str());
             
-            SetLocalData((*it).first, (*it).second);
+            std::string localData = GetLocalData((*it).first);
+            if (localData != (*it).second) {
+                SetLocalData((*it).first, (*it).second);
+            }
         }
     } else { // Offline mode - need to check local data
         std::string default_price = "20";
