@@ -188,8 +188,7 @@ class DiaNetwork {
                 curl_global_cleanup();
                 return 0;
             }
-            curl_easy_cleanup(curl);
-            	
+            curl_easy_cleanup(curl);            	
         }   	
 
 	delete[] tmpUrl;
@@ -1185,7 +1184,7 @@ int MyRegistry(Registries *MyRegistries) {
         }
 
         std::string reqUrl;	    
-        reqUrl = "https://" + OnlineCashRegister + ":443/";
+        reqUrl = "https://" + OnlineCashRegister + ":8443/";
         reqUrl += std::to_string(postPosition) + "/" + std::to_string(amount) + "/" + std::to_string(isCard);
 
         curl_easy_setopt(curl, CURLOPT_URL, reqUrl.c_str());

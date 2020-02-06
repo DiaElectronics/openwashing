@@ -9,7 +9,6 @@
 #include <time.h>
 #include <stdlib.h>
 #include "dia_security.h"
-#include "dia_storage.h"
 #include "dia_functions.h"
 #include "dia_configuration.h"
 #include "dia_runtime.h"
@@ -445,7 +444,7 @@ int main(int argc, char ** argv) {
     int res = -1;
 
     while (res != 0) {
-	printf("Looking for online kasse...\n");
+	printf("Looking for central-wash service ...\n");
         res = network.PingServer(&serverIP);
         
         if (res == 0)
