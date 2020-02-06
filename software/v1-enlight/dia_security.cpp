@@ -76,8 +76,12 @@ const char * dia_security_get_current_mac() {
     strcpy(path, MAC_ADDRESS_PATH);
 
     dia_security_calculate_md5(MAC_ADDRESS_PATH, hash1, "uchkumeisky_kamenber");
+
     static char mac_address[24];
     dia_security_read_file(path, mac_address, sizeof(mac_address));
+
+    printf("MAC addr: %s\n", mac_address);
+
     byte_to_string(hash1,hash1str);
     return (const char *)hash1str;
 }
@@ -134,7 +138,7 @@ void dia_security_generate_public_key(char *out, int max_size) {
 
     std::string str(max_size, 0);
     srand(time(NULL));
-    
+
     std::generate_n(str.begin(), max_size, randchar);
     strcpy(out, str.c_str());
 }

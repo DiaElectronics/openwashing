@@ -35,7 +35,7 @@ DiaConfiguration * config;
 
 int _100MsIntervalsCount;
 char devName[128];
-char centralKey[8];
+char centralKey[32];
 
 int _DebugKey = 0;
 int _Balance = 0;
@@ -395,6 +395,10 @@ int main(int argc, char ** argv) {
         fprintf(stderr, "Too many parameters. Please leave just folder with the firmware, like [firmware.exe .] \n");
         return 1;
     }
+
+    network.getMacAddress(centralKey);
+
+    printf("MAC: %s\n", centralKey);
 
     // Check public key on disk
     // If it doesn't exist - generate it
