@@ -48,30 +48,6 @@ typedef struct curl_answer {
     size_t length;
 } curl_answer_t;
 
-typedef struct create_token {
-  std::string login;
-  std::string password;
-} create_token_t;
-
-typedef struct create_company {
-  std::string name;
-  std::string login;
-  std::string password;
-  std::string role;
-} create_company_t;
-
-typedef struct create_washstation {
-  std::string name;
-  int company_id;
-} create_washstation_t;
-
-typedef struct create_station_post {
-  std::string name;
-  std::string serialid;
-  std::string login;
-  int washstation_id;
-} create_station_post_t;
-
 typedef struct create_money_report {
   int id;
   int transaction_id;
@@ -86,7 +62,7 @@ typedef struct create_money_report {
 
 typedef struct ping_report {
     std::string hash;
-} ping_report_t
+} ping_report_t;
 
 typedef struct RelayStat {
   int switched_count;
@@ -690,96 +666,6 @@ class DiaNetwork {
         return 0;
     }
 
-    int RegisterPostWash(std::string name, std::string serialid, std::string *password, std::string *keystr) {
-        assert(password);
-        *password = "";
-        assert(keystr);
-        *keystr = "";
-        std::string answer;
-        create_station_post_t station_post_data={"","","",0};
-        int res=0;
-        station_post_data.name = name;
-        station_post_data.serialid = serialid;
-        station_post_data.login = "";
-        station_post_data.washstation_id=0;
-
-        int attempts = 10;
-        while(_Mode!=MODE_HAVE_TOKEN && attempts>0) {
-            usleep(1000000);
-            printf("waiting... current mode is %d\n", _Mode);
-            attempts--;
-        }
-
-        std::string create_station_post_request = json_create_station_post(&station_post_data);
-
-        if (!_Token.empty()) {
-            res=SendRequest(&create_station_post_request, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            return 1;
-        }
-        if (res>0) {
-            printf("No connection to server\n");
-            return 1;
-        }
-
-        // XXX че, серьезно???? ты привязываешься к строгому порядку байт текущего ответа???
-        std::size_t found = answer.find("{\"errors\":[{\"message\":");
-        if (found!=std::string::npos) {
-            return 2;
-        }
-        json_t *root;
-        json_error_t error;
-        root = json_loads(answer.c_str(), 0, &error);
-        int err = 0;
-        do {
-            if ( !root ) {
-                printf("error in CreateStationPost: on line %d: %s\n", error.line, error.text );
-                err = 1;
-                break;
-            }
-            if(!json_is_object(root)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_post;
-            obj_post = json_object_get(obj_data, "CreateStationPost" );
-            if(!json_is_object(obj_post)) {
-                err = 1;
-                break;
-            }
-
-            json_t *obj_password;
-            obj_password = json_object_get(obj_post, "Password" );
-            if(!json_is_string(obj_password)) {
-                err = 1;
-                break;
-            }
-            const char* data_password = json_string_value(obj_password);
-
-            json_t *obj_keystr;
-            obj_keystr = json_object_get(obj_post, "KeyStr" );
-            if(!json_is_string(obj_keystr)) {
-                err = 1;
-                break;
-            }
-            const char* data_keystr = json_string_value(obj_keystr);
-
-            *password =  data_password;
-            *keystr = data_keystr;
-        } while(0);
-        json_decref(root);
-
-        return err;
-    }
-
 int MyPromotions(std::list<Promotion> *PromotionList) {
         std::string answer;
         int res=0;
@@ -1099,21 +985,13 @@ int MyRegistry(Registries *MyRegistries) {
         }
     }
 
-    std::string json_create_token(struct create_token *s) {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
-
-        json_object_set_new(myVar, "Login", json_string(s->login.c_str()));
-        json_object_set_new(myVar, "Password",json_string(s->password.c_str()));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("query($myVar: TokenCreateRequest!){\n  CreateToken(Request: $myVar)\n}\n"));
+    std::string json_create_ping(struct ping_report *s) {
+        json_t *object = json_object();
+        json_object_set_new(object, "hash", json_string(s->hash.c_str()));
         char *str = json_dumps(root, 0);
         std::string res = str;
         free(str);
-        json_decref(root);
+        json_decref(object);
         return res;
     }
 
@@ -1134,45 +1012,11 @@ int MyRegistry(Registries *MyRegistries) {
         return res;
     }
 
-    std::string json_create_company(struct create_company *s) {
-        char jsonObj[500];
-        const char* pattern="{\"operationName\":null,\"variables\":{\"myVar\":{\"Name\": \"%s\",\"Login\": \"%s\", \"Password\": \"%s\", \"Role\": \"%s\"}},\"query\":\"mutation($myVar: CompanysCreateRequest!){\\n  CreateCompany(Request: $myVar)\\n{ID}}\\n\"}";
-        sprintf(jsonObj,pattern,s->name.c_str(), s->login.c_str() ,s->password.c_str(),s->role.c_str());
-        return jsonObj;
-    }
-
-    std::string json_create_washstation(struct create_washstation *s) {
-        char jsonObj[500];
-        const char* pattern="{\"operationName\":null,\"variables\":{\"myVar\":{\"Name\": \"%s\",\"CompanyID\": %d}},\"query\":\"mutation($myVar: WashStationsCreateRequest!){\\n  CreateWashStation(Request: $myVar)\\n{ID}}\\n\"}";
-        sprintf(jsonObj,pattern,s->name.c_str(), s->company_id);
-        return jsonObj;
-    }
-
     std::string json_get_my_registry() {
         char jsonObj[500];
         const char* pattern="{\"operationName\":null,\"variables\":{\"myVar\":{\"Key\": \"%s\"}},\"query\":\"query($myVar: MyRegistryRequest!){\\n  GetMyRegistry(Request: $myVar)\\n {MyRegistrys{Key Value}}}\\n\"}";
         sprintf(jsonObj,pattern,"1");
         return jsonObj;
-    }
-
-    std::string json_create_station_post(struct create_station_post *s) {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
-
-        json_object_set_new(myVar, "Name", json_string(s->name.c_str()));
-        json_object_set_new(myVar, "SerialID",json_string(s->serialid.c_str()));
-        json_object_set_new(myVar, "Login", json_string(s->login.c_str()));
-        json_object_set_new(myVar, "WashStationID",json_integer(s->washstation_id));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("mutation($myVar: StationPostsCreateRequest!){\n  CreateStationPost(Request: $myVar)\n{ID Name SerialID CompanyID WashStationID Password KeyStr}}\n"));
-        char *str = json_dumps(root, 0);
-        std::string res = str;
-        free(str);
-        json_decref(root);
-        return res;
     }
 
     std::string json_create_money_report(struct create_money_report *s) {

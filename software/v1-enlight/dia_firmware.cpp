@@ -193,8 +193,6 @@ int smart_delay_function(void * arg, int ms) {
 /////// End of Runtime functions ///////
 
 /////// Central server communication functions //////
-
-/*
 inline int SendStatusRequest(const char * devName) {
     if (!config || !config->GetGpio()) {
         return 0;
@@ -289,35 +287,6 @@ int recover_relay() {
     delete last_relay_report;
     return err;
 }
-
-int activate() {
-    char buf_password[1024];
-    char buf_username[1024];
-    if (!file_exists(UNLOCK_KEY)) {
-        printf("your firmware is NOT activated\n");
-        printf("please type in your login:");
-        scanf("%s", buf_username);
-        printf("please type in your password:");
-        scanf("%s", buf_password);
-        int err = network.Login(buf_username, buf_password);
-        if (err) {
-            printf("Can't connect to the authority server, sorry. Please try again later (%d)\n", err );
-            return 1;
-        }
-
-        std::string dev_password;
-        std::string dev_key;
-        err = network.RegisterPostWash(devName, dia_security_get_key(),
-        &dev_password, &dev_key);
-        if (err) {
-            printf("Can't register your device (%d)\n", err);
-            return 1;
-        }
-        dia_security_write_file(UNLOCK_KEY, dev_key.c_str());
-        dia_security_write_file(DEVICE_PASS, dev_password.c_str());
-    }
-    return 0;
-}
 //////// End of Central server communication functions /////////
 
 //////// Local registry Save/Load functions /////////
@@ -341,6 +310,7 @@ void SetLocalData(std::string key, std::string value) {
 }
 /////////////////////////////////////////////////////
 
+/////// Registry processing function ///////////////
 int RecoverRegistry() {
     printf("---START-----------------------------------------------------------------\n");
     Registries* MyRegistry= new Registries;
@@ -383,7 +353,8 @@ int RecoverRegistry() {
     printf("--------------------------------------------------------------------------\n");
     return err;
 }
-*/
+//////////////////////////////////////////////
+
 int main(int argc, char ** argv) {
     config = 0;
 
@@ -433,36 +404,9 @@ int main(int argc, char ** argv) {
     printf("Looking for firmware in [%s]\n", folder.c_str());
     printf("Version: %s\n", DIA_VERSION);
     
+
     /*
-    int f = 1;
-    int err = activate();
-
-    if(err) {
-        printf("activation error\n");
-        return err;
-    }
-
-    if (file_exists(UNLOCK_KEY)) {
-        char unlock_key[1024];
-        dia_security_read_file(UNLOCK_KEY, unlock_key, sizeof(unlock_key));
-        f = !dia_security_check_key(unlock_key);
-    }
-    char devPass[1024];
-    printf("device name: [%s] \n", devName);
-    strcpy(devPass, "NO_PASS");
-    dia_security_read_file(DEVICE_PASS, devPass, sizeof(devPass));
-
-    if (f) {
-        printf(" DEMO MODE ...! \n");
-    }
-
-    err = network.Login(dia_security_get_key(), devPass);
-    if (err) {
-        printf("Can't login to diae server (%d)\n", err );
-    }
-    */
-    /*
-    // Runtime and firmware initialisation
+    // Runtime and firmware initialization
     DiaDeviceManager manager;
     DiaDeviceManager_AddCardReader(&manager);
 
