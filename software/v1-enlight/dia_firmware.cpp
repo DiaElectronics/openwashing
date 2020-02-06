@@ -27,7 +27,7 @@
 //#define USE_GPIO
 #define USE_KEYBOARD
 
-#define CENTRALWASH_KEY "/home/anton/centralwash.key"
+#define CENTRALWASH_KEY "/home/pi/centralwash.key"
 #define ID_KEY "/home/pi/id.txt"
 #define BILLION 1000000000
 
