@@ -409,23 +409,11 @@ int main(int argc, char ** argv) {
         dia_security_write_file(CENTRALWASH_KEY, centralKey);
         printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
     }
-    /*
-    // Locate Central wash server 
-    std::string serverIP = "localhost";
-    int res = -1;
 
-    while (res != 0) {
-	    printf("Looking for central-wash service ...\n");
-        res = network.PingServer(&serverIP);
-        
-        if (res == 0)
-            printf("Server located on:\n%s\n", serverIP.c_str());
-        else {
-            printf("Failed... Next attempt soon...\n");
-            sleep(60);
-        }
-    }
-    network.OnlineCashRegister = serverIP;
+    network.SetPublicKey(std::string(centralKey));
+    
+    std::string serverIP = network.LocateCentralServer();
+    network.SetHostName(serverIP);
 
     // Read ID from file
     strcpy(devName,"NO_ID");
@@ -444,7 +432,7 @@ int main(int argc, char ** argv) {
     }
     printf("Looking for firmware in [%s]\n", folder.c_str());
     printf("Version: %s\n", DIA_VERSION);
-    */
+    
     /*
     int f = 1;
     int err = activate();

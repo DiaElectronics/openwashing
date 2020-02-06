@@ -84,6 +84,10 @@ typedef struct create_money_report {
   int test_total;
 } create_money_report_t;
 
+typedef struct ping_report {
+    std::string hash;
+} ping_report_t
+
 typedef struct RelayStat {
   int switched_count;
   int total_time_on;
@@ -114,33 +118,76 @@ class Registries {
 
 class DiaNetwork {
     public:
+    
+    DiaNetwork() {
+        _Host = "";
 
-    std::string OnlineCashRegister;
+        _OnlineCashRegister = "";
+        _PublicKey = "";
 
-    DiaNetwork(const char *in_hostname) {
-        assert(in_hostname);
-        _Host = in_hostname;
-        _Token = "";
-        OnlineCashRegister = "";
         pthread_create(&entry_processing_thread, NULL, DiaNetwork::process_extract , this);
-        _Mode=MODE_NO_LOGIN;
     }
 
     ~DiaNetwork() {
-        printf("destroying diaNetworkNeo\n");
+        printf("Destroying DiaNetwork\n");
         StopTheWorld();
-        int status=pthread_join(entry_processing_thread,NULL);
+        int status = pthread_join(entry_processing_thread,NULL);
         if (status != 0) {
-            printf("main error: can't join thread, status = %d\n", status);
+            printf("Main error: can't join thread, status = %d\n", status);
         }
     }
 
-    int PingServer(std::string *ip) {
+    // Base function for sending a POST request.
+    // Parameters: gets pre-created HTTP body, modifies answer from server, gets address of host (URL).
+    int SendRequest(std::string *body, std::string *answer, std::string host_addr) {
+        assert(body);
+        assert(answer);
         CURL *curl;
         CURLcode res;
+        curl_answer_t raw_answer;
+        InitCurlAnswer(&raw_answer);
 
         curl_global_init(CURL_GLOBAL_ALL);
+        curl = curl_easy_init();
+        if (curl == NULL) {
+            return 1;
+        }
 
+        struct curl_slist *headers = NULL;
+        headers = curl_slist_append(headers, "Accept: application/json");
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        headers = curl_slist_append(headers, "charsets: utf-8");
+
+        curl_easy_setopt(curl, CURLOPT_URL, host_addr.c_str());
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body->c_str());
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+            if (res == CURLE_COULDNT_CONNECT) {
+                return SERVER_UNAVAILABLE;
+            }
+            return 1;
+        }
+        *answer = raw_answer.data;
+        fprintf(stderr, "Answer from server: %s\n",raw_answer.data);
+        DestructCurlAnswer(&raw_answer);
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+        curl_global_cleanup();
+        return 0;
+    }
+
+    // Central server searching, if it's IP address is unknown.
+    // Gets local machine's IP and starts pinging every address in block.
+    // Modifies IP address.
+    int SearchCentralServer(std::string *ip) {
 	    char* tmpUrl = new char[16];            	    
         int fd;
         struct ifreq ifr;
@@ -167,22 +214,14 @@ class DiaNetwork {
                 break;
         }
 
+        int err = 0;
+        // Scan whole block
         for (int i = 1; i <= 255; i++) {
-            curl = curl_easy_init();
-            if (curl == NULL) {
-                return 1;
-            }
-    
             std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
+            err = this->PingRequest(reqUrl);
 
-            curl_easy_setopt(curl, CURLOPT_URL, reqUrl.c_str());
-            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-            curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
-            curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10);
-
-            res = curl_easy_perform(curl);
-	    //printf("%s\n", reqUrl.c_str());
-            if (res == CURLE_OK) {
+            if (!err) {
+                // We found it!
                 *ip = reqIP + std::to_string(i);
                 curl_easy_cleanup(curl);
                 curl_global_cleanup();
@@ -196,6 +235,8 @@ class DiaNetwork {
         return SERVER_UNAVAILABLE;
     }
 
+    // Returns local machine's MAC address of eth0 interface.
+    // Modfifes out parameter == MAC address without ":" symbols.
     void GetMacAddress(char * out) {
    	    int fd;
 	
@@ -215,72 +256,133 @@ class DiaNetwork {
 	    sprintf((char *)out,(const char *)"%.2x%.2x%.2x%.2x%.2x%.2x" , mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     }
 
-    int Login(std::string userName, std::string password) {
-        _Token="";
-        _Login=userName;
-        _Password=password;
-        _Mode=MODE_HAVE_LOGIN;
-        printf("DEBUG: trying to login: user:[%s], pass:[%s]\n ", userName.c_str(), password.c_str() );
+    // Just key setter.
+    int SetPublicKey(std::string publicKey) {
+        _PublicKey = publicKey;
         return 0;
     }
 
-    int LoginRequest() {
-        //pthread_join(entry_processing_thread,NULL);
-        std::string answer;
-        create_token_t token_data;
-        int res;
-        token_data.login = _Login;
-        token_data.password = _Password;
-        std::string json_token_request = json_create_token(&token_data);
+    // Sets Central Server host name.
+    // Also sets same host name to Online Cash Register, which is located on the same server, as Central.
+    int SetHostName(std::string hostName) {
+        _Host = hostName;
+        _OnlineCashRegister = hostName;
+        return 0;
+    }
 
-        res=SendRequest(&json_token_request, &answer);
-        if (res==2) {
-            printf(" lr No connection to server\n");
+    // Returns Central Server IP address.
+    std::string GetCentralServerAddress() {
+        std::string serverIP = "localhost";
+        int res = -1;
+
+	    printf("Looking for Central-wash server ...\n");
+        res = this->SearchCentralServer(&serverIP);
+        
+        if (res == 0) {
+            printf("Server located on:\n%s\n", serverIP.c_str());
+        }
+        else {
+            printf("Failed: no server found...\n");
+        }
+    }
+
+    // PING request to specified URL. 
+    // Returns 0, if request was OK, other value - in case of failure.
+    int PingRequest(std::string url) {
+        std::string answer;
+
+        ping_report_t ping_data;
+        ping_data.hash = _PublicKey;
+
+        int result;
+        std::string json_ping_request = json_create_ping(&ping_data);
+        result = SendRequest(&json_ping_request, &answer, url);
+
+        if (result == 2) {
+            printf("No connection to server, PING aborted...\n");
             return 3;
         }
-        if (res) {
+        if (result) {
             return 1;
         }
 
-        json_t *root;
+        json_t *object;
         json_error_t error;
 
         int err = 0;
-        root = json_loads(answer.c_str(), 0, &error);
+        object = json_loads(answer.c_str(), 0, &error);
         do {
-            if ( !root ) {
-                printf("error in login: on line %d: %s\n", error.line, error.text );
+            if (!object) {
+                printf("Error in PING: %d: %s\n", error.line, error.text );
                 err = 1;
                 break;
             }
-            if(!json_is_object(root)) {
-                err = 1;
+
+            if(!json_is_object(object)) {
                 break;
             }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
+
+            json_t *obj_service_amount;
+            obj_service_amount = json_object_get(object, "serviceAmount");
+            if(json_is_object(obj_service_amount)) {
+                int serviceMoney = (int)json_integer_value(obj_service_amount);
+                
+                // TODO: trasfer money somehow
                 break;
             }
-            json_t *obj_token;
-            obj_token = json_object_get(obj_data, "CreateToken" );
-            if(!json_is_string(obj_token)) {
-                err = 1;
-                break;
-            }
-            std::string received_token = json_string_value(obj_token);
-            std::size_t found = received_token.find("error");
-            if (found!=std::string::npos) {
-                err = 2;
-                break;
-            }
-            _Token=received_token;
-            printf("recieved token: [%s]\n", _Token.c_str());
-            _Mode=MODE_HAVE_TOKEN;
+            
         } while (0);
-        json_decref(root);
+        json_decref(object);
         return err;
+    }
+
+    // Sends receipt report directly to Online Cash Register.
+    int ReceiptRequest(int postPosition, int isCard, int amount) {
+        int res = 0;
+        
+        res = SendReceiptRequest(postPosition, isCard, amount);
+        
+        if (res > 0) {
+            printf("No connection to server\n");
+            return 1;
+        }
+        return 0;
+    }
+
+    // Base function for receipt sending to Online Cash Register.
+    int SendReceiptRequest(int postPosition, int isCard, int amount) {
+        CURL *curl;
+        CURLcode res;
+
+        curl_global_init(CURL_GLOBAL_ALL);
+        
+        curl = curl_easy_init();
+        if (curl == NULL) {
+            return 1;
+        }
+
+        std::string reqUrl;	    
+        reqUrl = "https://" + _OnlineCashRegister + ":8443/";
+        reqUrl += std::to_string(postPosition) + "/" + std::to_string(amount) + "/" + std::to_string(isCard);
+
+        curl_easy_setopt(curl, CURLOPT_URL, reqUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
+	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+	        printf("%s", curl_easy_strerror(res));
+	        printf("\n");
+            curl_easy_cleanup(curl);
+            curl_global_cleanup();
+            return SERVER_UNAVAILABLE;
+        }
+
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+        return 0;
     }
 
     int create_money_report(int transaction_id,std::string station_post_id,std::string time_stamp,int cars_total,int coins_total,int banknotes_total,int cashless_total,int test_total) {
@@ -585,18 +687,6 @@ class DiaNetwork {
             return 1;
         }
 
-        return 0;
-    }
-
-    int ReceiptRequest(int postPosition, int isCard, int amount) {
-        int res = 0;
-        
-        res = SendReceiptRequest(postPosition, isCard, amount);
-        
-        if (res > 0) {
-            printf("No connection to server\n");
-            return 1;
-        }
         return 0;
     }
 
@@ -915,10 +1005,10 @@ int MyRegistry(Registries *MyRegistries) {
 
     private:
 
+    std::string _PublicKey;
+    std::string _OnlineCashRegister;
     std::string _Host;
-    std::string _Token;
-    std::string _Login;
-    std::string _Password;
+
     int _Mode;
     DiaChannel<NetworkMessage> channel;
     pthread_t entry_processing_thread;
@@ -1189,92 +1279,6 @@ int MyRegistry(Registries *MyRegistries) {
         answer->length = new_len;
 
         return size*nmemb;
-    }
-
-    int SendReceiptRequest(int postPosition, int isCard, int amount) {
-        CURL *curl;
-        CURLcode res;
-
-        curl_global_init(CURL_GLOBAL_ALL);
-        
-        curl = curl_easy_init();
-        if (curl == NULL) {
-            return 1;
-        }
-
-        std::string reqUrl;	    
-        reqUrl = "https://" + OnlineCashRegister + ":8443/";
-        reqUrl += std::to_string(postPosition) + "/" + std::to_string(amount) + "/" + std::to_string(isCard);
-
-        curl_easy_setopt(curl, CURLOPT_URL, reqUrl.c_str());
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
-
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-	    printf("%s", curl_easy_strerror(res));
-	    printf("\n");
-            curl_easy_cleanup(curl);
-            curl_global_cleanup();
-            return SERVER_UNAVAILABLE;
-        }
-
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        return 0;
-    }
-
-    int SendRequest(std::string *body, std::string *answer) {
-        assert(body);
-        assert(answer);
-        CURL *curl;
-        CURLcode res;
-        curl_answer_t raw_answer;
-        InitCurlAnswer(&raw_answer);
-
-        curl_global_init(CURL_GLOBAL_ALL);
-        curl = curl_easy_init();
-        if (curl == NULL) {
-            return 1;
-        }
-
-        struct curl_slist *headers = NULL;
-        headers = curl_slist_append(headers, "Accept: application/json");
-        headers = curl_slist_append(headers, "Content-Type: application/json");
-        headers = curl_slist_append(headers, "charsets: utf-8");
-
-        curl_easy_setopt(curl, CURLOPT_URL, _Host.c_str());
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, body->c_str());
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-
-        if (!_Token.empty()) {
-            // XXX DANGEROUS
-            char cookie_string[500];
-            sprintf(cookie_string,"token=%s;", _Token.c_str());
-            //printf("cookie_token= %s\n", cookie_string);
-            curl_easy_setopt(curl, CURLOPT_COOKIE, cookie_string);
-        }
-        res = curl_easy_perform(curl);
-        if (res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-            if (res==CURLE_COULDNT_CONNECT) {
-                return SERVER_UNAVAILABLE;
-            }
-            return 1;
-        }
-        *answer = raw_answer.data;
-        fprintf(stderr, "answer from server: %s\n",raw_answer.data);
-        DestructCurlAnswer(&raw_answer);
-        curl_easy_cleanup(curl);
-        curl_slist_free_all(headers);
-        curl_global_cleanup();
-        return 0;
     }
 
     void InitCurlAnswer(curl_answer_t * raw_answer) {
