@@ -192,96 +192,109 @@ int smart_delay_function(void * arg, int ms) {
 }
 /////// End of Runtime functions ///////
 
+
 /////// Central server communication functions //////
-inline int SendStatusRequest(const char * devName) {
+
+// Sends PING request to Central Server every 2 seconds.
+// May get service money from server.
+int CentralServerDialog() {
     if (!config || !config->GetGpio()) {
         return 0;
     }
 
     _100MsIntervalsCount++;
-    if(_100MsIntervalsCount<0) {
+    if(_100MsIntervalsCount < 0) {
         printf("Memory corruption on _100MsIntervalsCount\n");
-        _100MsIntervalsCount=0;
+        _100MsIntervalsCount = 0;
     }
 
-    if(_100MsIntervalsCount>600) {
-        _100MsIntervalsCount= 0;
-        char timestamp_buf[32];
-        timestamp_buf[0] = 0;
-        sprintf(timestamp_buf,"%lu", (unsigned long)time(NULL));
-        printf("sending status\n");
+    // Every 2 seconds we go inside this
+    if (_100MsIntervalsCount > 20) {
+        _100MsIntervalsCount = 0;
+        
+        printf("Sending another PING request to server...\n");
+        network.PingRequest(network.GetHostName());
 
-        network.create_money_report(0,devName,timestamp_buf, config->_Income.carsTotal,
-        config->_Income.totalIncomeCoins, config->_Income.totalIncomeBanknotes,
-        config->_Income.totalIncomeElectron, config->_Income.totalIncomeService );
-        DiaGpio * gpio = config->GetGpio();
-        if(config->GetStorage()){
-            config->GetStorage()->save(config->GetStorage()->object, "relays", &(gpio->Stat), sizeof(gpio->Stat));
-        }
-
-        RelayStat_t RelayStats[MAX_RELAY_NUM];
-        for(int i=0;i<MAX_RELAY_NUM;i++) {
-            RelayStats[i].switched_count=gpio->Stat.relay_switch[i+1];
-            RelayStats[i].total_time_on=gpio->Stat.relay_time[i+1]/1000;
-        }
-        network.create_relay_report(0,devName, timestamp_buf, RelayStats);
+        // TODO: get service money somehow
     }
     return 0;
 }
 
-int recover_money() {
-    create_money_report_t* last_money_report=new create_money_report_t;
+// 
+int RecoverMoney() {
+    create_money_report_t* last_money_report = new create_money_report_t;
+
     int err = 0;
     err = network.get_last_money_report(last_money_report);
-    if (err == 0) {
-    fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s CarsTotal:%d CoinsTotal:%d BanknotesTotal:%d CashlessTotal:%d TestTotal:%d\n",last_money_report->id,
-    last_money_report->transaction_id,last_money_report->station_post_id.c_str(),last_money_report->time_stamp.c_str(),last_money_report->cars_total,last_money_report->coins_total,
-    last_money_report->banknotes_total,last_money_report->cashless_total,last_money_report->test_total);
-    if ((config->_Income.totalIncomeCoins < last_money_report->coins_total) ||
-    (config->_Income.totalIncomeBanknotes < last_money_report->banknotes_total) ||
-    (config->_Income.totalIncomeElectron < last_money_report->cashless_total) ||
-    (config->_Income.totalIncomeService < last_money_report->test_total) ||
-    (config->_Income.carsTotal < last_money_report->cars_total)) {
-        config->_Income.totalIncomeCoins = last_money_report->coins_total;
-        config->_Income.totalIncomeBanknotes = last_money_report->banknotes_total;
-        config->_Income.totalIncomeElectron = last_money_report->cashless_total;
-        config->_Income.totalIncomeService = last_money_report->test_total;
-        config->_Income.carsTotal = last_money_report->cars_total;
-        SaveIncome();
-    }
-    } else {
-        fprintf(stderr,"get last money report err:%d\n",err);
+
+    if (err == 0) 
+    {
+        fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s CarsTotal:%d CoinsTotal:%d BanknotesTotal:%d CashlessTotal:%d TestTotal:%d\n",
+        last_money_report->id,
+        last_money_report->transaction_id,
+        last_money_report->station_post_id.c_str(),
+        last_money_report->time_stamp.c_str(),
+        last_money_report->cars_total,
+        last_money_report->coins_total,
+        last_money_report->banknotes_total,
+        last_money_report->cashless_total,
+        last_money_report->test_total);
+
+        // Update the local storage if needed
+        if ((config->_Income.totalIncomeCoins < last_money_report->coins_total) ||
+        (config->_Income.totalIncomeBanknotes < last_money_report->banknotes_total) ||
+        (config->_Income.totalIncomeElectron < last_money_report->cashless_total) ||
+        (config->_Income.totalIncomeService < last_money_report->test_total) ||
+        (config->_Income.carsTotal < last_money_report->cars_total)) 
+        {
+            config->_Income.totalIncomeCoins = last_money_report->coins_total;
+            config->_Income.totalIncomeBanknotes = last_money_report->banknotes_total;
+            config->_Income.totalIncomeElectron = last_money_report->cashless_total;
+            config->_Income.totalIncomeService = last_money_report->test_total;
+            config->_Income.carsTotal = last_money_report->cars_total;
+            SaveIncome();
+        }
+    } 
+    else 
+    {
+        fprintf(stderr,"Get last money report error: %d\n",err);
     }
 
     delete last_money_report;
     return err;
 }
 
-int recover_relay() {
-    create_relay_report_t* last_relay_report=new create_relay_report_t;
+int RecoverRelay() {
+    create_relay_report_t* last_relay_report = new create_relay_report_t;
+
     int err = 0;
     err = network.get_last_relay_report(last_relay_report);
+
     if (err == 0) {
         DiaGpio * gpio = config->GetGpio();
-        fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s\n",last_relay_report->id,
-        last_relay_report->transaction_id,last_relay_report->station_post_id.c_str(),last_relay_report->time_stamp.c_str());
+
+        fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s\n",
+        last_relay_report->id,
+        last_relay_report->transaction_id,
+        last_relay_report->station_post_id.c_str(),
+        last_relay_report->time_stamp.c_str());
 
         bool update = false;
-        for(int i=0;i<MAX_RELAY_NUM;i++) {
-            if ((gpio->Stat.relay_switch[i+1]<last_relay_report->RelayStats[i].switched_count) ||
-                (gpio->Stat.relay_time[i+1]<last_relay_report->RelayStats[i].total_time_on*1000)) {
+        for(int i = 0;i < MAX_RELAY_NUM; i++) {
+            if ((gpio->Stat.relay_switch[i+1] < last_relay_report->RelayStats[i].switched_count) ||
+                (gpio->Stat.relay_time[i+1] < last_relay_report->RelayStats[i].total_time_on*1000)) {
                     update = true;
             }
         }
         if (update) {
-            fprintf(stderr,"update stat\n");
-            for(int i=0;i<MAX_RELAY_NUM;i++) {
-                gpio->Stat.relay_switch[i+1]=last_relay_report->RelayStats[i].switched_count;
-                gpio->Stat.relay_time[i+1]=last_relay_report->RelayStats[i].total_time_on*1000;
+            fprintf(stderr,"Update stat\n");
+            for(int i=0; i<MAX_RELAY_NUM; i++) {
+                gpio->Stat.relay_switch[i+1] = last_relay_report->RelayStats[i].switched_count;
+                gpio->Stat.relay_time[i+1] = last_relay_report->RelayStats[i].total_time_on*1000;
             }
         }
     } else {
-            fprintf(stderr,"get last relay report err:%d\n",err);
+            fprintf(stderr,"Get last relay report err:%d\n",err);
     }
 
     delete last_relay_report;
@@ -389,8 +402,8 @@ int main(int argc, char ** argv) {
     // Read ID from file
     strcpy(devName,"NO_ID");
     dia_security_read_file(ID_KEY, devName, sizeof(devName));
-    for (unsigned int i=0;i<sizeof(devName);i++) {
-        if (devName[i]=='\n' || devName[i]=='\r') {
+    for (unsigned int i = 0; i < sizeof(devName); i++) {
+        if (devName[i] =='\n' || devName[i] =='\r') {
             devName[i] = 0;
         }
     }

@@ -77,16 +77,6 @@ typedef struct create_relay_report {
   RelayStat_t RelayStats[MAX_RELAY_NUM];
 } create_relay_report_t;
 
-class Promotion {
-    public:
-  int current_promotion_id;
-  std::string code;
-  std::map <std::string,std::string> required_details;
-  std::string time_stamp_start;
-  std::string time_stamp_end;
-  std::string info;
-} ;
-
 class Registries {
     public:
   std::map <std::string,std::string> registries;
@@ -244,6 +234,11 @@ class DiaNetwork {
         _Host = hostName;
         _OnlineCashRegister = hostName;
         return 0;
+    }
+
+    // Just host name getter.
+    std::string GetHostName() {
+        return _Host;
     }
 
     // Returns Central Server IP address.
@@ -643,166 +638,6 @@ class DiaNetwork {
         return err;
     }
 
-    int create_error_report(std::string message) {
-        std::string answer;
-        int res=0;
-        std::string mymessage=message;
-
-        std::string json_error_report_request = json_create_error(mymessage);
-         if (!_Token.empty()) {
-            res=SendRequest(&json_error_report_request, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            CreateAndPushEntry(json_error_report_request);
-            return 1;
-        }
-        if (res>0) {
-            printf("No connection to server\n");
-            CreateAndPushEntry(json_error_report_request);
-            return 1;
-        }
-
-        return 0;
-    }
-
-int MyPromotions(std::list<Promotion> *PromotionList) {
-        std::string answer;
-        int res=0;
-        int attempts = 10;
-        while(_Mode!=MODE_HAVE_TOKEN && attempts>0) {
-            usleep(1000000);
-            printf("waiting... current mode is %d\n", _Mode);
-            attempts--;
-        }
-        std::string get_my_promotions = json_get_my_promotions();
-        if (!_Token.empty()) {
-            res=SendRequest(&get_my_promotions, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            return 1;
-        }
-        if (res>0) {
-            printf("No connection to server\n");
-            return 1;
-        }
-
-        std::list<Promotion> prom_list;
-        std::size_t found = answer.find("{\"errors\":[{\"message\":");
-        if (found!=std::string::npos) {
-            return 2;
-        }
-        json_t *root,*req;
-        json_error_t error;
-        root = json_loads(answer.c_str(), 0, &error);
-        int err = 0;
-        do {
-            if ( !root ) {
-                printf("error in MyPromotion: on line %d: %s\n", error.line, error.text );
-                err = 1;
-                break;
-            }
-            if(!json_is_object(root)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_post;
-            obj_post = json_object_get(obj_data, "GetMyPromotions" );
-            if(!json_is_object(obj_post)) {
-                err = 1;
-                break;
-            }
-
-            json_t *obj_my_promotions;
-            obj_my_promotions = json_object_get(obj_post, "MyPromotions" );
-            if(!json_is_array(obj_my_promotions)) {
-                err = 1;
-                break;
-            }
-            json_t *element;
-            json_t *obj_for_array,*value;
-            int i;
-
-
-            json_array_foreach(obj_my_promotions,i, element){
-                Promotion* prom=new Promotion;
-                obj_for_array = json_object_get(element, "CurrentPromotionID" );
-                if(!json_is_integer(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                prom->current_promotion_id = json_integer_value(obj_for_array);
-
-                obj_for_array = json_object_get(element, "Code" );
-                if(!json_is_string(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-               prom->code = json_string_value(obj_for_array);
-
-                obj_for_array = json_object_get(element, "RequiredDetails" );
-                if(!json_is_string(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                req = json_loads(json_string_value(obj_for_array), 0, &error);
-                if ( !req ) {
-                    printf("error in MyPromotion: on line %d: %s\n", error.line, error.text );
-                    err = 1;
-                    break;
-                }
-                if(!json_is_object(req)) {
-                    err = 1;
-                    break;
-                }
-                const char* key;
-                json_object_foreach(req, key, value) {
-                        if(!json_is_string(value)) {
-                            err = 1;
-                            break;
-                        }
-                        prom->required_details.insert(std::pair<std::string, std::string>(key,json_string_value(value)));
-                 };
-                 json_decref(req);
-
-                obj_for_array = json_object_get(element, "TimeStampStart" );
-                if(!json_is_integer(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                prom->time_stamp_start = std::to_string(json_integer_value(obj_for_array));
-
-                obj_for_array = json_object_get(element, "TimeStampEnd" );
-                if(!json_is_integer(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                prom->time_stamp_end = std::to_string(json_integer_value(obj_for_array));
-
-                obj_for_array = json_object_get(element, "Info" );
-                if(!json_is_string(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                prom->info = json_string_value(obj_for_array);
-                PromotionList->push_back(*prom);
-                delete prom;
-            }
-
-
-        } while(0);
-        json_decref(root);
-
-        return err;
-    }
-
 int MyRegistry(Registries *MyRegistries) {
         std::string answer;
         int res=0;
@@ -928,23 +763,6 @@ int MyRegistry(Registries *MyRegistries) {
         return 0;
     }
 
-    int ModeHaveLogin() {
-        printf("000 MODE_HAVE_LOGIN\n");
-        int err=LoginRequest();
-        if (err==1) {
-            printf("000 another Error login to server\n");
-        } else if (err==2) {
-            printf("000 Incorrect login or password\n");
-            _Mode=MODE_NO_LOGIN;
-            _Login="";
-            _Password="";
-        } else if (err==3) {
-            printf("000 login No connection to server\n");
-        } else {
-            printf("000 logged in properly\n");
-        }
-        return err;
-    }
     int ModeHaveToken() {
         NetworkMessage * message;
         int err = channel.Pop(&message);
@@ -992,23 +810,6 @@ int MyRegistry(Registries *MyRegistries) {
         std::string res = str;
         free(str);
         json_decref(object);
-        return res;
-    }
-
-    std::string json_create_error(std::string s) {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
-
-        json_object_set_new(myVar, "Message", json_string(s.c_str()));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("mutation($myVar: ErrorReportCreateRequest!){\n  CreateErrorReport(Request: $myVar)\n{ID Message TimeStamp} }\n"));
-        char *str = json_dumps(root, 0);
-        std::string res = str;
-        free(str);
-        json_decref(root);
         return res;
     }
 
@@ -1104,13 +905,6 @@ int MyRegistry(Registries *MyRegistries) {
         free(str);
         json_decref(root);
         return res;
-    }
-
-    std::string json_get_my_promotions() {
-        char jsonObj[500];
-        const char* pattern="{\"operationName\":null,\"variables\":{\"myVar\":{\"StationPostID\": %s}},\"query\":\"query($myVar: MyPromotionRequest!){\\n  GetMyPromotions(Request: $myVar)\\n {MyPromotions{CurrentPromotionID Code RequiredDetails TimeStampStart TimeStampEnd Info}}}\\n\"}";
-        sprintf(jsonObj,pattern,"1");
-        return jsonObj;
     }
 
     static size_t _Writefunc(void *ptr, size_t size, size_t nmemb, curl_answer_t *answer) {
