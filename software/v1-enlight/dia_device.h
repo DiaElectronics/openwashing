@@ -43,7 +43,7 @@ public:
     void * Manager;
 
     int Open();
-    DiaDevice(char *portName);
+    DiaDevice(const char *portName);
     ~DiaDevice();
     int ReadPortBytes() {
         _Buf[0]=0;

@@ -9,7 +9,7 @@
 #include <errno.h>
 
 
-DiaDevice::DiaDevice(char *portName) {
+DiaDevice::DiaDevice(const char *portName) {
     _Buf[0] = 0;
     NeedWorking = 1;
     _PortName = strdup(portName);

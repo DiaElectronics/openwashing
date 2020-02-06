@@ -72,6 +72,10 @@ int DiaRuntime::Init(std::string folder, std::string src_str) {
     .addFunction("SmartDelay", &DiaRuntimeHardware::SmartDelay)
     .addFunction("GetKey", &DiaRuntimeHardware::GetKey)
     .addFunction("SendReceipt", &DiaRuntimeHardware::SendReceipt)
+    .addFunction("GetElectronical", &DiaRuntimeHardware::GetElectronical)
+    .addFunction("RequestTransaction", &DiaRuntimeHardware::RequestTransaction)
+    .addFunction("GetTransactionStatus", &DiaRuntimeHardware::GetTransactionStatus)
+    .addFunction("AbortTransaction", &DiaRuntimeHardware::AbortTransaction)
     .endClass();
 
     getGlobalNamespace(Lua)

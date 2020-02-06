@@ -77,6 +77,47 @@ public:
         return 0;
     }
 
+    void * electronical_object;
+    int (*get_electronical_function)(void * object);
+    int GetElectronical() {
+        if(electronical_object && get_electronical_function) {
+            return get_electronical_function(electronical_object);
+        } else {
+            printf("error: NIL object or function GetElectronical\n");
+        }
+        return 0;
+    }
+
+    int (*request_transaction_function)(void * object, int money);
+    int RequestTransaction(int money) {
+        if(electronical_object && request_transaction_function) {
+            return request_transaction_function(electronical_object, money);
+        } else {
+            printf("error: NIL object or function RequestTransaction\n");
+        }
+        return 0;
+    }
+
+    int (*get_transaction_status_function)(void * object);
+    int GetTransactionStatus() {
+        if(electronical_object && get_transaction_status_function) {
+            return get_transaction_status_function(electronical_object);
+        } else {
+            printf("error: NIL object or function GetTransactionStatus\n");
+        }
+        return 0;
+    }
+
+    int (*abort_transaction_function)(void * object);
+    int AbortTransaction() {
+        if(electronical_object && abort_transaction_function) {
+            return abort_transaction_function(electronical_object);
+        } else {
+            printf("error: NIL object or function AbortTransaction\n");
+        }
+        return 0;
+    }
+
     void * keys_object;
     int (*get_keys_function)(void * object);
     
@@ -110,13 +151,19 @@ public:
         program_object = 0;
         turn_program_function = 0;
 
-	send_receipt_function = 0;
+	    send_receipt_function = 0;
 
         coin_object = 0;
         get_coins_function = 0;
 
         banknote_object = 0;
         get_banknotes_function = 0;
+
+        electronical_object = 0;
+        get_electronical_function = 0;
+        request_transaction_function = 0;
+        get_transaction_status_function = 0;
+        abort_transaction_function = 0;
 
         keys_object = 0;
         get_keys_function = 0;

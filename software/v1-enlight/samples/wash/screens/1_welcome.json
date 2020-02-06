@@ -5,15 +5,23 @@
       "type":"image",
       "position": "0;0",
       "size":"848;480",
-      "src":"1.png",
+      "src":"pic/1/background.png",
       "visible":"true"
     },
     {
-      "id":"version",
+      "id":"logo",
+      "type":"image",
+      "position": "226;107",
+      "size":"400;130",
+      "src":"pic/1/logo.png",
+      "visible":"true"
+    },
+    {
+      "id":"post_number",
       "type": "digits",
-      "position": "1;1",
+      "position": "595;373",
       "font": "standard_number",
-      "symbol_size":"5;8",
+      "symbol_size":"25;40",
       "padding": "1",
       "length": "1",
       "visible":"true"

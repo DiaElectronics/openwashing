@@ -129,6 +129,42 @@ int get_banknotes(void *object) {
     return curMoney;
 }
 
+int get_electronical(void *object) {
+    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+    int curMoney = manager->ElectronMoney;
+    if(curMoney>0) {
+        printf("electron %d\n", curMoney);
+        if(config) {
+            config->_Income.totalIncomeElectron += curMoney;
+            SaveIncome();
+        }
+        manager->ElectronMoney  = 0;
+        _Balance = 0;
+    }
+    return curMoney;
+}
+
+int request_transaction(void *object, int money) {
+    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+    if (money > 0) {
+        DiaDeviceManager_PerformTransaction(manager, money);
+        return 0;
+    }
+    return 1;
+}
+
+int get_transaction_status(void *object) {
+    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+    int status = DiaDeviceManager_GetTransactionStatus(manager);
+    return status;
+}
+
+int abort_transaction(void *object) {
+    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+    DiaDeviceManager_AbortTransaction(manager);
+    return 0;
+}
+
 int smart_delay_function(void * arg, int ms) {
     struct timespec current_time;
     struct timespec *stored_time = (struct timespec *) arg;
@@ -252,6 +288,66 @@ int recover_relay() {
     return err;
 }
 
+int activate() {
+    char buf_password[1024];
+    char buf_username[1024];
+    if (!file_exists(UNLOCK_KEY)) {
+        printf("your firmware is NOT activated\n");
+        printf("please type in your login:");
+        scanf("%s", buf_username);
+        printf("please type in your password:");
+        scanf("%s", buf_password);
+        int err = network.Login(buf_username, buf_password);
+        if (err) {
+            printf("Can't connect to the authority server, sorry. Please try again later (%d)\n", err );
+            return 1;
+        }
+
+        std::string dev_password;
+        std::string dev_key;
+        err = network.RegisterPostWash(devName, dia_security_get_key(),
+        &dev_password, &dev_key);
+        if (err) {
+            printf("Can't register your device (%d)\n", err);
+            return 1;
+        }
+        dia_security_write_file(UNLOCK_KEY, dev_key.c_str());
+        dia_security_write_file(DEVICE_PASS, dev_password.c_str());
+    }
+
+ /*   std::list<Promotion> prom_list;
+    network.MyPromotions(&prom_list);
+    for (auto it = prom_list.begin(); it != prom_list.end(); ++it)
+    {
+        Promotion elem=*it;
+        fprintf(stderr, "code promo: %s . info promo: %s  . time1=%s map:",elem.code.c_str(),elem.info.c_str(),elem.time_stamp_start.c_str());
+        for (auto it = elem.required_details.begin(); it != elem.required_details.end(); ++it) {
+                fprintf(stderr, "%s:%s; ",(*it).first.c_str(),(*it).second.c_str());
+            }
+            fprintf(stderr,"\n");
+    }
+    prom_list.clear();
+
+  Registries* MyRegistry= new Registries;
+  network.MyRegistry(MyRegistry);
+            for (auto it = MyRegistry->registries.begin(); it !=  MyRegistry->registries.end(); ++it) {
+                    fprintf(stderr, "%s:%s; \n",(*it).first.c_str(),(*it).second.c_str());
+                }
+    delete(MyRegistry);
+
+
+
+  create_relay_report_t* last_relay_report=new create_relay_report_t;
+  network.get_last_relay_report(last_relay_report);
+  fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s\n",last_relay_report->id,
+  last_relay_report->transaction_id,last_relay_report->station_post_id.c_str(),last_relay_report->time_stamp.c_str());
+  delete last_relay_report;
+  for(int i = 0; i < MAX_RELAY_NUM; i ++) {
+    fprintf(stderr,"id:%d switched_count:%d  total_time_on:%d \n",i,last_relay_report->RelayStats[i].switched_count,last_relay_report->RelayStats[i].total_time_on);
+  }*/
+
+    return 0;
+}
 
 std::string GetLocalData(std::string key) {
     std::string filename = "registry_" + key + ".reg";
@@ -324,6 +420,27 @@ int main(int argc, char ** argv) {
         return 1;
     }
 
+    // -----------------TEST CODE-----------------------
+    /*
+    DiaDeviceManager man;
+    delay(1000);
+    DiaDeviceManager_AddCardReader(&man);
+    delay(1000);
+    request_transaction(&man, 100);
+
+    int done = 1;
+    while (done) {
+	    int status = get_transaction_status(&man);
+	    printf("Status: %d\n", status);
+	    int money = get_electronical(&man);
+	    printf("Money: %d\n", money);
+	    if (money > 0)
+                done = 0;
+	    delay(1000);
+    }
+    // ----------------TEST CODE------------------------
+    */
+
     std::string serverIP = "localhost";
     int res = -1;
 
@@ -361,6 +478,13 @@ int main(int argc, char ** argv) {
     int f = 1;
     printf("version: %s\n", DIA_VERSION);
 
+    int err = activate();
+
+    if(err) {
+        printf("activation error\n");
+        return err;
+    }
+
     if (file_exists(UNLOCK_KEY)) {
         char unlock_key[1024];
         dia_security_read_file(UNLOCK_KEY, unlock_key, sizeof(unlock_key));
@@ -375,18 +499,23 @@ int main(int argc, char ** argv) {
         printf(" DEMO MODE ...! \n");
     }
 
+    err = network.Login(dia_security_get_key(), devPass);
+    if (err) {
+        printf("Can't login to diae server (%d)\n", err );
+    }
+
     DiaDeviceManager manager;
+    DiaDeviceManager_AddCardReader(&manager);
+
     SDL_Event event;
 
     DiaConfiguration configuration(folder);
     config = &configuration;
-    int err = 0;
     err = configuration.Init();
     if (err!=0) {
         printf("can't run due to the configuration error\n");
         return 1;
     }
-    
     RecoverRegistry();
     recover_money();
     recover_relay();
@@ -434,6 +563,12 @@ int main(int argc, char ** argv) {
     hardware->banknote_object = &manager;
     hardware->get_banknotes_function = get_banknotes;
 
+    hardware->electronical_object = &manager;
+    hardware->get_electronical_function = get_electronical;    
+    hardware->request_transaction_function = request_transaction;  
+    hardware->get_transaction_status_function = get_transaction_status;
+    hardware->abort_transaction_function = abort_transaction;
+
     hardware->delay_object = &stored_time;
     hardware->smart_delay_function = smart_delay_function;
 
@@ -443,8 +578,6 @@ int main(int argc, char ** argv) {
     // end of runtime init
 
     int keypress = 0;
-
-
 
     //TODO REPORT POWER ON HERE
     // if(f)  then its NOT CORRECT KEY MODE
@@ -475,7 +608,6 @@ int main(int argc, char ** argv) {
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
-                        // Press UP to top up the balance (it's a cheat!)
                         case SDLK_UP:
                             _Balance+=10;
                             configuration._Income.totalIncomeService+=10;

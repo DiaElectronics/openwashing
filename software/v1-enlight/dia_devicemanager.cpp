@@ -2,13 +2,19 @@
 
 #include <pthread.h>
 #include <string.h>
+#include <string>
 #include <dirent.h>
 #include <stdio.h>
 #include "dia_nv9usb.h"
 #include "dia_microcoinsp.h"
+#include "dia_cardreader.h"
 #include <wiringPi.h>
 #include "money_types.h"
 
+void DiaDeviceManager_AddCardReader(DiaDeviceManager * manager) {
+    printf("Card reader added to Device Manager\n");
+    manager->_CardReader = new DiaCardReader(manager, DiaDeviceManager_ReportMoney);
+}
 
 void DiaDeviceManager_StartDeviceScan(DiaDeviceManager * manager)
 {
@@ -38,6 +44,7 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
         dev->Manager = manager;
         dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
         dev->Open();
+
         if (isACM)
         {
             printf("\nFOUND nv9\n\n");
@@ -127,6 +134,7 @@ DiaDeviceManager::~DiaDeviceManager() {
 }
 
 void DiaDeviceManager_ReportMoney(void *manager, int moneyType, int money) {
+    printf("Entered report money\n");
     DiaDeviceManager * Manager = (DiaDeviceManager *) manager;
     if (moneyType == DIA_BANKNOTES) {
         Manager->BanknoteMoney += money;
@@ -145,10 +153,42 @@ void DiaDeviceManager_ReportMoney(void *manager, int moneyType, int money) {
 void * DiaDeviceManager_WorkingThread(void * manager)
 {
     DiaDeviceManager * Manager = (DiaDeviceManager *) manager;
+
     while(Manager->NeedWorking)
     {
         DiaDeviceManager_ScanDevices(Manager);
         delay(100);
     }
     return 0;
+}
+
+void DiaDeviceManager_PerformTransaction(void *manager, int money) {
+    if (manager == NULL)
+    {
+        printf("DiaDeviceManager Perform Transaction got NULL driver\n");
+	    return;
+    }
+    DiaDeviceManager * Manager = (DiaDeviceManager *) manager;
+    printf("DiaDeviceManager got Perform Transaction, money = %d\n", money);
+    DiaCardReader_PerformTransaction(Manager->_CardReader, money);
+}
+
+void DiaDeviceManager_AbortTransaction(void *manager) {
+    DiaDeviceManager * Manager = (DiaDeviceManager *) manager;
+    if(manager == NULL)
+    {
+        printf("DiaDeviceManager Abort Transaction got NULL driver\n");
+        return;
+    }
+    DiaCardReader_AbortTransaction(&Manager->_CardReader);
+}
+
+int DiaDeviceManager_GetTransactionStatus(void *manager) {
+    DiaDeviceManager * Manager = (DiaDeviceManager *) manager;
+    if(manager == NULL)
+    {
+        printf("DiaDeviceManager Get Transaction Status got NULL driver\n");
+        return -1;
+    }
+    return DiaCardReader_GetTransactionStatus(&Manager->_CardReader);
 }

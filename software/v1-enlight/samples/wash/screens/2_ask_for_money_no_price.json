@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"848;480",
+      "src":"pic/2/background_no_price.png",
+      "visible":"true"
+    }
+  ]
+}

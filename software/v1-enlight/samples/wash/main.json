@@ -1,0 +1,92 @@
+{
+  "name": "default configuration",
+  "resolution": "848x480",
+  "screens": [
+    {
+      "id": "welcome",
+      "src": "screens/1_welcome.json"
+    },
+    {
+      "id": "ask_for_money",
+      "src": "screens/2_ask_for_money.json"
+    },
+    {
+      "id": "ask_for_money_no_price",
+      "src": "screens/2_ask_for_money_no_price.json"
+    },
+    {
+      "id": "start",
+      "src": "screens/3_start.json"
+    },  
+    {
+      "id": "water",
+      "src": "screens/4_water.json"
+    },  
+    {
+      "id": "soap",
+      "src": "screens/5_soap.json"
+    },  
+    {
+      "id": "active_soap",
+      "src": "screens/6_active_soap.json"
+    }, 
+    {
+      "id": "pause",
+      "src": "screens/7_pause.json"
+    },
+    {
+      "id": "osmosian",
+      "src": "screens/8_osmosian.json"
+    },
+    {
+      "id": "wax",
+      "src": "screens/9_wax.json"
+    },
+    {
+      "id": "thanks",
+      "src": "screens/10_thanks.json"
+    },
+    {
+      "id": "choose_method",
+      "src": "screens/11_choose_method.json"
+    },
+    {
+      "id": "select_price",
+      "src": "screens/12_select_price.json"
+    },
+    {
+      "id": "wait_for_card",
+      "src": "screens/13_wait_for_card.json"
+    }
+  ],
+  "buttons": 6,
+  "relays": 6,
+  "endpoint": "http://app.diae.ru/v0/gql/",
+  "programs": [
+    {
+      "id": "pause",
+      "src": "programs/pause.json"
+    },
+    {
+      "id": "water",
+      "src": "programs/water.json"
+    },
+    {
+      "id": "soap",
+      "src": "programs/soap.json"
+    },
+    {
+      "id": "active_soap",
+      "src": "programs/active_soap.json"
+    },
+    {
+      "id": "osmosian",
+      "src": "programs/osmosian.json"
+    },
+    {
+      "id": "wax",
+      "src": "programs/wax.json"
+    }
+  ],
+  "script": "script.lua"
+}

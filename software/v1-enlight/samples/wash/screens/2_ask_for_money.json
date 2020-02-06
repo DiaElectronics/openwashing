@@ -1,0 +1,82 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"848;480",
+      "src":"pic/2/background.png",
+      "visible":"true"
+    },
+    {
+      "id":"water",
+      "type": "digits",
+      "position": "230;92",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    },
+    {
+      "id":"soap",
+      "type": "digits",
+      "position": "230;125",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    },
+    {
+      "id":"active_soap",
+      "type": "digits",
+      "position": "230;158",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    },
+    {
+      "id":"osmosian",
+      "type": "digits",
+      "position": "230;191",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    },
+    {
+      "id":"wax",
+      "type": "digits",
+      "position": "230;224",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    },
+    {
+      "id":"pause",
+      "type": "digits",
+      "position": "230;257",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "2",
+      "visible":"true"
+    }, 
+    {
+      "id":"pause_sec",
+      "type": "digits",
+      "position": "451;257",
+      "font": "standard_number",
+      "symbol_size":"16;28",
+      "padding": "2",
+      "length": "3",
+      "visible":"true"
+    }
+  ]
+}
