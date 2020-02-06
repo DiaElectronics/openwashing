@@ -213,9 +213,11 @@ int CentralServerDialog() {
         _100MsIntervalsCount = 0;
         
         printf("Sending another PING request to server...\n");
-        network.PingRequest(network.GetHostName());
+        int* serviceMoney = 0;
+        network.PingRequest(network.GetHostName(), serviceMoney);
 
-        // TODO: get service money somehow
+        config->_Income.totalIncomeService += *serviceMoney;
+        SaveIncome();
     }
     return 0;
 }
@@ -280,7 +282,7 @@ int RecoverRelay() {
         last_relay_report->time_stamp.c_str());
 
         bool update = false;
-        for(int i = 0;i < MAX_RELAY_NUM; i++) {
+        for(int i = 0; i < MAX_RELAY_NUM; i++) {
             if ((gpio->Stat.relay_switch[i+1] < last_relay_report->RelayStats[i].switched_count) ||
                 (gpio->Stat.relay_time[i+1] < last_relay_report->RelayStats[i].total_time_on*1000)) {
                     update = true;
@@ -288,7 +290,7 @@ int RecoverRelay() {
         }
         if (update) {
             fprintf(stderr,"Update stat\n");
-            for(int i=0; i<MAX_RELAY_NUM; i++) {
+            for(int i = 0; i < MAX_RELAY_NUM; i++) {
                 gpio->Stat.relay_switch[i+1] = last_relay_report->RelayStats[i].switched_count;
                 gpio->Stat.relay_time[i+1] = last_relay_report->RelayStats[i].total_time_on*1000;
             }
@@ -332,7 +334,7 @@ int RecoverRegistry() {
     
     DiaRuntimeRegistry* registry = &(config->GetRuntime()->Registry);
     
-    if (err==0) { // Connection to CRM is OK
+    if (err == 0) { // Connection to CRM is OK
         fprintf(stderr, "Online registry: \n");
     
         for (auto it = MyRegistry->registries.begin(); it !=  MyRegistry->registries.end(); ++it) {

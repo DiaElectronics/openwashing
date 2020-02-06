@@ -184,7 +184,7 @@ class DiaNetwork {
         // Scan whole block
         for (int i = 1; i <= 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
-            err = this->PingRequest(reqUrl);
+            err = this->PingRequest(reqUrl, NULL);
 
             if (!err) {
                 // We found it!
@@ -259,7 +259,8 @@ class DiaNetwork {
 
     // PING request to specified URL. 
     // Returns 0, if request was OK, other value - in case of failure.
-    int PingRequest(std::string url) {
+    // Modifies service money, if server returned that kind of data.
+    int PingRequest(std::string url, int* service_money) {
         std::string answer;
 
         ping_report_t ping_data;
@@ -298,7 +299,9 @@ class DiaNetwork {
             if(json_is_object(obj_service_amount)) {
                 int serviceMoney = (int)json_integer_value(obj_service_amount);
                 
-                // TODO: trasfer money somehow
+                if (service_money != NULL) {
+                    *service_money = serviceMoney;
+                }
                 break;
             }
             
