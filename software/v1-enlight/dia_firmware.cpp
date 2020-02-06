@@ -403,7 +403,7 @@ int main(int argc, char ** argv) {
         printf("Public key read from file: %s \n", centralKey);
 
     } else {
-        network.getMacAddress(centralKey);
+        network.GetMacAddress(centralKey);
         printf("MAC address: %s\n", centralKey);
 
         dia_security_write_file(CENTRALWASH_KEY, centralKey);
