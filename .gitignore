@@ -1,3 +1,6 @@
+# Registry data
+*.reg
+
 # Prerequisites
 *.d
 
@@ -30,3 +33,4 @@
 *.exe
 *.out
 *.app
+*.exe.debug
