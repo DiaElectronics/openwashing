@@ -35,7 +35,7 @@ DiaConfiguration * config;
 
 int _100MsIntervalsCount;
 char devName[128];
-char centralKey[32];
+char centralKey[12];
 
 int _DebugKey = 0;
 int _Balance = 0;
@@ -396,19 +396,15 @@ int main(int argc, char ** argv) {
         return 1;
     }
 
-    network.getMacAddress(centralKey);
-
-    printf("MAC: %s\n", centralKey);
-
     // Check public key on disk
-    // If it doesn't exist - generate it
+    // If it doesn't exist - get it from MAC
     if (file_exists(CENTRALWASH_KEY)) {
         dia_security_read_file(CENTRALWASH_KEY, centralKey, sizeof(centralKey)+1);
         printf("Public key read from file: %s \n", centralKey);
 
     } else {
-        dia_security_generate_public_key(centralKey, sizeof(centralKey));
-        printf("Public key generated: %s \n", centralKey);
+        network.getMacAddress(centralKey);
+        printf("MAC address: %s\n", centralKey);
 
         dia_security_write_file(CENTRALWASH_KEY, centralKey);
         printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
