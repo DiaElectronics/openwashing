@@ -27,15 +27,15 @@
 //#define USE_GPIO
 #define USE_KEYBOARD
 
-#define UNLOCK_KEY "/home/pi/unlock.key"
+#define CENTRALWASH_KEY "/home/anton/centralwash.key"
 #define ID_KEY "/home/pi/id.txt"
-#define DEVICE_PASS "/home/pi/pass.key"
 #define BILLION 1000000000
 
 DiaConfiguration * config;
 
 int _100MsIntervalsCount;
 char devName[128];
+char centralKey[8];
 
 int _DebugKey = 0;
 int _Balance = 0;
@@ -58,7 +58,7 @@ int GetKey(DiaGpio * _gpio) {
 
 DiaNetwork network("http://app.diae.ru:8001/v0/graphql");
 
-// functions for runtime, move out this crap
+////// Runtime functions ///////
 int get_key(void *object) {
     return GetKey((DiaGpio *)object);
 }
@@ -190,8 +190,11 @@ int smart_delay_function(void * arg, int ms) {
     }
     return 0;
 }
-// end of
+/////// End of Runtime functions ///////
 
+/////// Central server communication functions //////
+
+/*
 inline int SendStatusRequest(const char * devName) {
     if (!config || !config->GetGpio()) {
         return 0;
@@ -313,41 +316,11 @@ int activate() {
         dia_security_write_file(UNLOCK_KEY, dev_key.c_str());
         dia_security_write_file(DEVICE_PASS, dev_password.c_str());
     }
-
- /*   std::list<Promotion> prom_list;
-    network.MyPromotions(&prom_list);
-    for (auto it = prom_list.begin(); it != prom_list.end(); ++it)
-    {
-        Promotion elem=*it;
-        fprintf(stderr, "code promo: %s . info promo: %s  . time1=%s map:",elem.code.c_str(),elem.info.c_str(),elem.time_stamp_start.c_str());
-        for (auto it = elem.required_details.begin(); it != elem.required_details.end(); ++it) {
-                fprintf(stderr, "%s:%s; ",(*it).first.c_str(),(*it).second.c_str());
-            }
-            fprintf(stderr,"\n");
-    }
-    prom_list.clear();
-
-  Registries* MyRegistry= new Registries;
-  network.MyRegistry(MyRegistry);
-            for (auto it = MyRegistry->registries.begin(); it !=  MyRegistry->registries.end(); ++it) {
-                    fprintf(stderr, "%s:%s; \n",(*it).first.c_str(),(*it).second.c_str());
-                }
-    delete(MyRegistry);
-
-
-
-  create_relay_report_t* last_relay_report=new create_relay_report_t;
-  network.get_last_relay_report(last_relay_report);
-  fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s\n",last_relay_report->id,
-  last_relay_report->transaction_id,last_relay_report->station_post_id.c_str(),last_relay_report->time_stamp.c_str());
-  delete last_relay_report;
-  for(int i = 0; i < MAX_RELAY_NUM; i ++) {
-    fprintf(stderr,"id:%d switched_count:%d  total_time_on:%d \n",i,last_relay_report->RelayStats[i].switched_count,last_relay_report->RelayStats[i].total_time_on);
-  }*/
-
     return 0;
 }
+//////// End of Central server communication functions /////////
 
+//////// Local registry Save/Load functions /////////
 std::string GetLocalData(std::string key) {
     std::string filename = "registry_" + key + ".reg";
     if (file_exists(filename.c_str())) {
@@ -366,6 +339,7 @@ void SetLocalData(std::string key, std::string value) {
     fprintf(stderr, "Key: %s, Value: %s \n", key.c_str(), value.c_str());
     dia_security_write_file(filename.c_str(), value.c_str());
 }
+/////////////////////////////////////////////////////
 
 int RecoverRegistry() {
     printf("---START-----------------------------------------------------------------\n");
@@ -409,57 +383,51 @@ int RecoverRegistry() {
     printf("--------------------------------------------------------------------------\n");
     return err;
 }
-
-
+*/
 int main(int argc, char ** argv) {
     config = 0;
-    // timer initialization
+
+    // Timer initialization
     struct timespec stored_time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &stored_time);
 
     if (argc>2) {
-        fprintf(stderr, "too many parameters. Please leave just folder with the firmware. like [firmware.exe .] \n");
+        fprintf(stderr, "Too many parameters. Please leave just folder with the firmware, like [firmware.exe .] \n");
         return 1;
     }
 
-    // -----------------TEST CODE-----------------------
-    /*
-    DiaDeviceManager man;
-    delay(1000);
-    DiaDeviceManager_AddCardReader(&man);
-    delay(1000);
-    request_transaction(&man, 100);
+    // Check public key on disk
+    // If it doesn't exist - generate it
+    if (file_exists(CENTRALWASH_KEY)) {
+        dia_security_read_file(CENTRALWASH_KEY, centralKey, sizeof(centralKey)+1);
+        printf("Public key read from file: %s \n", centralKey);
 
-    int done = 1;
-    while (done) {
-	    int status = get_transaction_status(&man);
-	    printf("Status: %d\n", status);
-	    int money = get_electronical(&man);
-	    printf("Money: %d\n", money);
-	    if (money > 0)
-                done = 0;
-	    delay(1000);
+    } else {
+        dia_security_generate_public_key(centralKey, sizeof(centralKey));
+        printf("Public key generated: %s \n", centralKey);
+
+        dia_security_write_file(CENTRALWASH_KEY, centralKey);
+        printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
     }
-    // ----------------TEST CODE------------------------
-    */
-
+    /*
+    // Locate Central wash server 
     std::string serverIP = "localhost";
     int res = -1;
 
     while (res != 0) {
-	printf("Looking for central-wash service ...\n");
+	    printf("Looking for central-wash service ...\n");
         res = network.PingServer(&serverIP);
         
         if (res == 0)
             printf("Server located on:\n%s\n", serverIP.c_str());
         else {
-            printf("Failed... Next attempt soon\n");
+            printf("Failed... Next attempt soon...\n");
             sleep(60);
         }
     }
-
     network.OnlineCashRegister = serverIP;
 
+    // Read ID from file
     strcpy(devName,"NO_ID");
     dia_security_read_file(ID_KEY, devName, sizeof(devName));
     for (unsigned int i=0;i<sizeof(devName);i++) {
@@ -467,19 +435,18 @@ int main(int argc, char ** argv) {
             devName[i] = 0;
         }
     }
+    printf("Device name: %s \n", devName);
 
-    printf("device name: %s \n", devName);
-
+    // Set working folder 
     std::string folder = "./firmware";
     if (argc == 2) {
         folder = argv[1];
     }
-
-    printf("looking for firmware in [%s]\n", folder.c_str());
-
+    printf("Looking for firmware in [%s]\n", folder.c_str());
+    printf("Version: %s\n", DIA_VERSION);
+    */
+    /*
     int f = 1;
-    printf("version: %s\n", DIA_VERSION);
-
     int err = activate();
 
     if(err) {
@@ -505,7 +472,9 @@ int main(int argc, char ** argv) {
     if (err) {
         printf("Can't login to diae server (%d)\n", err );
     }
-
+    */
+    /*
+    // Runtime and firmware initialisation
     DiaDeviceManager manager;
     DiaDeviceManager_AddCardReader(&manager);
 
@@ -515,16 +484,16 @@ int main(int argc, char ** argv) {
     config = &configuration;
     err = configuration.Init();
     if (err!=0) {
-        printf("can't run due to the configuration error\n");
+        printf("Can't run due to the configuration error\n");
         return 1;
     }
     RecoverRegistry();
     recover_money();
     recover_relay();
 
-    //printf("Configuration is loaded...\n");
+    printf("Configuration is loaded...\n");
 
-    // probably this should be moved to a proper file
+    // Screen load
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it=configuration.ScreenConfigs.begin(); it!=configuration.ScreenConfigs.end() ;it++) {
         std::string currentID = it->second->id;
@@ -545,8 +514,7 @@ int main(int argc, char ** argv) {
 
     configuration.GetRuntime()->AddAnimations();
 
-    /////
-
+    ///// Runtime init
     DiaRuntimeHardware * hardware = new DiaRuntimeHardware();
     hardware->keys_object = configuration.GetGpio();
     hardware->get_keys_function = get_key;
@@ -575,25 +543,10 @@ int main(int argc, char ** argv) {
     hardware->smart_delay_function = smart_delay_function;
 
     configuration.GetRuntime()->AddHardware(hardware);
-
     configuration.GetRuntime()->AddRegistry(&(config->GetRuntime()->Registry));
-    // end of runtime init
-
+    
+    // Runtime start
     int keypress = 0;
-
-    //TODO REPORT POWER ON HERE
-    // if(f)  then its NOT CORRECT KEY MODE
-
-    // TODO INITIALIZE CUSTOM FIRMWARE HERE
-
-// Duplicated loading from the database, most likely this is extra code
-/*
-    if(configuration.GetStorage()) {
-        printf("trying to recover income statistics\n");
-      configuration.GetStorage()->load(configuration.GetStorage()->object,
-        "income", &(configuration._Income), sizeof(configuration._Income));
-    }
-*/
     configuration.GetRuntime()->Setup();
     while(!keypress)
     {
@@ -653,7 +606,7 @@ int main(int argc, char ** argv) {
             }
         }
     }
-
+    */
     delay(2000);
     return 0;
 }

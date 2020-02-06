@@ -141,7 +141,7 @@ class DiaNetwork {
 
         curl_global_init(CURL_GLOBAL_ALL);
 
-	char* tmpUrl = new char[16];            	    
+	    char* tmpUrl = new char[16];            	    
         int fd;
         struct ifreq ifr;
 
@@ -154,10 +154,10 @@ class DiaNetwork {
 
         sscanf(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr), "%s", tmpUrl);
 
-	std::string baseIP(tmpUrl);
+	    std::string baseIP(tmpUrl);
         std::string reqIP;
 
-	// Truncate baseIP to prepare for scan
+	    // Truncate baseIP to prepare for scan
         int dotCount = 0;
         for (int j = 0; j < 12; j++) {
             if (baseIP[j] == '.')
@@ -191,7 +191,7 @@ class DiaNetwork {
             curl_easy_cleanup(curl);            	
         }   	
 
-	delete[] tmpUrl;
+	    delete[] tmpUrl;
         curl_global_cleanup();
         return SERVER_UNAVAILABLE;
     }
