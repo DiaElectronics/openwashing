@@ -1,7 +1,6 @@
 #include "dia_configuration.h"
 #include "dia_functions.h"
 #include "dia_storage_interface.h"
-#include "dia_storage.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -102,31 +101,13 @@ DiaConfiguration::DiaConfiguration(std::string folder) {
     _Gpio = 0;
     _Screen = 0; // use Init();
 
-    // Let's move storage initialization here
-    DiaStore * redis_storage = new DiaStore();
-    redis_storage->Init();
-
     // let's init income
-
     _Income.totalIncomeCoins = 0;
     _Income.totalIncomeBanknotes = 0;
     _Income.totalIncomeElectron = 0;
     _Income.totalIncomeService = 0;
 
-    int isOk=redis_storage->IsOk();
-    _Storage = 0;
-    if (!isOk) {
-        _Storage = CreateEmptyInterface();
-        printf("ERROR: STORAGE IS FAKE\n");
-    } else {
-        _Storage = redis_storage->CreateInterface();
-        int err = _Storage->load(_Storage->object, "income", &_Income, sizeof(_Income));
-        if (err) {
-            printf("INFO: income is not loaded\n");
-        } else {
-            printf("INFO: income is loaded!!!\n");
-        }
-    }
+    _Storage = CreateEmptyInterface();
 }
 int DiaConfiguration::InitFromJson(json_t * configuration_json) {
     if (configuration_json == 0) {
