@@ -61,7 +61,7 @@ init_prices = function()
     if price_p2 == 0 then price_p2 = 18 end
 
     price_p3 = get_price("price3")
-    if price_p3 == 0 then price_p3 = 36 end
+    if price_p3 == 0 then price_p3 = 18 end
 
     price_p4 = get_price("price4")
     if price_p4 == 0 then price_p4 = 18 end
