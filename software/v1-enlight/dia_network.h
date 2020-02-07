@@ -110,7 +110,6 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-        curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -146,6 +145,17 @@ public:
 
         sscanf(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr), "%s", tmpUrl);
 
+        int err = 0;
+        int tmp = 0;
+
+        printf("Checking localhost...\n");
+        err = this->SendPingRequest("localhost", tmp);
+        if (!err) {
+            printf("Server is located on localhost\n");
+            delete[] tmpUrl;
+            *ip = "localhost";
+        }
+
 	    std::string baseIP(tmpUrl);
         std::string reqIP;
 
@@ -159,11 +169,9 @@ public:
                 break;
         }
 
-        int err = 0;
         // Scan whole block
         for (int i = 1; i <= 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
-            int tmp = 0;
             err = this->SendPingRequest(reqUrl, tmp);
 
             if (!err) {
@@ -219,7 +227,7 @@ public:
 
     // Returns Central Server IP address.
     std::string GetCentralServerAddress() {
-        std::string serverIP = "localhost";
+        std::string serverIP = "";
         int res = -1;
 
 	    printf("Looking for Central-wash server ...\n");

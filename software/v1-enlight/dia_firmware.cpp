@@ -432,6 +432,11 @@ int main(int argc, char ** argv) {
     network.SetPublicKey(std::string(centralKey));
     
     std::string serverIP = network.GetCentralServerAddress();
+    if (serverIP == "") {
+        printf("Error: Center Server is unavailable\n");
+        return 1;
+    }
+    
     network.SetHostAddress(serverIP);
     
     // Runtime and firmware initialization
