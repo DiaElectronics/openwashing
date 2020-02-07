@@ -527,7 +527,6 @@ public:
             printf("No connection to server\n");
             return result;
         }
-        int err = 0;
         
         json_t *object;
         json_error_t error;
