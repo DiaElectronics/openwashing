@@ -35,6 +35,7 @@ class NetworkMessage {
     std::string json_request;
     std::string type_request;
     std::string time_stamp;
+    std::string route;
     uint64_t stime;
 };
 
@@ -122,7 +123,6 @@ public:
             return 1;
         }
         *answer = raw_answer.data;
-        fprintf(stderr, "Answer from server: %s\n",raw_answer.data);
         DestructCurlAnswer(&raw_answer);
         curl_easy_cleanup(curl);
         curl_slist_free_all(headers);
@@ -356,7 +356,7 @@ public:
         std::string json_money_report_request = json_create_money_report(&money_report_data);
 
         // Send a request
-        CreateAndPushEntry(json_money_report_request);
+        CreateAndPushEntry(json_money_report_request, "/save-money");
         return 0;
     }
 
@@ -373,7 +373,7 @@ public:
         std::string json_relay_report_request = json_create_relay_report(&relay_report_data);
 
         // Send a request
-        CreateAndPushEntry(json_relay_report_request);
+        CreateAndPushEntry(json_relay_report_request, "/save-relay");
         return 0;
     }
 
@@ -385,7 +385,8 @@ public:
         std::string json_get_last_money_report_request = json_get_last_money_report();
 
         // Send request to Central Server
-        int res = SendRequest(&json_get_last_money_report_request, &answer, _Host);
+	std::string url = _Host + _Port + "/load-money";
+        int res = SendRequest(&json_get_last_money_report_request, &answer, url);
         
         if (res > 0) {
             printf("No connection to server\n");
@@ -456,7 +457,8 @@ public:
         std::string json_get_last_relay_report_request = json_get_last_relay_report();
 
         // Send request to Central Server
-        int res = SendRequest(&json_get_last_relay_report_request, &answer, _Host);
+	std::string url = _Host + _Port + "/load-relay";
+        int res = SendRequest(&json_get_last_relay_report_request, &answer, url);
         
         if (res > 0) {
             printf("No connection to server\n");
@@ -523,6 +525,28 @@ public:
         return err;
     }
 
+    // Sends SAVE request to Central Server and decodes JSON result to value string.
+    // Gets key and value strings.
+    std::string SetRegistryValueByKey(std::string key, std::string value) {
+        std::string answer;
+        std::string result = "";
+
+        // Encode SAVE request to JSON with key string
+        std::string set_registry_value = json_set_registry_value(key, value);
+        printf("JSON:\n%s\n", set_registry_value.c_str());
+
+        // Send request to Central Server
+        std::string url = _Host + _Port + "/save";
+        int res = SendRequest(&set_registry_value, &answer, url);
+
+        printf("Server answer: \n%s\n", answer.c_str());
+
+        if (res > 0) {
+            printf("No connection to server\n");
+        }
+        return result;
+    }
+
     // Sends LOAD request to Central Server and decodes JSON result to value string.
     // Gets key string.
     std::string GetRegistryValueByKey(std::string key) {
@@ -531,40 +555,19 @@ public:
 
         // Encode LOAD request to JSON with key string
         std::string get_registry_value = json_get_registry_value(key);
+	printf("JSON:\n%s\n", get_registry_value.c_str());
 
         // Send request to Central Server
-        int res = SendRequest(&get_registry_value, &answer, _Host);
+	std::string url = _Host + _Port + "/load";
+        int res = SendRequest(&get_registry_value, &answer, url);
         
+	printf("Server answer: %s\n", answer.c_str());
+
         if (res > 0) {
             printf("No connection to server\n");
-            return result;
-        }
-        
-        json_t *object;
-        json_error_t error;
-        object = json_loads(answer.c_str(), 0, &error);
-        do {
-            if (!object) {
-                printf("Error in GetRegistryValue on line %d: %s\n", error.line, error.text);
-                result = "";
-                break;
-            }
-
-            if(!json_is_object(object)) {
-                result = "";
-                break;
-            }
-
-            json_t *obj_value;
-            obj_value = json_object_get(object, "Value");
-            if(!json_is_object(obj_value)) {
-                result = "";
-                break;
-            }
-            result = json_string_value(obj_value);
-
-        } while(0);
-        json_decref(object);
+        } else {
+	    result = answer.substr(1, 2);
+	}
         return result;
     }
 
@@ -607,7 +610,8 @@ private:
         if (!err) {
             if(message && message->json_request != "") {
                 std::string answer;
-                int res = SendRequest(&(message->json_request), &answer, _Host);
+		std::string url = _Host + _Port + message->route;
+                int res = SendRequest(&(message->json_request), &answer, url);
 
                 //let's ignore the answer for now;
                 if (res == SERVER_UNAVAILABLE) {
@@ -627,7 +631,7 @@ private:
     }
 
     // Add new message (report) to the channel. Thread will pop it in the future.
-    int CreateAndPushEntry(std::string json_string) {
+    int CreateAndPushEntry(std::string json_string, std::string route) {
         NetworkMessage * entry = new NetworkMessage();
         if(!entry) {
             return 1;
@@ -635,6 +639,7 @@ private:
 
         entry->stime = time(NULL);
         entry->json_request = json_string;
+	entry->route = route;
 
         if (channel.Push(entry) == CHANNEL_BUFFER_OVERFLOW) {
             printf("CHANNEL BUFFER OVERFLOW\n");
@@ -700,13 +705,31 @@ private:
         return res;
     }
 
+    // Encodes key and value to JSON string.
+    std::string json_set_registry_value(std::string key, std::string value) {
+        json_t *object = json_object();
+	json_t *keypair = json_object();
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(keypair, "Key", json_string(key.c_str()));
+	json_object_set_new(keypair, "Value", json_string(value.c_str()));
+	json_object_set_new(object, "KeyPair", keypair);
+
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        json_decref(object);
+        return res;
+    }
+
     // Encodes key to JSON string.
     std::string json_get_registry_value(std::string key) {
         json_t *object = json_object();
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         json_object_set_new(object, "Key", json_string(key.c_str()));
-        
+
         char *str = json_dumps(object, 0);
         std::string res = str;
 

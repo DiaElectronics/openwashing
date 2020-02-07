@@ -347,6 +347,7 @@ int RecoverRegistry() {
 
     int tmp = 0;
     int err = network.SendPingRequest(network.GetHostName(), tmp);
+    std::string default_price = "20";
 
     if (!err) {
         // Load all prices in online mode
@@ -357,20 +358,22 @@ int RecoverRegistry() {
             std::string value = network.GetRegistryValueByKey(key);
 
             if (value != "") {
-                registry->SetValue(key.c_str(), value.c_str());
                 fprintf(stderr, "Key-value read online => %s:%s; \n", key.c_str(), value.c_str());
+            } else {
+		fprintf(stderr, "Server returned empty value, setting default...\n");
+		value = default_price;
+		network.SetRegistryValueByKey(key, value);
+	    }
+	    registry->SetValue(key.c_str(), value.c_str());
 
-                std::string localData = GetLocalData(key);
-                if (localData != value) {
-                    SetLocalData(key, value);
-                }
-            }
+	    std::string localData = GetLocalData(key);
+	    if (localData != value) {
+		SetLocalData(key, value);
+	    }
         }
     } else {
         fprintf(stderr, "Offline mode, checking local registries...\n");
-        
-        std::string default_price = "20";
-        
+
         // 6 washing modes ~ 6 prices
         for (int i = 1; i < 7; i++) {
             std::string current_key = "price" + std::to_string(i);
@@ -457,7 +460,7 @@ int main(int argc, char ** argv) {
     RecoverData();
 
     printf("Configuration is loaded...\n");
-
+/*
     // Screen load
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
@@ -594,7 +597,7 @@ int main(int argc, char ** argv) {
             }
         }
     }
-    
+    */
     delay(2000);
     return 0;
 }
