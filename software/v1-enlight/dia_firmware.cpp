@@ -240,6 +240,7 @@ int CentralServerDialog() {
         network.SendPingRequest(network.GetHostName(), serviceMoney);
 
         if (serviceMoney > 0) {
+	    _Balance += serviceMoney;
             config->_Income.totalIncomeService += serviceMoney;
             SaveIncome();
         }      
@@ -465,7 +466,7 @@ int main(int argc, char ** argv) {
     RecoverData();
 
     printf("Configuration is loaded...\n");
-/*
+
     // Screen load
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
@@ -602,7 +603,7 @@ int main(int argc, char ** argv) {
             }
         }
     }
-    */
+
     delay(2000);
     return 0;
 }

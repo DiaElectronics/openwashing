@@ -257,14 +257,16 @@ public:
         std::string json_ping_request = json_create_ping_report();
         printf("JSON:\n%s\n", json_ping_request.c_str());
         result = SendRequest(&json_ping_request, &answer, url);
+	printf("Server answer on PING:\n%s\n", answer.c_str());
 
+	
         if (result == 2) {
             return 3;
         }
         if (result) {
             return 1;
         }
-
+	
         json_t *object;
         json_error_t error;
 
@@ -278,15 +280,13 @@ public:
             }
 
             if(!json_is_object(object)) {
+		printf("Not a JSON\n");
                 break;
             }
 
             json_t *obj_service_amount;
             obj_service_amount = json_object_get(object, "serviceAmount");
-            if(json_is_object(obj_service_amount)) {
-                service_money = (int)json_integer_value(obj_service_amount);
-            }
-            break;
+            service_money = (int)json_integer_value(obj_service_amount);
             
         } while (0);
         json_decref(object);
@@ -352,9 +352,10 @@ public:
         money_report_data.cashless_total = cashless_total;
         money_report_data.service_total = service_total;
 
+	printf("Sending money report...\n");
         // Encode data to JSON
         std::string json_money_report_request = json_create_money_report(&money_report_data);
-
+	printf("JSON:\n%s\n", json_money_report_request.c_str());
         // Send a request
         CreateAndPushEntry(json_money_report_request, "/save-money");
         return 0;
@@ -368,10 +369,10 @@ public:
             relay_report_data.RelayStats[i].switched_count = RelayStats[i].switched_count;
             relay_report_data.RelayStats[i].total_time_on = RelayStats[i].total_time_on;
         }
-
+	printf("Sending relay report...\n");
         // Encode data to JSON
         std::string json_relay_report_request = json_create_relay_report(&relay_report_data);
-
+	printf("JSON:\n%s\n", json_relay_report_request.c_str());
         // Send a request
         CreateAndPushEntry(json_relay_report_request, "/save-relay");
         return 0;
@@ -605,10 +606,12 @@ private:
 
         if (!err) {
             if(message && message->json_request != "") {
+		printf("New message popped\n");
                 std::string answer;
 		std::string url = _Host + _Port + message->route;
                 int res = SendRequest(&(message->json_request), &answer, url);
 
+		printf("Answer from server: %s\n", answer.c_str());
                 //let's ignore the answer for now;
                 if (res == SERVER_UNAVAILABLE) {
                     printf("ERR: SERVER IS NOT AVAILABLE\n");
@@ -650,7 +653,7 @@ private:
     std::string json_create_ping_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "Hash", json_string("give me money"));
         char *str = json_dumps(object, 0);
         std::string res = str;
 
