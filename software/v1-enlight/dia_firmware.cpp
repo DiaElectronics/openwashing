@@ -431,8 +431,8 @@ int main(int argc, char ** argv) {
 
     network.SetPublicKey(std::string(centralKey));
     
-    std::string serverIP = network.SearchCentralServer();
-    network.SetHostName(serverIP);
+    std::string serverIP = network.GetCentralServerAddress();
+    network.SetHostAddress(serverIP);
     
     // Runtime and firmware initialization
     DiaDeviceManager manager;

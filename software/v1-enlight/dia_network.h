@@ -204,9 +204,9 @@ public:
         return 0;
     }
 
-    // Sets Central Server host name.
+    // Sets Central Server host address.
     // Also sets same host name to Online Cash Register, which is located on the same server as Central.
-    int SetHostName(std::string hostName) {
+    int SetHostAddress(std::string hostName) {
         _Host = hostName;
         _OnlineCashRegister = hostName;
         return 0;
@@ -521,7 +521,7 @@ public:
         std::string get_registry_value = json_get_registry_value(key);
 
         // Send request to Central Server
-        int res = SendRequest(&get_registry_value, &answer);
+        int res = SendRequest(&get_registry_value, &answer, _Host);
         
         if (res > 0) {
             printf("No connection to server\n");
@@ -595,7 +595,7 @@ private:
         if (!err) {
             if(message && message->json_request != "") {
                 std::string answer;
-                int res = SendRequest(&(message->json_request), &answer);
+                int res = SendRequest(&(message->json_request), &answer, _Host);
 
                 //let's ignore the answer for now;
                 if (res == SERVER_UNAVAILABLE) {
