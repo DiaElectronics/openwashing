@@ -419,27 +419,27 @@ send_receipt = function(post_pos, is_card, amount)
 end
 
 run_p1 = function()
-    run_program(program.p1program)
+    run_program(program.p1relay)
 end
 
 run_p2 = function()
-    run_program(program.p2program)
+    run_program(program.p2relay)
 end
 
 run_p3 = function()
-    run_program(program.p3program)
+    run_program(program.p3relay)
 end
 
 run_p4 = function()
-    run_program(program.p4program)
+    run_program(program.p4relay)
 end
 
 run_p5 = function()
-    run_program(program.p5program)
+    run_program(program.p5relay)
 end
 
 run_p6 = function()
-    run_program(program.p6program)
+    run_program(program.p6relay)
 end
 
 run_stop = function()
