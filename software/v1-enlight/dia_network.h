@@ -172,6 +172,7 @@ public:
         // Scan whole block
         for (int i = 1; i <= 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
+            printf("Using URL: %s\n", reqUrl.c_str());
             err = this->SendPingRequest(reqUrl, tmp);
 
             if (!err) {
@@ -251,10 +252,10 @@ public:
 
         int result;
         std::string json_ping_request = json_create_ping_report();
+        printf("JSON:\n%s\n", json_ping_request.c_str());
         result = SendRequest(&json_ping_request, &answer, url);
 
         if (result == 2) {
-            printf("No connection to server, PING aborted...\n");
             return 3;
         }
         if (result) {
