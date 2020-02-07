@@ -570,7 +570,8 @@ public:
         if (res > 0) {
             printf("No connection to server\n");
         } else {
-	    result = answer.substr(1, 2);
+	    if (answer != "")
+	    	result = answer.substr(1, 2);
 	}
         return result;
     }
