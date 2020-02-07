@@ -22,41 +22,63 @@
 #define WORK 2
 #define PAUSE 3
 
-#define DIA_VERSION "v1.3-enlight"
+#define DIA_VERSION "v1.4-enlight"
 
 //#define USE_GPIO
 #define USE_KEYBOARD
 
 #define CENTRALWASH_KEY "/home/pi/centralwash.key"
-#define ID_KEY "/home/pi/id.txt"
 #define BILLION 1000000000
 
 DiaConfiguration * config;
 
 int _100MsIntervalsCount;
-char devName[128];
+
+// Public key for signing every request to Central Server.
 char centralKey[12];
 
 int _DebugKey = 0;
+
+// Variable for storing an additional money.
+// For instance, service money from Central Server can be transfered inside.
 int _Balance = 0;
+
 int GetKey(DiaGpio * _gpio) {
-    int key =0;
+    int key = 0;
+
 #ifdef USE_GPIO
     key = DiaGpio_GetLastKey(_gpio);
 #endif
 
 #ifdef USE_KEYBOARD
-    if(_DebugKey!=0) key = _DebugKey;
+    if (_DebugKey != 0) {
+        key = _DebugKey;
+    }
     _DebugKey = 0;
 #endif
-    //if(key == 7) key = 6;
+
     if (key) {
-        printf("key %d reported\n", key);
+        printf("Key %d reported\n", key);
     }
     return key;
 }
 
-DiaNetwork network("http://app.diae.ru:8001/v0/graphql");
+// Main object for Client-Server communication.
+DiaNetwork network;
+
+// Saves new income money and creates money report to Central Server.
+void SaveIncome() {
+    if (config && config->GetStorage()) {
+        storage_interface_t * storage = config->GetStorage();
+        storage->save(storage->object, "income", &(config->_Income), sizeof(income));
+
+        network.SendMoneyReport((int)config->_Income.carsTotal,
+        (int)config->_Income.totalIncomeCoins,
+        (int)config->_Income.totalIncomeBanknotes,
+        (int)config->_Income.totalIncomeElectron,
+        (int)config->_Income.totalIncomeService);
+    }
+}
 
 ////// Runtime functions ///////
 int get_key(void *object) {
@@ -72,6 +94,7 @@ int turn_light(void *object, int pin, int animation_id) {
     return 0;
 }
 
+// Creates receipt request to Online Cash Register.
 int send_receipt(int postPosition, int isCard, int amount) {
     return network.ReceiptRequest(postPosition, isCard, amount);
 }
@@ -80,19 +103,12 @@ int turn_program(void *object, int program) {
     #ifdef USE_GPIO
     DiaGpio * gpio = (DiaGpio *)object;
     // negative number will stop all
-    if(program>=MAX_PROGRAMS_COUNT) {
+    if (program >= MAX_PROGRAMS_COUNT) {
         return 1;
     }
     gpio->CurrentProgram = program;
     #endif
     return 0;
-}
-
-void SaveIncome() {
-    if (config && config->GetStorage()) {
-        storage_interface_t * storage = config->GetStorage();
-        storage->save(storage->object, "income", &(config->_Income), sizeof(income));
-    }
 }
 
 int get_coins(void *object) {
@@ -102,10 +118,10 @@ int get_coins(void *object) {
     manager->CoinMoney  = 0;
     _Balance = 0;
         
-    if(curMoney>0) {
+    if (curMoney > 0) {
         printf("coin %d\n", curMoney);
 
-        if(config) {
+        if (config) {
             config->_Income.totalIncomeCoins += curMoney;
             SaveIncome();
         }
@@ -116,9 +132,9 @@ int get_coins(void *object) {
 int get_banknotes(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int curMoney = manager->BanknoteMoney;
-    if(curMoney>0) {
+    if (curMoney > 0) {
         printf("bank %d\n", curMoney);
-        if(config) {
+        if (config) {
             config->_Income.totalIncomeBanknotes += curMoney;
             SaveIncome();
         }
@@ -131,9 +147,9 @@ int get_banknotes(void *object) {
 int get_electronical(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int curMoney = manager->ElectronMoney;
-    if(curMoney>0) {
+    if (curMoney>0) {
         printf("electron %d\n", curMoney);
-        if(config) {
+        if (config) {
             config->_Income.totalIncomeElectron += curMoney;
             SaveIncome();
         }
@@ -143,6 +159,8 @@ int get_electronical(void *object) {
     return curMoney;
 }
 
+// Tries to perform a bank card NFC transaction.
+// Gets money amount.
 int request_transaction(void *object, int money) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     if (money > 0) {
@@ -152,12 +170,16 @@ int request_transaction(void *object, int money) {
     return 1;
 }
 
+// Returns a status of NFC transaction. 
+// Returned value == amount of money, which are expected by the reader.
+// For example, 0 - reader is offline; 100 - reader expects 100 RUB.
 int get_transaction_status(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int status = DiaDeviceManager_GetTransactionStatus(manager);
     return status;
 }
 
+// Deletes actual NFC transaction. 
 int abort_transaction(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     DiaDeviceManager_AbortTransaction(manager);
@@ -213,46 +235,43 @@ int CentralServerDialog() {
         _100MsIntervalsCount = 0;
         
         printf("Sending another PING request to server...\n");
-        int* serviceMoney = 0;
-        network.PingRequest(network.GetHostName(), serviceMoney);
 
-        config->_Income.totalIncomeService += *serviceMoney;
-        SaveIncome();
+        int serviceMoney = 0;
+        network.SendPingRequest(network.GetHostName(), serviceMoney);
+
+        if (serviceMoney > 0) {
+            config->_Income.totalIncomeService += serviceMoney;
+            SaveIncome();
+        }      
     }
     return 0;
 }
 
-// 
 int RecoverMoney() {
-    create_money_report_t* last_money_report = new create_money_report_t;
+    money_report_t* last_money_report = new money_report_t;
 
-    int err = 0;
-    err = network.get_last_money_report(last_money_report);
+    int err = network.GetLastMoneyReport(last_money_report);
 
     if (err == 0) 
     {
-        fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s CarsTotal:%d CoinsTotal:%d BanknotesTotal:%d CashlessTotal:%d TestTotal:%d\n",
-        last_money_report->id,
-        last_money_report->transaction_id,
-        last_money_report->station_post_id.c_str(),
-        last_money_report->time_stamp.c_str(),
+        fprintf(stderr,"CarsTotal:%d CoinsTotal:%d BanknotesTotal:%d CashlessTotal:%d TestTotal:%d\n",
         last_money_report->cars_total,
         last_money_report->coins_total,
         last_money_report->banknotes_total,
         last_money_report->cashless_total,
-        last_money_report->test_total);
+        last_money_report->service_total);
 
         // Update the local storage if needed
         if ((config->_Income.totalIncomeCoins < last_money_report->coins_total) ||
         (config->_Income.totalIncomeBanknotes < last_money_report->banknotes_total) ||
         (config->_Income.totalIncomeElectron < last_money_report->cashless_total) ||
-        (config->_Income.totalIncomeService < last_money_report->test_total) ||
+        (config->_Income.totalIncomeService < last_money_report->service_total) ||
         (config->_Income.carsTotal < last_money_report->cars_total)) 
         {
             config->_Income.totalIncomeCoins = last_money_report->coins_total;
             config->_Income.totalIncomeBanknotes = last_money_report->banknotes_total;
             config->_Income.totalIncomeElectron = last_money_report->cashless_total;
-            config->_Income.totalIncomeService = last_money_report->test_total;
+            config->_Income.totalIncomeService = last_money_report->service_total;
             config->_Income.carsTotal = last_money_report->cars_total;
             SaveIncome();
         }
@@ -267,19 +286,12 @@ int RecoverMoney() {
 }
 
 int RecoverRelay() {
-    create_relay_report_t* last_relay_report = new create_relay_report_t;
+    relay_report_t* last_relay_report = new create_relay_report_t;
 
-    int err = 0;
-    err = network.get_last_relay_report(last_relay_report);
+    int err = network.GetLastRelayReport(last_relay_report);
 
     if (err == 0) {
         DiaGpio * gpio = config->GetGpio();
-
-        fprintf(stderr,"id:%d transaction_id:%d StationPostID:%s TimeStamp:%s\n",
-        last_relay_report->id,
-        last_relay_report->transaction_id,
-        last_relay_report->station_post_id.c_str(),
-        last_relay_report->time_stamp.c_str());
 
         bool update = false;
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
@@ -325,32 +337,48 @@ void SetLocalData(std::string key, std::string value) {
 }
 /////////////////////////////////////////////////////
 
+// Just compilation of recovers.
+void RecoverData() {
+    RecoverRegistry();
+    RecoverMoney();
+    RecoverRelay();
+}
+
 /////// Registry processing function ///////////////
 int RecoverRegistry() {
-    printf("---START-----------------------------------------------------------------\n");
-    Registries* MyRegistry= new Registries;
-    int err = 0;
-    err = network.MyRegistry(MyRegistry);
-    
+    printf("Recovering registries...\n");
+
     DiaRuntimeRegistry* registry = &(config->GetRuntime()->Registry);
-    
-    if (err == 0) { // Connection to CRM is OK
-        fprintf(stderr, "Online registry: \n");
-    
-        for (auto it = MyRegistry->registries.begin(); it !=  MyRegistry->registries.end(); ++it) {
-            registry->SetValue((*it).first.c_str(),(*it).second.c_str());
-            fprintf(stderr, "%s:%s; \n",(*it).first.c_str(),(*it).second.c_str());
-            
-            std::string localData = GetLocalData((*it).first);
-            if (localData != (*it).second) {
-                SetLocalData((*it).first, (*it).second);
+
+    std::string value = "";
+
+    int tmp = 0;
+    int err = network.SendPingRequest(network.GetHostName(), tmp);
+
+    if (!err) {
+        // Load all prices in online mode
+        fprintf(stderr, "Online mode, registry got from Central Server...\n");
+
+        for (int i = 1; i < 7; i++) {
+            std::string key = "price" + std::to_string(i);
+            std::string value = network.GetRegistryValueByKey(key);
+
+            if (value != "") {
+                registry->SetValue(key.c_str(), value.c_str());
+                fprintf(stderr, "Key-value read online => %s:%s; \n", key.c_str(), value.c_str());
+
+                std::string localData = GetLocalData(key);
+                if (localData != value) {
+                    SetLocalData(key, value;
+                }
             }
         }
-    } else { // Offline mode - need to check local data
+    } else {
+        fprintf(stderr, "Offline mode, checking local registries...\n");
+        
         std::string default_price = "20";
         
-        fprintf(stderr, "Local registry: \n");
-        
+        // 6 washing modes ~ 6 prices
         for (int i = 1; i < 7; i++) {
             std::string current_key = "price" + std::to_string(i);
             
@@ -359,13 +387,10 @@ int RecoverRegistry() {
                 value = default_price;
             } 
             
-            registry->SetValue(current_key.c_str(),value.c_str());
-            fprintf(stderr, "%s:%s; \n",current_key.c_str(),value.c_str());
-        } 
-    }
-    
-    delete(MyRegistry);    
-    printf("--------------------------------------------------------------------------\n");
+            registry->SetValue(current_key.c_str(), value.c_str());
+            fprintf(stderr, "Key-value read locally => %s:%s; \n", current_key.c_str(), value.c_str());
+        }
+    }  
     return err;
 }
 //////////////////////////////////////////////
@@ -377,10 +402,18 @@ int main(int argc, char ** argv) {
     struct timespec stored_time;
     clock_gettime(CLOCK_MONOTONIC_RAW, &stored_time);
 
-    if (argc>2) {
+    if (argc > 2) {
         fprintf(stderr, "Too many parameters. Please leave just folder with the firmware, like [firmware.exe .] \n");
         return 1;
     }
+
+    // Set working folder 
+    std::string folder = "./firmware";
+    if (argc == 2) {
+        folder = argv[1];
+    }
+    printf("Looking for firmware in [%s]\n", folder.c_str());
+    printf("Version: %s\n", DIA_VERSION);
 
     // Check public key on disk
     // If it doesn't exist - get it from MAC
@@ -400,27 +433,7 @@ int main(int argc, char ** argv) {
     
     std::string serverIP = network.LocateCentralServer();
     network.SetHostName(serverIP);
-
-    // Read ID from file
-    strcpy(devName,"NO_ID");
-    dia_security_read_file(ID_KEY, devName, sizeof(devName));
-    for (unsigned int i = 0; i < sizeof(devName); i++) {
-        if (devName[i] =='\n' || devName[i] =='\r') {
-            devName[i] = 0;
-        }
-    }
-    printf("Device name: %s \n", devName);
-
-    // Set working folder 
-    std::string folder = "./firmware";
-    if (argc == 2) {
-        folder = argv[1];
-    }
-    printf("Looking for firmware in [%s]\n", folder.c_str());
-    printf("Version: %s\n", DIA_VERSION);
     
-
-    /*
     // Runtime and firmware initialization
     DiaDeviceManager manager;
     DiaDeviceManager_AddCardReader(&manager);
@@ -430,19 +443,19 @@ int main(int argc, char ** argv) {
     DiaConfiguration configuration(folder);
     config = &configuration;
     err = configuration.Init();
-    if (err!=0) {
+    if (err != 0) {
         printf("Can't run due to the configuration error\n");
         return 1;
     }
-    RecoverRegistry();
-    recover_money();
-    recover_relay();
+
+    // Get working data from server: money, relays, prices
+    RecoverData();
 
     printf("Configuration is loaded...\n");
 
     // Screen load
     std::map<std::string, DiaScreenConfig *>::iterator it;
-    for (it=configuration.ScreenConfigs.begin(); it!=configuration.ScreenConfigs.end() ;it++) {
+    for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
         std::string currentID = it->second->id;
         DiaRuntimeScreen * screen = new DiaRuntimeScreen();
         screen->Name = currentID;
@@ -453,6 +466,7 @@ int main(int argc, char ** argv) {
         configuration.GetRuntime()->AddScreen(screen);
     }
 
+    // Program load
     #ifdef USE_GPIO
     configuration.GetRuntime()->AddPrograms(&configuration.GetGpio()->_ProgramMapping);
     #else
@@ -494,66 +508,88 @@ int main(int argc, char ** argv) {
     
     // Runtime start
     int keypress = 0;
+
+    // Call Lua setup function
     configuration.GetRuntime()->Setup();
+
     while(!keypress)
     {
+        // Call Lua loop function
         configuration.GetRuntime()->Loop();
-        SendStatusRequest(devName);
+
+        // Ping server every 2 sec and probably get service money from it
+        CentralServerDialog();
+
+        // Process pressed button
         while(SDL_PollEvent(&event))
         {
             switch (event.type)
             {
                 case SDL_QUIT:
                     keypress = 1;
-                    printf("quitting by sdl_quit\n");
+                    printf("Quitting by sdl_quit\n");
                 break;
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
                         case SDLK_UP:
-                            _Balance+=10;
+                            // Debug service money addition
+                            _Balance += 10;
                             configuration._Income.totalIncomeService+=10;
+
+                            // Save this in the storage
                             configuration.GetStorage()->save(configuration.GetStorage()->object, "income", &configuration._Income, sizeof(income));
+
+                            // TODO: create money report here
+
                             printf("UP\n"); fflush(stdout);
                             break;
+
                         case SDLK_1:
                             _DebugKey = 1;
                             printf("1\n"); fflush(stdout);
                             break;
+
                         case SDLK_2:
                             _DebugKey = 2;
                             printf("2\n"); fflush(stdout);
                             break;
+
                         case SDLK_3:
                             _DebugKey = 3;
                             printf("3\n"); fflush(stdout);
                             break;
+
                         case SDLK_4:
                             _DebugKey = 4;
                             printf("4\n"); fflush(stdout);
                             break;
+
                         case SDLK_5:
                             _DebugKey = 5;
                             printf("5\n"); fflush(stdout);
                             break;
+
                         case SDLK_6:
                             _DebugKey = 6;
                             printf("6\n"); fflush(stdout);
                             break;
+
                         case SDLK_7:
                             _DebugKey = 7;
                             printf("7\n"); fflush(stdout);
                             break;
+
                         default:
                             keypress = 1;
-                            printf("quitting by keypress...");
+                            printf("Quitting by keypress...");
                             break;
                     }
                 break;
             }
         }
     }
-    */
+    
     delay(2000);
     return 0;
 }

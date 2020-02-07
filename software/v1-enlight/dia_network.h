@@ -12,8 +12,6 @@
 #include <new>
 #include <list>
 #include <map>
-// for ubuntu use sudo apt-get install libjson-c-dev
-//#include <json-c/json.h>
 #include <jansson.h>
 
 #include <sys/types.h>
@@ -27,12 +25,9 @@
 #define CHANNEL_SIZE 8192
 #define RETRY_DELAY 5
 
-#define MODE_NO_LOGIN 0
-#define MODE_HAVE_LOGIN 1
-#define MODE_HAVE_TOKEN 2
-
 #define SERVER_UNAVAILABLE 2
 
+// Message for report sending channel.
 class NetworkMessage {
     public:
     uint8_t resolved;
@@ -48,56 +43,38 @@ typedef struct curl_answer {
     size_t length;
 } curl_answer_t;
 
-typedef struct create_money_report {
-  int id;
-  int transaction_id;
-  std::string station_post_id;
-  std::string time_stamp;
-  int cars_total;
-  int coins_total;
-  int banknotes_total;
-  int cashless_total;
-  int test_total;
-} create_money_report_t;
-
-typedef struct ping_report {
-    std::string hash;
-} ping_report_t;
+typedef struct money_report {
+    int cars_total;
+    int coins_total;
+    int banknotes_total;
+    int cashless_total;
+    int service_total;
+} money_report_t;
 
 typedef struct RelayStat {
-  int switched_count;
-  int total_time_on;
+    int switched_count;
+    int total_time_on;
 } RelayStat_t;
 
-typedef struct create_relay_report {
-	int id;
-  int transaction_id;
-  std::string station_post_id;
-  std::string time_stamp;
-  RelayStat_t RelayStats[MAX_RELAY_NUM];
-} create_relay_report_t;
-
-class Registries {
-    public:
-  std::map <std::string,std::string> registries;
-} ;
+typedef struct relay_report {
+    RelayStat_t RelayStats[MAX_RELAY_NUM];
+} relay_report_t;
 
 class DiaNetwork {
-    public:
-    
+public:    
     DiaNetwork() {
         _Host = "";
 
         _OnlineCashRegister = "";
         _PublicKey = "";
 
-        pthread_create(&entry_processing_thread, NULL, DiaNetwork::process_extract , this);
+        pthread_create(&entry_processing_thread, NULL, DiaNetwork::process_extract, this);
     }
 
     ~DiaNetwork() {
         printf("Destroying DiaNetwork\n");
         StopTheWorld();
-        int status = pthread_join(entry_processing_thread,NULL);
+        int status = pthread_join(entry_processing_thread, NULL);
         if (status != 0) {
             printf("Main error: can't join thread, status = %d\n", status);
         }
@@ -108,9 +85,11 @@ class DiaNetwork {
     int SendRequest(std::string *body, std::string *answer, std::string host_addr) {
         assert(body);
         assert(answer);
+
         CURL *curl;
         CURLcode res;
         curl_answer_t raw_answer;
+
         InitCurlAnswer(&raw_answer);
 
         curl_global_init(CURL_GLOBAL_ALL);
@@ -184,7 +163,8 @@ class DiaNetwork {
         // Scan whole block
         for (int i = 1; i <= 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
-            err = this->PingRequest(reqUrl, NULL);
+            int tmp = 0;
+            err = this->SendPingRequest(reqUrl, tmp);
 
             if (!err) {
                 // We found it!
@@ -229,7 +209,7 @@ class DiaNetwork {
     }
 
     // Sets Central Server host name.
-    // Also sets same host name to Online Cash Register, which is located on the same server, as Central.
+    // Also sets same host name to Online Cash Register, which is located on the same server as Central.
     int SetHostName(std::string hostName) {
         _Host = hostName;
         _OnlineCashRegister = hostName;
@@ -260,14 +240,11 @@ class DiaNetwork {
     // PING request to specified URL. 
     // Returns 0, if request was OK, other value - in case of failure.
     // Modifies service money, if server returned that kind of data.
-    int PingRequest(std::string url, int* service_money) {
+    int SendPingRequest(std::string url, int& service_money) {
         std::string answer;
 
-        ping_report_t ping_data;
-        ping_data.hash = _PublicKey;
-
         int result;
-        std::string json_ping_request = json_create_ping(&ping_data);
+        std::string json_ping_request = json_create_ping_report();
         result = SendRequest(&json_ping_request, &answer, url);
 
         if (result == 2) {
@@ -297,13 +274,9 @@ class DiaNetwork {
             json_t *obj_service_amount;
             obj_service_amount = json_object_get(object, "serviceAmount");
             if(json_is_object(obj_service_amount)) {
-                int serviceMoney = (int)json_integer_value(obj_service_amount);
-                
-                if (service_money != NULL) {
-                    *service_money = serviceMoney;
-                }
-                break;
+                service_money = (int)json_integer_value(obj_service_amount);
             }
+            break;
             
         } while (0);
         json_decref(object);
@@ -359,429 +332,284 @@ class DiaNetwork {
         return 0;
     }
 
-    int create_money_report(int transaction_id,std::string station_post_id,std::string time_stamp,int cars_total,int coins_total,int banknotes_total,int cashless_total,int test_total) {
-        std::string answer;
-        // Create classes and constructors
-        create_money_report_t money_report_data={0,0,"","",0,0,0,0};
-        //int res=0;
-        money_report_data.transaction_id = transaction_id;
-        money_report_data.station_post_id = station_post_id;
-        money_report_data.time_stamp = time_stamp;
+    // Encodes money report data and sends it to Central Server via SAVE request.
+    int SendMoneyReport(int cars_total, int coins_total, int banknotes_total, int cashless_total, int service_total) {
+        money_report_t money_report_data = {0,0,0,0,0};
+        money_report_data.hash =_PublicKey;
         money_report_data.cars_total = cars_total;
-        money_report_data.coins_total=coins_total;
-        money_report_data.banknotes_total=banknotes_total;
-        money_report_data.cashless_total=cashless_total;
-        money_report_data.test_total=test_total;
+        money_report_data.coins_total = coins_total;
+        money_report_data.banknotes_total = banknotes_total;
+        money_report_data.cashless_total = cashless_total;
+        money_report_data.service_total = service_total;
 
+        // Encode data to JSON
         std::string json_money_report_request = json_create_money_report(&money_report_data);
+
+        // Send a request
         CreateAndPushEntry(json_money_report_request);
         return 0;
     }
 
-    int create_relay_report(int transaction_id,std::string station_post_id,std::string time_stamp,struct RelayStat RelayStats[MAX_RELAY_NUM]) {
-        std::string answer;
-        create_relay_report_t relay_report_data={0,0,"","",{{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}};
-        relay_report_data.transaction_id = transaction_id;
-        relay_report_data.station_post_id = station_post_id;
-        relay_report_data.time_stamp = time_stamp;
+    // Encodes relay report data and sends it to Central Server via SAVE request.
+    int SendRelayReport(struct RelayStat RelayStats[MAX_RELAY_NUM]) {
+        relay_report_t relay_report_data={{{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}};
 
-        for(int i = 0; i < MAX_RELAY_NUM; i ++) {
+        relay_report_data.hash = _PublicKey;
+
+        for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relay_report_data.RelayStats[i].switched_count = RelayStats[i].switched_count;
             relay_report_data.RelayStats[i].total_time_on = RelayStats[i].total_time_on;
         }
 
+        // Encode data to JSON
         std::string json_relay_report_request = json_create_relay_report(&relay_report_data);
+
+        // Send a request
         CreateAndPushEntry(json_relay_report_request);
         return 0;
     }
 
-    int get_last_money_report(create_money_report_t *money_report_data) {
+    // Sends LOAD request to Central Server and decodes JSON result to money report.
+    int GetLastMoneyReport(money_report_t *money_report_data) {
         std::string answer;
-        int attempts = 10;
-        while(_Mode!=MODE_HAVE_TOKEN && attempts>0) {
-            usleep(1000000);
-            printf("waiting... current mode is %d\n", _Mode);
-            attempts--;
-        }
+        
+        // Encode LOAD request to JSON
         std::string json_get_last_money_report_request = json_get_last_money_report();
-        int res=0;
-        if (!_Token.empty()) {
-            res=SendRequest(&json_get_last_money_report_request, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            return 1;
-        }
-        if (res>0) {
+
+        // Send request to Central Server
+        int res = SendRequest(&json_get_last_money_report_request, &answer);
+        
+        if (res > 0) {
             printf("No connection to server\n");
             return 1;
         }
 
-        std::size_t found = answer.find("{\"errors\":[{\"message\":");
-        if (found!=std::string::npos) {
-            return 2;
-        }
-        json_t *root;
+        json_t *object;
         json_error_t error;
-        root = json_loads(answer.c_str(), 0, &error);
+        object = json_loads(answer.c_str(), 0, &error);
         int err = 0;
 
         do {
-            if ( !root ) {
-                printf("error in get_last_money_report: on line %d: %s\n", error.line, error.text );
-                err = 1;
-                break;
-            }
-            if(!json_is_object(root)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_post;
-            obj_post = json_object_get(obj_data, "GetLastMoneyReport" );
-            if(!json_is_object(obj_post)) {
+            if (!object) {
+                printf("Error in get_last_money_report on line %d: %s\n", error.line, error.text );
                 err = 1;
                 break;
             }
 
-            json_t *obj_tek;
-            obj_tek = json_object_get(obj_post, "ID" );
-            if(!json_is_integer(obj_tek)) {
+            if(!json_is_object(object)) {
                 err = 1;
                 break;
             }
-            money_report_data->id = json_integer_value(obj_tek);
+            
+            json_t* obj_var = json_object_get(object, "CarsTotal");
+            if(!json_is_integer(obj_var)) {
+                err = 1;
+                break;
+            }
+            money_report_data->cars_total = json_integer_value(obj_var);
 
-            obj_tek = json_object_get(obj_post, "TransactionID" );
-            if(!json_is_integer(obj_tek)) {
+            obj_var = json_object_get(object, "Coins");
+            if(!json_is_integer(obj_var)) {
                 err = 1;
                 break;
             }
-            money_report_data->transaction_id = json_integer_value(obj_tek);
+            money_report_data->coins_total = json_integer_value(obj_var);
 
-            obj_tek = json_object_get(obj_post, "StationPostID" );
-            if(!json_is_integer(obj_tek)) {
+            obj_var = json_object_get(object, "Banknotes");
+            if(!json_is_integer(obj_var)) {
                 err = 1;
                 break;
             }
-            money_report_data->station_post_id = std::to_string( json_integer_value(obj_tek));
+            money_report_data->banknotes_total = json_integer_value(obj_var);
 
-            obj_tek = json_object_get(obj_post, "TimeStamp" );
-            if(!json_is_integer(obj_tek)) {
+            obj_var = json_object_get(object, "Electronical");
+            if(!json_is_integer(obj_var)) {
                 err = 1;
                 break;
             }
-            money_report_data->time_stamp =std::to_string( json_integer_value(obj_tek));
+            money_report_data->cashless_total = json_integer_value(obj_var);
 
-            obj_tek = json_object_get(obj_post, "CarsTotal" );
-            if(!json_is_integer(obj_tek)) {
+            obj_var = json_object_get(object, "Service");
+            if(!json_is_integer(obj_var)) {
                 err = 1;
                 break;
             }
-            money_report_data->cars_total = json_integer_value(obj_tek);
-
-            obj_tek = json_object_get(obj_post, "CoinsTotal" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            money_report_data->coins_total = json_integer_value(obj_tek);
-
-            obj_tek = json_object_get(obj_post, "BanknotesTotal" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            money_report_data->banknotes_total = json_integer_value(obj_tek);
-
-            obj_tek = json_object_get(obj_post, "CashlessTotal" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            money_report_data->cashless_total = json_integer_value(obj_tek);
-
-            obj_tek = json_object_get(obj_post, "TestTotal" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            money_report_data->test_total = json_integer_value(obj_tek);
+            money_report_data->service_total = json_integer_value(obj_var);
         } while(0);
-        json_decref(root);
+        json_decref(object);
         return err;
     }
 
-    int get_last_relay_report(create_relay_report_t *relay_report_data) {
+    // Sends LOAD request to Central Server and decodes JSON result to relay report.
+    int GetLastRelayReport(relay_report_t *relay_report_data) {
         std::string answer;
-        int attempts = 10;
-        while(_Mode!=MODE_HAVE_TOKEN && attempts>0) {
-            usleep(1000000);
-            printf("waiting... current mode is %d\n", _Mode);
-            attempts--;
-        }
+        
+        // Encode LOAD request to JSON
         std::string json_get_last_relay_report_request = json_get_last_relay_report();
-        int res=0;
-        if (!_Token.empty()) {
-            res=SendRequest(&json_get_last_relay_report_request, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            return 1;
-        }
-        if (res>0) {
+
+        // Send request to Central Server
+        int res = SendRequest(&json_get_last_relay_report_request, &answer);
+        
+        if (res > 0) {
             printf("No connection to server\n");
             return 1;
         }
 
-        std::size_t found = answer.find("{\"errors\":[{\"message\":");
-        if (found!=std::string::npos) {
-            return 2;
-        }
-        fprintf(stderr,"%s",answer.c_str());
-        json_t *root;
+        fprintf(stderr,"%s\n",answer.c_str());
+
+        json_t *object;
         json_error_t error;
-        root = json_loads(answer.c_str(), 0, &error);
+        object = json_loads(answer.c_str(), 0, &error);
         int err = 0;
 
         do {
-            if ( !root ) {
-                printf("error in get_last_relay_report: on line %d: %s\n", error.line, error.text );
-                err = 1;
-                break;
-            }
-            if(!json_is_object(root)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_post;
-            obj_post = json_object_get(obj_data, "GetLastRelayReport" );
-            if(!json_is_object(obj_post)) {
+            if (!object) {
+                printf("Error in get_last_relay_report on line %d: %s\n", error.line, error.text );
                 err = 1;
                 break;
             }
 
-            json_t *obj_tek;
-            obj_tek = json_object_get(obj_post, "ID" );
-            if(!json_is_integer(obj_tek)) {
+            if(!json_is_object(object)) {
                 err = 1;
                 break;
             }
-            relay_report_data->id = json_integer_value(obj_tek);
 
-            obj_tek = json_object_get(obj_post, "TransactionID" );
-            if(!json_is_integer(obj_tek)) {
+            json_t *obj_array;
+            obj_array = json_object_get(object, "RelayStats");
+            if(!json_is_object(obj_array)) {
                 err = 1;
                 break;
             }
-            relay_report_data->transaction_id = json_integer_value(obj_tek);
 
-            obj_tek = json_object_get(obj_post, "StationPostID" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            relay_report_data->station_post_id = std::to_string( json_integer_value(obj_tek));
-
-            obj_tek = json_object_get(obj_post, "TimeStamp" );
-            if(!json_is_integer(obj_tek)) {
-                err = 1;
-                break;
-            }
-            relay_report_data->time_stamp =std::to_string( json_integer_value(obj_tek));
-
-
-            obj_tek = json_object_get(obj_post, "RelayStats" );
-            if(!json_is_array(obj_tek)) {
-                err = 1;
-                break;
-            }
             json_t *element;
-            json_t *obj_for_array;
-            int i,relay_id,switched_count,total_time_on;
+            json_t *obj_var;
+            int i, relay_id, switched_count, total_time_on;
 
-
-            json_array_foreach(obj_tek,i, element){
-                obj_for_array = json_object_get(element, "RelayID" );
-                if(!json_is_integer(obj_for_array)) {
+            json_array_foreach(obj_array, i, element) {
+                obj_var = json_object_get(element, "RelayID" );
+                if(!json_is_integer(obj_var)) {
                     err = 1;
                     break;
                 }
-                relay_id = json_integer_value(obj_for_array);
-
-                obj_for_array = json_object_get(element, "SwitchedCount" );
-                if(!json_is_integer(obj_for_array)) {
+                relay_id = json_integer_value(obj_var);
+            
+                obj_var = json_object_get(element, "SwitchedCount" );
+                if(!json_is_integer(obj_var)) {
                     err = 1;
                     break;
                 }
-               switched_count = json_integer_value(obj_for_array);
+                switched_count = json_integer_value(obj_var);
 
-                obj_for_array = json_object_get(element, "TotalTimeOn" );
-                if(!json_is_integer(obj_for_array)) {
+                obj_var = json_object_get(element, "TotalTimeOn" );
+                if(!json_is_integer(obj_var)) {
                     err = 1;
                     break;
                 }
-               total_time_on = json_integer_value(obj_for_array);
-               relay_report_data->RelayStats[relay_id-1].switched_count =switched_count;
-               relay_report_data->RelayStats[relay_id-1].total_time_on =total_time_on;
+                total_time_on = json_integer_value(obj_var);
+                relay_report_data->RelayStats[relay_id-1].switched_count = switched_count;
+                relay_report_data->RelayStats[relay_id-1].total_time_on = total_time_on;
             }
         } while(0);
-        json_decref(root);
+
+        json_decref(object);
         return err;
     }
 
-int MyRegistry(Registries *MyRegistries) {
+    // Sends LOAD request to Central Server and decodes JSON result to value string.
+    // Gets key string.
+    std::string GetRegistryValueByKey(std::string key) {
         std::string answer;
-        int res=0;
-        int attempts = 10;
-        while(_Mode!=MODE_HAVE_TOKEN && attempts>0) {
-            usleep(1000000);
-            printf("waiting... current mode is %d\n", _Mode);
-            attempts--;
-        }
-        std::string get_my_registry = json_get_my_registry();
-        if (!_Token.empty()) {
-            res=SendRequest(&get_my_registry, &answer);
-        }
-        else {
-            printf("Token empty\n");
-            return 1;
-        }
-        if (res>0) {
+        std::string result = "";
+
+        // Encode LOAD request to JSON with key string
+        std::string get_registry_value = json_get_registry_value(key);
+
+        // Send request to Central Server
+        int res = SendRequest(&get_registry_value, &answer);
+        
+        if (res > 0) {
             printf("No connection to server\n");
-            return 1;
+            return result;
         }
         int err = 0;
-        std::size_t found = answer.find("{\"errors\":[{\"message\":");
-        if (found!=std::string::npos) {
-            return 2;
-        }
-        json_t *root;
+        
+        json_t *object;
         json_error_t error;
-        root = json_loads(answer.c_str(), 0, &error);
+        object = json_loads(answer.c_str(), 0, &error);
         do {
-            if ( !root ) {
-                printf("error in MyRegistry: on line %d: %s\n", error.line, error.text );
-                err = 1;
-                break;
-            }
-            if(!json_is_object(root)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_data;
-            obj_data = json_object_get(root, "data" );
-            if(!json_is_object(obj_data)) {
-                err = 1;
-                break;
-            }
-            json_t *obj_post;
-            obj_post = json_object_get(obj_data, "GetMyRegistry" );
-            if(!json_is_object(obj_post)) {
-                err = 1;
+            if (!object) {
+                printf("Error in GetRegistryValue on line %d: %s\n", error.line, error.text);
+                result = "";
                 break;
             }
 
-            json_t *obj_my_promotions;
-            obj_my_promotions = json_object_get(obj_post, "MyRegistrys" );
-            if(!json_is_array(obj_my_promotions)) {
-                err = 1;
+            if(!json_is_object(object)) {
+                result = "";
                 break;
             }
-            json_t *element;
-            json_t *obj_for_array;
-            int i;
-            std::string key,value;
 
-            json_array_foreach(obj_my_promotions,i, element){
-                obj_for_array = json_object_get(element, "Key" );
-                if(!json_is_string(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-                key = json_string_value(obj_for_array);
-
-                obj_for_array = json_object_get(element, "Value" );
-                if(!json_is_string(obj_for_array)) {
-                    err = 1;
-                    break;
-                }
-               value = json_string_value(obj_for_array);
-                MyRegistries->registries.insert(std::pair<std::string, std::string>(key,value));
+            json_t *obj_value;
+            obj_value = json_object_get(object, "Value");
+            if(!json_is_object(obj_value)) {
+                result = "";
+                break;
             }
+            result = json_string_value(obj_value);
+
         } while(0);
-        json_decref(root);
-        return err;
+        json_decref(object);
+        return result;
     }
 
+private:
     int interrupted = 0;
-
-    private:
-
     std::string _PublicKey;
     std::string _OnlineCashRegister;
     std::string _Host;
 
-    int _Mode;
     DiaChannel<NetworkMessage> channel;
     pthread_t entry_processing_thread;
     pthread_mutex_t nfct_entries_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-
+    // Thread, which tries to send reports to Central Server.
     static void *process_extract(void *arg) {
         DiaNetwork *Dia = (DiaNetwork*) arg;
 
         while(!Dia->interrupted) {
-            if (Dia->_Mode==MODE_HAVE_TOKEN) {
-                int res = Dia->ModeHaveToken();
-                if (res == SERVER_UNAVAILABLE) {
-                    usleep(5000000); //let's sleep for 5 second before the next attempt
-                }
-            } else if (Dia->_Mode==MODE_HAVE_LOGIN) {
-                int res = Dia->ModeHaveLogin();
-                if (res) {
-                    usleep(5000000);
-                }
-            } else if (Dia->_Mode==MODE_NO_LOGIN) {
-                usleep(1000000);
+            int res = Dia->PopAndSend();
+            if (res == SERVER_UNAVAILABLE) {
+                usleep(5000000); //let's sleep for 5 second before the next attempt
             }
         }
         pthread_exit(NULL);
         return NULL;
     }
 
+    // Interrupt the report processing thread. 
     int StopTheWorld() {
         interrupted = 1;
         return 0;
     }
 
-    int ModeHaveToken() {
+    // Pop message from channel (queue) and send it to the Central Server. 
+    int PopAndSend() {
         NetworkMessage * message;
         int err = channel.Pop(&message);
+
         if (!err) {
-            if(message && message->json_request!="") {
+            if(message && message->json_request != "") {
                 std::string answer;
-                int res=SendRequest(&(message->json_request), &answer);
+                int res = SendRequest(&(message->json_request), &answer);
+
                 //let's ignore the answer for now;
-                if (res==SERVER_UNAVAILABLE) { // server is not answering
+                if (res == SERVER_UNAVAILABLE) {
                     printf("ERR: SERVER IS NOT AVAILABLE\n");
                     return SERVER_UNAVAILABLE;
                 }
                 free(message);
                 return res;
             } else {
-                printf("ERROR: somethings wrong with the channel");
+                printf("ERROR: something is wrong with the channel\n");
             }
         } else {
             sleep(1);
@@ -790,14 +618,17 @@ int MyRegistry(Registries *MyRegistries) {
         return err;
     }
 
-    int CreateAndPushEntry(std::string json_string){
+    // Add new message (report) to the channel. Thread will pop it in the future.
+    int CreateAndPushEntry(std::string json_string) {
         NetworkMessage * entry = new NetworkMessage();
         if(!entry) {
             return 1;
         }
+
         entry->stime = time(NULL);
         entry->json_request = json_string;
-        if (channel.Push(entry)==CHANNEL_BUFFER_OVERFLOW) {
+
+        if (channel.Push(entry) == CHANNEL_BUFFER_OVERFLOW) {
             printf("CHANNEL BUFFER OVERFLOW\n");
             return 1;
         }
@@ -806,107 +637,115 @@ int MyRegistry(Registries *MyRegistries) {
         }
     }
 
-    std::string json_create_ping(struct ping_report *s) {
+    // Encodes _PublicKey to JSON string.
+    std::string json_create_ping_report() {
         json_t *object = json_object();
-        json_object_set_new(object, "hash", json_string(s->hash.c_str()));
-        char *str = json_dumps(root, 0);
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        json_decref(object);
+        return res;
+    }
+
+    // Encodes money report struct to JSON string. 
+    std::string json_create_money_report(struct money_report *s) {
+        json_t *object = json_object();
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Banknotes", json_integer(s->banknotes_total));
+        json_object_set_new(object, "CarsTotal", json_integer(s->cars_total));
+        json_object_set_new(object, "Coins", json_integer(s->coins_total));
+        json_object_set_new(object, "Electronical",json_integer(s->cashless_total));
+        json_object_set_new(object, "Service",json_integer(s->test_total));
+    
+        char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
         json_decref(object);
         return res;
     }
 
-    std::string json_get_my_registry() {
-        char jsonObj[500];
-        const char* pattern="{\"operationName\":null,\"variables\":{\"myVar\":{\"Key\": \"%s\"}},\"query\":\"query($myVar: MyRegistryRequest!){\\n  GetMyRegistry(Request: $myVar)\\n {MyRegistrys{Key Value}}}\\n\"}";
-        sprintf(jsonObj,pattern,"1");
-        return jsonObj;
-    }
-
-    std::string json_create_money_report(struct create_money_report *s) {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
-
-        json_object_set_new(myVar, "TransactionID", json_integer(s->transaction_id));
-        json_object_set_new(myVar, "StationPostID", json_string(s->station_post_id.c_str()));
-        json_object_set_new(myVar, "TimeStamp",json_integer(std::stoi( s->time_stamp)));
-        json_object_set_new(myVar, "CarsTotal", json_integer(s->cars_total));
-        json_object_set_new(myVar, "CoinsTotal", json_integer(s->coins_total));
-        json_object_set_new(myVar, "BanknotesTotal",json_integer(s->banknotes_total));
-        json_object_set_new(myVar, "CashlessTotal",json_integer(s->cashless_total));
-        json_object_set_new(myVar, "TestTotal",json_integer(s->test_total));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("mutation($myVar:MoneyReportsCreateRequest!) {\n  CreateMoneyReport(Request: $myVar) {\n    ID\n TransactionID\n StationPostID\n TimeStamp\n CarsTotal\n CoinsTotal\n BanknotesTotal\n CashlessTotal\n TestTotal\n    }\n}\n"));
-        char *str = json_dumps(root, 0);
-        std::string res = str;
-        free(str);
-        json_decref(root);
-        return res;
-    }
-
-    std::string json_create_relay_report(struct create_relay_report *s) {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
+    // Encodes relay report struct to JSON string.
+    std::string json_create_relay_report(struct relay_report *s) {
+        json_t *object = json_object();
         json_t *relayarr = json_array();
         json_t *relayobj[MAX_RELAY_NUM];
 
-        for(int i = 0; i < MAX_RELAY_NUM; i ++) {
-            relayobj[i]=json_object();
-            json_object_set_new(relayobj[i], "RelayID",json_integer(i+1));
-            json_object_set_new(relayobj[i], "SwitchedCount",json_integer(s->RelayStats[i].switched_count));
-            json_object_set_new(relayobj[i], "TotalTimeOn",json_integer(s->RelayStats[i].total_time_on));
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+
+        for(int i = 0; i < MAX_RELAY_NUM; i++) {
+            relayobj[i] = json_object();
+            json_object_set_new(relayobj[i], "RelayID", json_integer(i+1));
+            json_object_set_new(relayobj[i], "SwitchedCount", json_integer(s->RelayStats[i].switched_count));
+            json_object_set_new(relayobj[i], "TotalTimeOn", json_integer(s->RelayStats[i].total_time_on));
             json_array_append_new(relayarr, relayobj[i]);
         }
-        json_object_set_new(myVar, "TransactionID", json_integer(s->transaction_id));
-        json_object_set_new(myVar, "StationPostID", json_string(s->station_post_id.c_str()));
-        json_object_set_new(myVar, "TimeStamp",json_integer(std::stoi( s->time_stamp)));
-        json_object_set_new(myVar, "StationPostID", json_string(s->station_post_id.c_str()));
-        json_object_set_new(myVar, "RelayStats", relayarr);
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("mutation($myVar:RelayReportsCreateRequest!) {\n  CreateRelayReport(Request:$myVar) {\n    ID\n TransactionID\n    StationPostID\n    TimeStamp\n    RelayStats {\n      RelayID\n      SwitchedCount\n      TotalTimeOn\n    }\n  }\n}\n"));
-        char *str = json_dumps(root, 0);
+
+        json_object_set_new(object, "RelayStats", relayarr);
+        char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
-        json_decref(root);
+        json_decref(object);
         return res;
     }
 
+    // Encodes key to JSON string.
+    std::string json_get_registry_value(std::string key) {
+        json_t *object = json_object();
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Key", json_string(key.c_str());
+        
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        json_decref(object);
+        return res;
+    }
+
+    // Encodes empty money report to JSON string.
     std::string json_get_last_money_report() {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
+        json_t *object = json_object();
 
-        json_object_set_new(myVar, "Total",json_integer(1));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("query($myVar:EmptyRequest!) {\n  GetLastMoneyReport(Request: $myVar) {\n    ID\n TransactionID\n StationPostID\n TimeStamp\n CarsTotal\n CoinsTotal\n BanknotesTotal\n CashlessTotal\n TestTotal\n    }\n}\n"));
-        char *str = json_dumps(root, 0);
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Banknotes", json_integer(1));
+        json_object_set_new(object, "CarsTotal", json_integer(1));
+        json_object_set_new(object, "Coins", json_integer(1));
+        json_object_set_new(object, "Electronical",json_integer(1));
+        json_object_set_new(object, "Service",json_integer(1));
+    
+        char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
-        json_decref(root);
+        json_decref(object);
         return res;
     }
 
+    // Encodes empty relay report to JSON string.
     std::string json_get_last_relay_report() {
-        json_t *root = json_object();
-        json_t *myVar = json_object();
-        json_t *variables = json_object();
-        json_object_set_new(myVar, "Total", json_integer(1));
-        json_object_set_new(variables, "myVar",myVar);
-        json_object_set_new(root, "operationName", json_null());
-        json_object_set_new(root, "variables",variables);
-        json_object_set_new(root, "query",json_string("query($myVar:EmptyRequest!) {\n  GetLastRelayReport(Request:$myVar) {\n    ID\n TransactionID\n   StationPostID\n    TimeStamp\n    RelayStats {\n      RelayID\n      SwitchedCount\n      TotalTimeOn\n    }\n  }\n}\n"));
-        char *str = json_dumps(root, 0);
+        json_t *object = json_object();
+        json_t *relayarr = json_array();
+        json_t *relayobj[MAX_RELAY_NUM];
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+
+        for(int i = 0; i < MAX_RELAY_NUM; i++) {
+            relayobj[i] = json_object();
+            json_object_set_new(relayobj[i], "RelayID", json_integer(1));
+            json_object_set_new(relayobj[i], "SwitchedCount", json_integer(1));
+            json_object_set_new(relayobj[i], "TotalTimeOn", json_integer(1));
+            json_array_append_new(relayarr, relayobj[i]);
+        }
+
+        json_object_set_new(object, "RelayStats", relayarr);
+        char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
-        json_decref(root);
+        json_decref(object);
         return res;
     }
 
