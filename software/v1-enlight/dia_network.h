@@ -64,6 +64,7 @@ class DiaNetwork {
 public:    
     DiaNetwork() {
         _Host = "";
+	_Port = ":8020";
 
         _OnlineCashRegister = "";
         _PublicKey = "";
@@ -110,6 +111,7 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -132,7 +134,7 @@ public:
     // Gets local machine's IP and starts pinging every address in block.
     // Modifies IP address.
     int SearchCentralServer(std::string *ip) {
-	    char* tmpUrl = new char[16];            	    
+	char* tmpUrl = new char[16];            	    
         int fd;
         struct ifreq ifr;
 
@@ -151,12 +153,12 @@ public:
         printf("Checking localhost...\n");
         err = this->SendPingRequest("localhost", tmp);
         if (!err) {
-            printf("Server is located on localhost\n");
             delete[] tmpUrl;
             *ip = "localhost";
+	    return 0;
         }
 
-	    std::string baseIP(tmpUrl);
+	std::string baseIP(tmpUrl);
         std::string reqIP;
 
 	    // Truncate baseIP to prepare for scan
@@ -171,7 +173,7 @@ public:
 
         // Scan whole block
         for (int i = 1; i <= 255; i++) {
-            std::string reqUrl = reqIP + std::to_string(i) + ":8020/ping";
+            std::string reqUrl = reqIP + std::to_string(i);
             printf("Using URL: %s\n", reqUrl.c_str());
             err = this->SendPingRequest(reqUrl, tmp);
 
@@ -231,11 +233,11 @@ public:
         std::string serverIP = "";
         int res = -1;
 
-	    printf("Looking for Central-wash server ...\n");
+	printf("Looking for Central-wash server ...\n");
         res = this->SearchCentralServer(&serverIP);
         
         if (res == 0) {
-            printf("Server located on:\n%s\n", serverIP.c_str());
+            printf("Server located on: %s\n", serverIP.c_str());
         }
         else {
             printf("Failed: no server found...\n");
@@ -249,6 +251,7 @@ public:
     // Modifies service money, if server returned that kind of data.
     int SendPingRequest(std::string url, int& service_money) {
         std::string answer;
+	url += _Port + "/ping";
 
         int result;
         std::string json_ping_request = json_create_ping_report();
@@ -570,6 +573,7 @@ private:
     std::string _PublicKey;
     std::string _OnlineCashRegister;
     std::string _Host;
+    std::string _Port;
 
     DiaChannel<NetworkMessage> channel;
     pthread_t entry_processing_thread;
