@@ -268,6 +268,7 @@ int RecoverMoney() {
         (config->_Income.totalIncomeService < last_money_report->service_total) ||
         (config->_Income.carsTotal < last_money_report->cars_total)) 
         {
+	    printf("Money in config updated\n");
             config->_Income.totalIncomeCoins = last_money_report->coins_total;
             config->_Income.totalIncomeBanknotes = last_money_report->banknotes_total;
             config->_Income.totalIncomeElectron = last_money_report->cashless_total;
@@ -292,6 +293,10 @@ int RecoverRelay() {
 
     if (err == 0) {
         DiaGpio * gpio = config->GetGpio();
+	for (int i = 0; i < MAX_RELAY_NUM; i++) {
+		printf("Relay %d: switched - %d, total - %d\n", i, last_relay_report->RelayStats[i].switched_count,
+		last_relay_report->RelayStats[i].total_time_on*1000);
+	}
 
         bool update = false;
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
@@ -301,7 +306,7 @@ int RecoverRelay() {
             }
         }
         if (update) {
-            fprintf(stderr,"Update stat\n");
+            fprintf(stderr,"Relays in config updated\n");
             for(int i = 0; i < MAX_RELAY_NUM; i++) {
                 gpio->Stat.relay_switch[i+1] = last_relay_report->RelayStats[i].switched_count;
                 gpio->Stat.relay_time[i+1] = last_relay_report->RelayStats[i].total_time_on*1000;

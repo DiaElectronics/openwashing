@@ -398,6 +398,7 @@ public:
         object = json_loads(answer.c_str(), 0, &error);
         int err = 0;
 
+	printf("Server returned for Get Last Money: \n%s\n", answer.c_str());
         do {
             if (!object) {
                 printf("Error in get_last_money_report on line %d: %s\n", error.line, error.text );
@@ -410,40 +411,35 @@ public:
                 break;
             }
             
-            json_t* obj_var = json_object_get(object, "CarsTotal");
+            json_t* obj_var = json_object_get(object, "carsTotal");
             if(!json_is_integer(obj_var)) {
-                err = 1;
-                break;
-            }
-            money_report_data->cars_total = json_integer_value(obj_var);
+                money_report_data->cars_total = 0;
+            } else
+                money_report_data->cars_total = json_integer_value(obj_var);
 
-            obj_var = json_object_get(object, "Coins");
+            obj_var = json_object_get(object, "coins");
             if(!json_is_integer(obj_var)) {
-                err = 1;
-                break;
-            }
-            money_report_data->coins_total = json_integer_value(obj_var);
+                money_report_data->coins_total = 0;
+            } else
+                money_report_data->coins_total = json_integer_value(obj_var);
 
-            obj_var = json_object_get(object, "Banknotes");
+            obj_var = json_object_get(object, "banknotes");
             if(!json_is_integer(obj_var)) {
-                err = 1;
-                break;
-            }
-            money_report_data->banknotes_total = json_integer_value(obj_var);
+                money_report_data->banknotes_total = 0;
+            } else
+            	money_report_data->banknotes_total = json_integer_value(obj_var);
 
-            obj_var = json_object_get(object, "Electronical");
+            obj_var = json_object_get(object, "electronical");
             if(!json_is_integer(obj_var)) {
-                err = 1;
-                break;
-            }
-            money_report_data->cashless_total = json_integer_value(obj_var);
+                money_report_data->cashless_total = 0;
+            } else
+            	money_report_data->cashless_total = json_integer_value(obj_var);
 
-            obj_var = json_object_get(object, "Service");
+            obj_var = json_object_get(object, "service");
             if(!json_is_integer(obj_var)) {
-                err = 1;
-                break;
-            }
-            money_report_data->service_total = json_integer_value(obj_var);
+                money_report_data->service_total = 0;
+            } else
+            	money_report_data->service_total = json_integer_value(obj_var);
         } while(0);
         json_decref(object);
         return err;
@@ -480,13 +476,14 @@ public:
             }
 
             if(!json_is_object(object)) {
+		printf("JSON is not an object\n");
                 err = 1;
                 break;
             }
 
             json_t *obj_array;
-            obj_array = json_object_get(object, "RelayStats");
-            if(!json_is_object(obj_array)) {
+            obj_array = json_object_get(object, "relayStats");
+            if(!json_is_array(obj_array)) {
                 err = 1;
                 break;
             }
@@ -496,26 +493,25 @@ public:
             int i, relay_id, switched_count, total_time_on;
 
             json_array_foreach(obj_array, i, element) {
-                obj_var = json_object_get(element, "RelayID" );
+                obj_var = json_object_get(element, "relayID" );
                 if(!json_is_integer(obj_var)) {
-                    err = 1;
-                    break;
+		    printf("relayId problem\n");
+		    err = 1;
+		    break;
                 }
                 relay_id = json_integer_value(obj_var);
             
-                obj_var = json_object_get(element, "SwitchedCount" );
+                obj_var = json_object_get(element, "switchedCount" );
                 if(!json_is_integer(obj_var)) {
-                    err = 1;
-                    break;
-                }
-                switched_count = json_integer_value(obj_var);
+		    switched_count = 0;
+                } else
+                    switched_count = json_integer_value(obj_var);
 
-                obj_var = json_object_get(element, "TotalTimeOn" );
+                obj_var = json_object_get(element, "totalTimeOn" );
                 if(!json_is_integer(obj_var)) {
-                    err = 1;
-                    break;
-                }
-                total_time_on = json_integer_value(obj_var);
+		    total_time_on = 0;
+                } else
+                    total_time_on = json_integer_value(obj_var);
                 relay_report_data->RelayStats[relay_id-1].switched_count = switched_count;
                 relay_report_data->RelayStats[relay_id-1].total_time_on = total_time_on;
             }
@@ -742,7 +738,7 @@ private:
     std::string json_get_last_money_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "Hash", json_string("give me report"));
         json_object_set_new(object, "Banknotes", json_integer(1));
         json_object_set_new(object, "CarsTotal", json_integer(1));
         json_object_set_new(object, "Coins", json_integer(1));
@@ -762,7 +758,7 @@ private:
         json_t *relayarr = json_array();
         json_t *relayobj[MAX_RELAY_NUM];
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "Hash", json_string("give me report"));
 
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relayobj[i] = json_object();
