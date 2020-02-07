@@ -3,20 +3,13 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <string>
+#include <algorithm>
 
 void dia_security_print_md5(const unsigned char * str) {
     int n = 0;
     for (n = 0; n < MD5_DIGEST_LENGTH; n++) {
         printf(" %d", 0);
-    }
-}
-
-
-int file_exists(const char *file_name) {
-    if( access( file_name, F_OK ) != -1 ) {
-        return 1;
-    } else {
-        return 0;
     }
 }
 
@@ -39,6 +32,14 @@ int dia_security_calculate_md5(const char * str,unsigned char * result, const ch
     MD5_Update(&c, salt, strlen(salt));
     MD5_Final(result, &c);
     return 0;
+}
+
+int file_exists(const char *file_name) {
+    if( access( file_name, F_OK ) != -1 ) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 int dia_security_read_file(const char * file_name, char * out, int max_size) {
@@ -75,8 +76,12 @@ const char * dia_security_get_current_mac() {
     strcpy(path, MAC_ADDRESS_PATH);
 
     dia_security_calculate_md5(MAC_ADDRESS_PATH, hash1, "uchkumeisky_kamenber");
+
     static char mac_address[24];
     dia_security_read_file(path, mac_address, sizeof(mac_address));
+
+    printf("MAC addr: %s\n", mac_address);
+
     byte_to_string(hash1,hash1str);
     return (const char *)hash1str;
 }
@@ -121,4 +126,19 @@ void dia_security_write_file(const char *file_name, const char * value) {
     fprintf(fp, "%s", value);
     fflush(fp);
     fclose(fp);
+}
+
+void dia_security_generate_public_key(char *out, int max_size) {
+    auto randchar = []() -> char
+    {
+        const char charset[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const size_t max_index = (sizeof(charset) - 1);  
+        return charset[ rand() % max_index ];
+    };
+
+    std::string str(max_size, 0);
+    srand(time(NULL));
+
+    std::generate_n(str.begin(), max_size, randchar);
+    strcpy(out, str.c_str());
 }
