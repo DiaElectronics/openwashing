@@ -105,7 +105,7 @@ public:
         headers = curl_slist_append(headers, "Content-Type: application/json");
         headers = curl_slist_append(headers, "charsets: utf-8");
 
-	printf("%s\n",host_addr.c_str());
+	//printf("%s\n",host_addr.c_str());
 
         curl_easy_setopt(curl, CURLOPT_URL, host_addr.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -118,7 +118,7 @@ public:
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
+            //fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
             if (res == CURLE_COULDNT_CONNECT) {
                 return SERVER_UNAVAILABLE;
             }
@@ -163,7 +163,7 @@ public:
 	std::string baseIP(tmpUrl);
         std::string reqIP;
 
-	printf("Base IP: %s", baseIP.c_str());
+	printf("Base IP: %s\n", baseIP.c_str());
 
 	// Truncate baseIP to prepare for scan
         int dotCount = 0;
@@ -267,7 +267,7 @@ public:
         int result;
         std::string json_ping_request = json_create_ping_report();
         result = SendRequest(&json_ping_request, &answer, url);
-	printf("Server answer on PING:\n%s\n", answer.c_str());
+	//printf("Server answer on PING:\n%s\n", answer.c_str());
 
 	
         if (result == 2) {
@@ -664,7 +664,7 @@ private:
     std::string json_create_ping_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string("give me money"));
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         char *str = json_dumps(object, 0);
         std::string res = str;
 
@@ -752,7 +752,7 @@ private:
     std::string json_get_last_money_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string("give me report"));
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         json_object_set_new(object, "Banknotes", json_integer(1));
         json_object_set_new(object, "CarsTotal", json_integer(1));
         json_object_set_new(object, "Coins", json_integer(1));
@@ -772,7 +772,7 @@ private:
         json_t *relayarr = json_array();
         json_t *relayobj[MAX_RELAY_NUM];
 
-        json_object_set_new(object, "Hash", json_string("give me report"));
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
 
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relayobj[i] = json_object();
