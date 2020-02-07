@@ -196,7 +196,7 @@ end
 
 start_mode = function()
     show_start(balance)
-    run_pause()
+    run_p6()
     turn_light(0, animation.intense)
     balance_seconds = free_pause_seconds    
     update_balance()
@@ -269,7 +269,7 @@ end
 
 p6_mode = function()
     show_p6(balance, balance_seconds)
-    run_pause()
+    run_p6()
     turn_light(6, animation.one_button)
     update_balance()
     if balance_seconds > 0 then
