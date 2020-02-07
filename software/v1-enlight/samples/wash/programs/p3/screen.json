@@ -30,7 +30,7 @@
         "id":"current_label",
         "type":"image",
         "position": "62;80",
-        "size":"164;59",
+        "size":"234;34",
         "src":"programs/p3/label.png",
         "visible":"true"
       }
