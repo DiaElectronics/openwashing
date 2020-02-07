@@ -169,15 +169,11 @@ public:
             if (!err) {
                 // We found it!
                 *ip = reqIP + std::to_string(i);
-                curl_easy_cleanup(curl);
-                curl_global_cleanup();
                 return 0;
-            }
-            curl_easy_cleanup(curl);            	
+            }         	
         }   	
 
 	    delete[] tmpUrl;
-        curl_global_cleanup();
         return SERVER_UNAVAILABLE;
     }
 
@@ -234,7 +230,9 @@ public:
         }
         else {
             printf("Failed: no server found...\n");
+            serverIP = "";
         }
+        return serverIP;
     }
 
     // PING request to specified URL. 
@@ -335,7 +333,7 @@ public:
     // Encodes money report data and sends it to Central Server via SAVE request.
     int SendMoneyReport(int cars_total, int coins_total, int banknotes_total, int cashless_total, int service_total) {
         money_report_t money_report_data = {0,0,0,0,0};
-        money_report_data.hash =_PublicKey;
+        
         money_report_data.cars_total = cars_total;
         money_report_data.coins_total = coins_total;
         money_report_data.banknotes_total = banknotes_total;
@@ -353,8 +351,6 @@ public:
     // Encodes relay report data and sends it to Central Server via SAVE request.
     int SendRelayReport(struct RelayStat RelayStats[MAX_RELAY_NUM]) {
         relay_report_t relay_report_data={{{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}}};
-
-        relay_report_data.hash = _PublicKey;
 
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relay_report_data.RelayStats[i].switched_count = RelayStats[i].switched_count;
@@ -377,7 +373,7 @@ public:
         std::string json_get_last_money_report_request = json_get_last_money_report();
 
         // Send request to Central Server
-        int res = SendRequest(&json_get_last_money_report_request, &answer);
+        int res = SendRequest(&json_get_last_money_report_request, &answer, _Host);
         
         if (res > 0) {
             printf("No connection to server\n");
@@ -448,7 +444,7 @@ public:
         std::string json_get_last_relay_report_request = json_get_last_relay_report();
 
         // Send request to Central Server
-        int res = SendRequest(&json_get_last_relay_report_request, &answer);
+        int res = SendRequest(&json_get_last_relay_report_request, &answer, _Host);
         
         if (res > 0) {
             printf("No connection to server\n");
@@ -641,7 +637,7 @@ private:
     std::string json_create_ping_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         char *str = json_dumps(object, 0);
         std::string res = str;
 
@@ -654,12 +650,12 @@ private:
     std::string json_create_money_report(struct money_report *s) {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         json_object_set_new(object, "Banknotes", json_integer(s->banknotes_total));
         json_object_set_new(object, "CarsTotal", json_integer(s->cars_total));
         json_object_set_new(object, "Coins", json_integer(s->coins_total));
         json_object_set_new(object, "Electronical",json_integer(s->cashless_total));
-        json_object_set_new(object, "Service",json_integer(s->test_total));
+        json_object_set_new(object, "Service",json_integer(s->service_total));
     
         char *str = json_dumps(object, 0);
         std::string res = str;
@@ -674,7 +670,7 @@ private:
         json_t *relayarr = json_array();
         json_t *relayobj[MAX_RELAY_NUM];
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
 
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relayobj[i] = json_object();
@@ -696,8 +692,8 @@ private:
     std::string json_get_registry_value(std::string key) {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
-        json_object_set_new(object, "Key", json_string(key.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "Key", json_string(key.c_str()));
         
         char *str = json_dumps(object, 0);
         std::string res = str;
@@ -711,7 +707,7 @@ private:
     std::string json_get_last_money_report() {
         json_t *object = json_object();
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         json_object_set_new(object, "Banknotes", json_integer(1));
         json_object_set_new(object, "CarsTotal", json_integer(1));
         json_object_set_new(object, "Coins", json_integer(1));
@@ -731,7 +727,7 @@ private:
         json_t *relayarr = json_array();
         json_t *relayobj[MAX_RELAY_NUM];
 
-        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str());
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
 
         for(int i = 0; i < MAX_RELAY_NUM; i++) {
             relayobj[i] = json_object();

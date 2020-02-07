@@ -286,7 +286,7 @@ int RecoverMoney() {
 }
 
 int RecoverRelay() {
-    relay_report_t* last_relay_report = new create_relay_report_t;
+    relay_report_t* last_relay_report = new relay_report_t;
 
     int err = network.GetLastRelayReport(last_relay_report);
 
@@ -337,13 +337,6 @@ void SetLocalData(std::string key, std::string value) {
 }
 /////////////////////////////////////////////////////
 
-// Just compilation of recovers.
-void RecoverData() {
-    RecoverRegistry();
-    RecoverMoney();
-    RecoverRelay();
-}
-
 /////// Registry processing function ///////////////
 int RecoverRegistry() {
     printf("Recovering registries...\n");
@@ -369,7 +362,7 @@ int RecoverRegistry() {
 
                 std::string localData = GetLocalData(key);
                 if (localData != value) {
-                    SetLocalData(key, value;
+                    SetLocalData(key, value);
                 }
             }
         }
@@ -394,6 +387,13 @@ int RecoverRegistry() {
     return err;
 }
 //////////////////////////////////////////////
+
+// Just compilation of recovers.
+void RecoverData() {
+    RecoverRegistry();
+    RecoverMoney();
+    RecoverRelay();
+}
 
 int main(int argc, char ** argv) {
     config = 0;
@@ -431,7 +431,7 @@ int main(int argc, char ** argv) {
 
     network.SetPublicKey(std::string(centralKey));
     
-    std::string serverIP = network.LocateCentralServer();
+    std::string serverIP = network.SearchCentralServer();
     network.SetHostName(serverIP);
     
     // Runtime and firmware initialization
@@ -442,7 +442,7 @@ int main(int argc, char ** argv) {
 
     DiaConfiguration configuration(folder);
     config = &configuration;
-    err = configuration.Init();
+    int err = configuration.Init();
     if (err != 0) {
         printf("Can't run due to the configuration error\n");
         return 1;
