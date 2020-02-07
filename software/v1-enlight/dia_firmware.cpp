@@ -488,8 +488,7 @@ int main(int argc, char ** argv) {
     #endif
 
     configuration.GetRuntime()->AddAnimations();
-
-    ///// Runtime init
+  
     DiaRuntimeHardware * hardware = new DiaRuntimeHardware();
     hardware->keys_object = configuration.GetGpio();
     hardware->get_keys_function = get_key;

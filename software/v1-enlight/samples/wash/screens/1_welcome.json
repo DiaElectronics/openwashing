@@ -9,14 +9,6 @@
       "visible":"true"
     },
     {
-      "id":"logo",
-      "type":"image",
-      "position": "226;107",
-      "size":"400;130",
-      "src":"pic/1/logo.png",
-      "visible":"true"
-    },
-    {
       "id":"post_number",
       "type": "digits",
       "position": "595;373",

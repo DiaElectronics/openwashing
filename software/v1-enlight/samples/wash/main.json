@@ -11,36 +11,32 @@
       "src": "screens/2_ask_for_money.json"
     },
     {
-      "id": "ask_for_money_no_price",
-      "src": "screens/2_ask_for_money_no_price.json"
-    },
-    {
       "id": "start",
       "src": "screens/3_start.json"
     },  
     {
-      "id": "water",
-      "src": "screens/4_water.json"
+      "id": "p1screen",
+      "src": "programs/p1/screen.json"
     },  
     {
-      "id": "soap",
-      "src": "screens/5_soap.json"
+      "id": "p2screen",
+      "src": "programs/p2/screen.json"
     },  
     {
-      "id": "active_soap",
-      "src": "screens/6_active_soap.json"
+      "id": "p3screen",
+      "src": "programs/p3/screen.json"
     }, 
     {
-      "id": "pause",
-      "src": "screens/7_pause.json"
+      "id": "p4screen",
+      "src": "programs/p4/screen.json"
     },
     {
-      "id": "osmosian",
-      "src": "screens/8_osmosian.json"
+      "id": "p5screen",
+      "src": "programs/p5/screen.json"
     },
     {
-      "id": "wax",
-      "src": "screens/9_wax.json"
+      "id": "p6screen",
+      "src": "programs/p6/screen.json"
     },
     {
       "id": "thanks",
@@ -64,28 +60,28 @@
   "endpoint": "http://app.diae.ru/v0/gql/",
   "programs": [
     {
-      "id": "pause",
-      "src": "programs/pause.json"
+      "id": "p1relay",
+      "src": "programs/p1/relay.json"
     },
     {
-      "id": "water",
-      "src": "programs/water.json"
+      "id": "p2relay",
+      "src": "programs/p2/relay.json"
     },
     {
-      "id": "soap",
-      "src": "programs/soap.json"
+      "id": "p3relay",
+      "src": "programs/p3/relay.json"
     },
     {
-      "id": "active_soap",
-      "src": "programs/active_soap.json"
+      "id": "p4relay",
+      "src": "programs/p4/relay.json"
     },
     {
-      "id": "osmosian",
-      "src": "programs/osmosian.json"
+      "id": "p5relay",
+      "src": "programs/p5/relay.json"
     },
     {
-      "id": "wax",
-      "src": "programs/wax.json"
+      "id": "p6relay",
+      "src": "programs/p6/relay.json"
     }
   ],
   "script": "script.lua"
