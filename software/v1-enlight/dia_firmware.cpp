@@ -439,13 +439,16 @@ int main(int argc, char ** argv) {
     }
 
     network.SetPublicKey(std::string(centralKey));
-    
-    std::string serverIP = network.GetCentralServerAddress();
-    if (serverIP == "") {
-        printf("Error: Center Server is unavailable\n");
-        return 1;
+    int need_to_find = 1; 
+    std::string serverIP = "";
+
+    while (need_to_find) {
+    	serverIP = network.GetCentralServerAddress();
+    	if (serverIP == "") {
+        	printf("Error: Center Server is unavailable. Next try...\n");
+    	} else
+	    need_to_find = 0;
     }
-    
     network.SetHostAddress(serverIP);
     
     // Runtime and firmware initialization
