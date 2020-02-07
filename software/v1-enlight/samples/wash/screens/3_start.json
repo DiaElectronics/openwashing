@@ -5,7 +5,7 @@
         "type":"image",
         "position": "0;0",
         "size":"848;480",
-        "src":"pic/3/background.png",
+        "src":"pic/background.png",
         "visible":"true"
       },
       {
@@ -13,7 +13,7 @@
         "type":"image",
         "position": "368;36",
         "size":"422;233",
-        "src":"pic/3/balance.png",
+        "src":"pic/balance.png",
         "visible":"true"
       },
       {
@@ -31,7 +31,7 @@
         "type":"image",
         "position": "62;194",
         "size":"215;47",
-        "src":"pic/3/recommend.png",
+        "src":"pic/recommend.png",
         "visible":"true"
       },
       {
@@ -39,7 +39,7 @@
         "type":"image",
         "position": "74;445",
         "size":"30;17",
-        "src":"pic/3/arrow.png",
+        "src":"pic/arrow.png",
         "visible":"true"
       }
     ]
