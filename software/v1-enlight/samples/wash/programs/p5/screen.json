@@ -5,7 +5,7 @@
         "type":"image",
         "position": "0;0",
         "size":"848;480",
-        "src":"pic/3/background.png",
+        "src":"pic/background.png",
         "visible":"true"
       },
       {
@@ -13,7 +13,7 @@
         "type":"image",
         "position": "368;36",
         "size":"422;233",
-        "src":"pic/3/balance.png",
+        "src":"pic/balance.png",
         "visible":"true"
       },
       {
@@ -30,24 +30,8 @@
         "id":"current_label",
         "type":"image",
         "position": "62;80",
-        "size":"164;59",
-        "src":"pic/6/active_soap.png",
-        "visible":"true"
-      },    
-      {
-        "id":"recommend_label",
-        "type":"image",
-        "position": "62;194",
-        "size":"215;48",
-        "src":"pic/5/recommend.png",
-        "visible":"true"
-      },
-      {
-        "id":"recommend_arrow",
-        "type":"image",
-        "position": "750;445",
-        "size":"30;17",
-        "src":"pic/3/arrow.png",
+        "size":"225;33",
+        "src":"programs/p5/label.png",
         "visible":"true"
       }
     ]

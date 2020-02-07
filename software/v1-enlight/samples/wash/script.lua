@@ -21,21 +21,14 @@ setup = function()
     
     hascardreader = false
 
-    price_pause = 0
-    price_water = 0
-    price_soap = 0
-    price_active_soap = 0
-    price_osmosian = 0
-    price_wax = 0
+    price_p1 = 0
+    price_p2 = 0
+    price_p3 = 0
+    price_p4 = 0
+    price_p5 = 0
+    price_p6 = 0
 
     init_prices()
-    ask_for_money:Set("water.value", price_water)
-    ask_for_money:Set("soap.value", price_soap)
-    ask_for_money:Set("active_soap.value", price_active_soap)
-    ask_for_money:Set("osmosian.value", price_osmosian)
-    ask_for_money:Set("wax.value", price_wax)
-    ask_for_money:Set("pause.value", price_pause)
-    ask_for_money:Set("pause_sec.value", free_pause_seconds)
     
     mode_welcome = 0
     mode_choose_method = 10
@@ -43,39 +36,41 @@ setup = function()
     mode_wait_for_card = 30
     mode_ask_for_money = 40
     mode_start = 50
-    mode_water = 60
-    mode_soap = 70
-    mode_active_soap = 80
-    mode_pause = 90
-    mode_osmosian = 100
-    mode_wax = 110
+    mode_p1 = 60
+    mode_p2 = 70
+    mode_p3 = 80
+    mode_p4 = 90
+    mode_p5 = 100
+    mode_p6 = 110
     mode_thanks = 120
     
     currentMode = mode_welcome
-    version = "0.4"
+    version = "1.0.0"
 
-    printMessage("Kanatnikoff Wash v." .. version)
+    printMessage("dia generic wash firmware v." .. version)
     return 0
 end
 
 init_prices = function()
-    price_pause = get_price("price6")
-    if price_pause == 0 then price_pause = 18 end
+    
 
-    price_water = get_price("price1")
-    if price_water == 0 then price_water = 18 end
+    price_p1 = get_price("price1")
+    if price_p1 == 0 then price_p1 = 18 end
 
-    price_soap = get_price("price2")
-    if price_soap == 0 then price_soap = 18 end
+    price_p2 = get_price("price2")
+    if price_p2 == 0 then price_p2 = 18 end
 
-    price_active_soap = get_price("price3")
-    if price_active_soap == 0 then price_active_soap = 36 end
+    price_p3 = get_price("price3")
+    if price_p3 == 0 then price_p3 = 36 end
 
-    price_osmosian = get_price("price4")
-    if price_osmosian == 0 then price_osmosian = 18 end
+    price_p4 = get_price("price4")
+    if price_p4 == 0 then price_p4 = 18 end
 
-    price_wax = get_price("price5")
-    if price_wax == 0 then price_wax = 18 end
+    price_p5 = get_price("price5")
+    if price_p5 == 0 then price_p5 = 18 end
+    
+    price_p6 = get_price("price6")
+    if price_p6 == 0 then price_p6 = 18 end
 end
 
 -- loop is being executed
@@ -92,12 +87,12 @@ run_mode = function(new_mode)
     if new_mode == mode_wait_for_card then return wait_for_card_mode() end
     if new_mode == mode_ask_for_money then return ask_for_money_mode() end
     if new_mode == mode_start then return start_mode() end
-    if new_mode == mode_water then return water_mode() end
-    if new_mode == mode_soap then return soap_mode() end
-    if new_mode == mode_active_soap then return active_soap_mode() end
-    if new_mode == mode_pause then return pause_mode() end
-    if new_mode == mode_osmosian then return osmosian_mode() end
-    if new_mode == mode_wax then return wax_mode() end
+    if new_mode == mode_p1 then return p1_mode() end
+    if new_mode == mode_p2 then return p2_mode() end
+    if new_mode == mode_p3 then return p3_mode() end
+    if new_mode == mode_p4 then return p4_mode() end
+    if new_mode == mode_p5 then return p5_mode() end
+    if new_mode == mode_p6 then return p6_mode() end
     if new_mode == mode_thanks then return thanks_mode() end
 end
 
@@ -211,44 +206,69 @@ start_mode = function()
     return mode_start
 end
 
-water_mode = function()
-    show_water(balance)
-    run_water()
+p1_mode = function()
+    show_p1(balance)
+    run_p1()
     turn_light(1, animation.one_button)
-    charge_balance(price_water)
+    charge_balance(price_p1)
     if balance <= 0.01 then return mode_thanks end
     update_balance()
     suggested_mode = get_mode_by_pressed_key()
     if suggested_mode >=0 then return suggested_mode end
-    return mode_water
+    return mode_p1
 end
 
-soap_mode = function()
-    show_soap(balance)
-    run_soap()
+p2_mode = function()
+    show_p2(balance)
+    run_p2()
     turn_light(2, animation.one_button)
-    charge_balance(price_soap)
+    charge_balance(price_p2)
     if balance <= 0.01 then return mode_thanks end
     update_balance()
     suggested_mode = get_mode_by_pressed_key()
     if suggested_mode >=0 then return suggested_mode end
-    return mode_soap
+    return mode_p2
 end
 
-active_soap_mode = function()
-    show_active_soap(balance)
-    run_active_soap()
+p3_mode = function()
+    show_p3(balance)
+    run_p3()
     turn_light(3, animation.one_button)
     charge_balance(price_active_soap)
     if balance <= 0.01 then return mode_thanks end
     update_balance()
     suggested_mode = get_mode_by_pressed_key()
     if suggested_mode >=0 then return suggested_mode end
-    return mode_active_soap
+    return mode_p3
 end
 
-pause_mode = function()
-    show_pause(balance, balance_seconds)
+p4_mode = function()
+    show_p4(balance)
+    run_p4()
+    turn_light(4, animation.one_button)
+    charge_balance(price_p4)
+    if balance <= 0.01 then return mode_thanks end
+    update_balance()
+    suggested_mode = get_mode_by_pressed_key()
+    if suggested_mode >=0 then return suggested_mode end
+    return mode_p4
+end
+
+p5_mode = function()
+    show_p5(balance)
+    run_p5()
+    turn_light(5, animation.one_button)
+    charge_balance(price_p5)
+    if balance <= 0.01 then return mode_thanks end
+    update_balance()
+    suggested_mode = get_mode_by_pressed_key()
+    if suggested_mode >=0 then return suggested_mode end
+    return mode_p5
+end
+
+
+p6_mode = function()
+    show_p6(balance, balance_seconds)
     run_pause()
     turn_light(6, animation.one_button)
     update_balance()
@@ -256,45 +276,21 @@ pause_mode = function()
         balance_seconds = balance_seconds - 0.1
     else
         balance_seconds = 0
-        charge_balance(price_pause)         
+        charge_balance(price_p6)         
     end
     
     if balance <= 0.01 then return mode_thanks end
     
     suggested_mode = get_mode_by_pressed_key()
     if suggested_mode >=0 then return suggested_mode end
-    return mode_pause
-end
-
-osmosian_mode = function()
-    show_osmosian(balance)
-    run_osmosian()
-    turn_light(4, animation.one_button)
-    charge_balance(price_osmosian)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_osmosian
-end
-
-wax_mode = function()
-    show_wax(balance)
-    run_wax()
-    turn_light(5, animation.one_button)
-    charge_balance(price_wax)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_wax
+    return mode_p6
 end
 
 thanks_mode = function()
     balance = 0
     show_thanks(thanks_mode_seconds)
     turn_light(1, animation.one_button)
-    run_program(program.pause)
+    run_program(program.p6relay)
     waiting_loops = thanks_mode_seconds * 10;
     
     while(waiting_loops>0)
@@ -322,7 +318,7 @@ show_welcome = function()
 end
 
 show_ask_for_money = function()
-    ask_for_money_no_price:Display()
+    ask_for_money:Display()
 end
 
 show_choose_method = function()
@@ -345,43 +341,45 @@ show_start = function(balance_rur)
     start:Display()
 end
 
-show_water = function(balance_rur)
+show_p1 = function(balance_rur)
     balance_int = math.ceil(balance_rur)
-    water:Set("balance.value", balance_int)
-    water:Display()
+    p1screen:Set("balance.value", balance_int)
+    p1screen:Display()
 end
 
-show_soap = function(balance_rur)
+show_p2 = function(balance_rur)
     balance_int = math.ceil(balance_rur)
-    soap:Set("balance.value", balance_int)
-    soap:Display()
+    p2screen:Set("balance.value", balance_int)
+    p2screen:Display()
 end
 
-show_active_soap = function(balance_rur)
+show_p3 = function(balance_rur)
     balance_int = math.ceil(balance_rur)
-    active_soap:Set("balance.value", balance_int)
-    active_soap:Display()
+    p3screen:Set("balance.value", balance_int)
+    p3screen:Display()
 end
 
-show_pause = function(balance_rur, balance_sec)
+show_p4 = function(balance_rur)
+    balance_int = math.ceil(balance_rur)
+    p4screen:Set("balance.value", balance_int)
+    p4screen:Display()
+end
+
+show_p5 = function(balance_rur)
+    balance_int = math.ceil(balance_rur)
+    p5screen:Set("balance.value", balance_int)
+    p5screen:Display()
+end
+
+show_p6 = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
-    pause:Set("pause_balance.value", sec_int)
-    pause:Set("balance.value", balance_int)
-    pause:Display()
+    p6screen:Set("pause_balance.value", sec_int)
+    p6screen:Set("balance.value", balance_int)
+    p6screen:Display()
 end
 
-show_osmosian = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    osmosian:Set("balance.value", balance_int)
-    osmosian:Display()
-end
 
-show_wax = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    wax:Set("balance.value", balance_int)
-    wax:Display()
-end
 
 show_thanks =  function(seconds_float)
     seconds_int = math.ceil(seconds_float)
@@ -391,12 +389,12 @@ end
 
 get_mode_by_pressed_key = function()
     pressed_key = get_key()
-    if pressed_key == 1 then return mode_water end
-    if pressed_key == 2 then return mode_soap end
-    if pressed_key == 3 then return mode_active_soap end
-    if pressed_key == 4 then return mode_osmosian end
-    if pressed_key == 5 then return mode_wax end
-    if pressed_key == 6 then return mode_pause end
+    if pressed_key == 1 then return mode_p1 end
+    if pressed_key == 2 then return mode_p2 end
+    if pressed_key == 3 then return mode_p3 end
+    if pressed_key == 4 then return mode_p4 end
+    if pressed_key == 5 then return mode_p5 end
+    if pressed_key == 6 then return mode_p6 end
     return -1
 end
 
@@ -420,28 +418,28 @@ send_receipt = function(post_pos, is_card, amount)
     hardware:SendReceipt(post_pos, is_card, amount)
 end
 
-run_pause = function()
-    run_program(program.pause)
+run_p1 = function()
+    run_program(program.p1program)
 end
 
-run_water = function()
-    run_program(program.water)
+run_p2 = function()
+    run_program(program.p2program)
 end
 
-run_soap = function()
-    run_program(program.soap)
+run_p3 = function()
+    run_program(program.p3program)
 end
 
-run_active_soap = function()
-    run_program(program.active_soap)
+run_p4 = function()
+    run_program(program.p4program)
 end
 
-run_osmosian = function()
-    run_program(program.osmosian)
+run_p5 = function()
+    run_program(program.p5program)
 end
 
-run_wax = function()
-    run_program(program.wax)
+run_p6 = function()
+    run_program(program.p6program)
 end
 
 run_stop = function()
