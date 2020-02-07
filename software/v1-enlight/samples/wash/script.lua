@@ -234,7 +234,7 @@ p3_mode = function()
     show_p3(balance)
     run_p3()
     turn_light(3, animation.one_button)
-    charge_balance(price_active_soap)
+    charge_balance(price_p3)
     if balance <= 0.01 then return mode_thanks end
     update_balance()
     suggested_mode = get_mode_by_pressed_key()
