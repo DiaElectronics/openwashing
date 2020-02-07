@@ -82,6 +82,44 @@ public:
         }
     }
 
+    // Base function for sending a GET request.
+    // Parameters: gets pre-created HTTP body, modifies answer from server, gets address of host (URL).
+    int SendRequestGet(std::string *answer, std::string host_addr) {
+        assert(answer);
+
+        CURL *curl;
+        CURLcode res;
+        curl_answer_t raw_answer;
+
+        InitCurlAnswer(&raw_answer);
+
+        curl_global_init(CURL_GLOBAL_ALL);
+        curl = curl_easy_init();
+        if (curl == NULL) {
+            return 1;
+        }
+
+        curl_easy_setopt(curl, CURLOPT_URL, host_addr.c_str());
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
+	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
+
+        res = curl_easy_perform(curl);
+        if (res != CURLE_OK) {
+            if (res == CURLE_COULDNT_CONNECT) {
+                return SERVER_UNAVAILABLE;
+            }
+            return 1;
+        }
+        *answer = raw_answer.data;
+        DestructCurlAnswer(&raw_answer);
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+        return 0;
+    }
+
     // Base function for sending a POST request.
     // Parameters: gets pre-created HTTP body, modifies answer from server, gets address of host (URL).
     int SendRequest(std::string *body, std::string *answer, std::string host_addr) {
@@ -150,10 +188,9 @@ public:
         sscanf(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr), "%s", tmpUrl);
 
         int err = 0;
-        int tmp = 0;
 
         printf("Checking localhost...\n");
-        err = this->SendPingRequest("localhost", tmp);
+        err = this->SendPingRequestGet("localhost");
         if (!err) {
             delete[] tmpUrl;
             *ip = "localhost";
@@ -179,7 +216,7 @@ public:
         for (int i = 1; i < 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i);
 
-            err = this->SendPingRequest(reqUrl, tmp);
+            err = this->SendPingRequestGet(reqUrl);
 
             if (!err) {
                 // We found it!
@@ -237,7 +274,7 @@ public:
         std::string serverIP = "";
         int res = -1;
 
-	printf("Looking for Central-wash server ...\n");
+	    printf("Looking for Central-wash server ...\n");
         res = this->SearchCentralServer(&serverIP, "eth0");
         
         if (res == 0) {
@@ -257,7 +294,16 @@ public:
         return serverIP;
     }
 
-    // PING request to specified URL. 
+    // PING request to specified URL with method GET. 
+    // Returns 0, if request was OK, other value - in case of failure.
+    int SendPingRequestGet(std::string url) {
+        std::string answer;
+	    url += _Port + "/ping";
+
+        return SendRequestGet(&answer, url);
+    }
+
+    // PING request to specified URL with method POST. 
     // Returns 0, if request was OK, other value - in case of failure.
     // Modifies service money, if server returned that kind of data.
     int SendPingRequest(std::string url, int& service_money) {
