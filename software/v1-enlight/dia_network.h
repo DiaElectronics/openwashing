@@ -133,14 +133,14 @@ public:
     // Central server searching, if it's IP address is unknown.
     // Gets local machine's IP and starts pinging every address in block.
     // Modifies IP address.
-    int SearchCentralServer(std::string *ip) {
+    int SearchCentralServer(std::string *ip, std::string interface) {
 	char* tmpUrl = new char[16];            	    
         int fd;
         struct ifreq ifr;
 
         fd = socket(AF_INET, SOCK_DGRAM, 0);
         ifr.ifr_addr.sa_family = AF_INET;
-        strncpy(ifr.ifr_name, "eth0", IFNAMSIZ-1);
+        strncpy(ifr.ifr_name, interface.c_str(), IFNAMSIZ-1);
 
         ioctl(fd, SIOCGIFADDR, &ifr);
         close(fd);
@@ -234,14 +234,21 @@ public:
         int res = -1;
 
 	printf("Looking for Central-wash server ...\n");
-        res = this->SearchCentralServer(&serverIP);
+        res = this->SearchCentralServer(&serverIP, "eth0");
         
         if (res == 0) {
             printf("Server located on: %s\n", serverIP.c_str());
         }
         else {
-            printf("Failed: no server found...\n");
-            serverIP = "";
+            printf("Failed: no server found on eth0. Looking for wlan0...\n");
+	    res = this->SearchCentralServer(&serverIP, "wlan0");
+
+	    if (res == 0) {
+		printf("Server located on %s\n", serverIP.c_str());
+	    } else {
+		printf("Failed: no server found on wlan0...\n");
+		serverIP = "";
+	    }
         }
         return serverIP;
     }
