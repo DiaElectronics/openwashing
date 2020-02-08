@@ -33,6 +33,7 @@
 DiaConfiguration * config;
 
 int _100MsIntervalsCount;
+int _100MsIntervalsCountRelay;
 
 // Public key for signing every request to Central Server.
 char centralKey[12];
@@ -230,6 +231,12 @@ int CentralServerDialog() {
         _100MsIntervalsCount = 0;
     }
 
+    _100MsIntervalsCountRelay++;
+    if(_100MsIntervalsCountRelay < 0) {
+        printf("Memory corruption on _100MsIntervalsCountRelay\n");
+        _100MsIntervalsCountRelay = 0;
+    }
+
     // Every 2 seconds we go inside this
     if (_100MsIntervalsCount > 20) {
         _100MsIntervalsCount = 0;
@@ -244,6 +251,25 @@ int CentralServerDialog() {
             config->_Income.totalIncomeService += serviceMoney;
             SaveIncome();
         }      
+    }
+
+    // Every 5 min (300 sec) we go inside this
+    if (_100MsIntervalsCountRelay > 3000) {
+        _100MsIntervalsCountRelay = 0;
+        
+        printf("Sending relay report to server...\n");
+        RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
+
+        DiaGpio * gpio = config->GetGpio();
+
+        for (int i = 0; i < MAX_RELAY_NUM; i++) {
+            relays[i].switched_count = gpio->Stat.relay_switch[i+1];
+            relays[i].total_time_on = gpio->Stat.relay_time[i+1];
+        }
+        
+        network.SendRelayReport(relays);
+
+        delete relays;
     }
     return 0;
 }
@@ -555,8 +581,6 @@ int main(int argc, char ** argv) {
 
                             // Save this in the storage
                             configuration.GetStorage()->save(configuration.GetStorage()->object, "income", &configuration._Income, sizeof(income));
-
-                            // TODO: create money report here
 
                             printf("UP\n"); fflush(stdout);
                             break;
