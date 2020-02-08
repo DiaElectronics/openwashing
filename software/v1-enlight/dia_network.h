@@ -114,7 +114,7 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 50);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -176,7 +176,7 @@ public:
         }
 
         // Scan whole block
-        for (int i = 1; i <= 255; i++) {
+        for (int i = 1; i < 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i);
 
             err = this->SendPingRequest(reqUrl, tmp);
