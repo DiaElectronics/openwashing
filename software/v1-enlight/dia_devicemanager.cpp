@@ -57,7 +57,7 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
 
     // Get short name of port, for instance:
     //   /dev/ttyACM0 ==> /ttyACM0
-    std::string shortPortName = portName.substr(4, 7);
+    std::string shortPortName = portName.substr(4, 8);
     printf("Port short name: %s\n", shortPortName.c_str());
 
     size_t devicePortPosition = bashOutput.find(shortPortName);
