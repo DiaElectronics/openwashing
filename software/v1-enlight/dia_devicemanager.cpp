@@ -50,31 +50,22 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     printf("\nChecking port %s for NV9 device...\n", PortName);
 
     std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id");
-    printf("Exec bash result: \n %s\n", bashOutput.c_str());
-
     std::string portName = std::string(PortName);
     size_t maxDiff = 50;
 
     // Get short name of port, for instance:
     //   /dev/ttyACM0 ==> /ttyACM0
     std::string shortPortName = portName.substr(4, 8);
-    printf("Port short name: %s\n", shortPortName.c_str());
 
     size_t devicePortPosition = bashOutput.find(shortPortName);
-    printf("Device Port Position: %d\n", (int)devicePortPosition);
 
     // Check existance of port in list
     if (devicePortPosition != std::string::npos) {
-        printf("Port exists!\n");
-
         size_t deviceNamePosition = bashOutput.find("E0A2E1");
-        printf("Device Name Position: %d\n", (int)deviceNamePosition);
-        size_t tmp = devicePortPosition - deviceNamePosition; 
-        printf("Difference between Name and Port: %d\n", (int)tmp);
 
+        // Compare distance between positions with maxDiff const
         if (deviceNamePosition != std::string::npos && 
             devicePortPosition - deviceNamePosition < maxDiff) {
-                printf("\nFound NV9 on port %s\n\n", PortName);
                 return 1;
             } 
     }
@@ -96,7 +87,7 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     }
     if(!devInList)
     {
-        if (isACM) {
+        if (isACM && !manager->isBanknoteReaderFound) {
             if (DiaDeviceManager_CheckNV9(PortName)) {
                 printf("\nFound NV9 on port %s\n\n", PortName);
                 DiaDevice * dev = new DiaDevice(PortName);
@@ -107,6 +98,7 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
                 DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
                 DiaNv9Usb_StartDriver(newNv9);
                 manager->_Devices.push_back(dev);
+                manager->isBanknoteReaderFound = 1;
             }
         } else {
             printf("\nChecking port %s for MicroCoinSp...\n", PortName);
@@ -186,6 +178,7 @@ void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
 DiaDeviceManager::DiaDeviceManager()
 {
     NeedWorking = 1;
+    isBanknoteReaderFound = 0;
     CoinMoney = 0;
     BanknoteMoney = 0;
     ElectronMoney = 0;

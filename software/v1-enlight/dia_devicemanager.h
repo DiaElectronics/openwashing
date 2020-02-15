@@ -16,6 +16,7 @@ public:
     int ServiceMoney;
     
     int NeedWorking;
+    int isBanknoteReaderFound;
     char * _PortName;
     pthread_mutex_t _DevicesLock = PTHREAD_MUTEX_INITIALIZER;
 
