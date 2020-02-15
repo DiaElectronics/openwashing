@@ -100,7 +100,8 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
                 manager->_Devices.push_back(dev);
                 manager->isBanknoteReaderFound = 1;
             }
-        } else {
+        }
+        if (!isACM) { 
             printf("\nChecking port %s for MicroCoinSp...\n", PortName);
             DiaDevice * dev = new DiaDevice(PortName);
 
