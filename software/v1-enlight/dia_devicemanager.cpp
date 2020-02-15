@@ -58,14 +58,20 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     // Get short name of port, for instance:
     //   /dev/ttyACM0 ==> /ttyACM0
     std::string shortPortName = portName.substr(4, 7);
+    printf("Port short name: %s\n", shortPortName.c_str());
 
     size_t devicePortPosition = bashOutput.find(shortPortName);
+    printf("Device Port Position: %d\n", (int)devicePortPosition);
 
     // Check existance of port in list
     if (devicePortPosition != std::string::npos) {
+        printf("Port exists!\n");
 
         size_t deviceNamePosition = bashOutput.find("E0A2E1");
-        
+        printf("Device Name Position: %d\n", (int)deviceNamePosition);
+        size_t tmp = devicePortPosition - deviceNamePosition; 
+        printf("Difference between Name and Port: %d\n", (int)tmp);
+
         if (deviceNamePosition != std::string::npos && 
             devicePortPosition - deviceNamePosition < maxDiff) {
                 printf("\nFound NV9 on port %s\n\n", PortName);
