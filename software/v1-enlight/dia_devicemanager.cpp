@@ -41,6 +41,7 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     if(!devInList)
     {
         DiaDevice * dev = new DiaDevice(PortName);
+        printf("Device manager found device: %s\n", PortName);
         dev->Manager = manager;
         dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
         dev->Open();
