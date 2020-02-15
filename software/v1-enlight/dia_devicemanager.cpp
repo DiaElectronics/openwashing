@@ -49,10 +49,31 @@ std::string DiaDeviceManager_ExecBashCommand(const char* cmd) {
 int DiaDeviceManager_CheckNV9(char* PortName) {
     printf("\nChecking port %s for NV9 device...\n", PortName);
 
-    std::string res = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id");
-    printf("Exec bash result: \n %s\n", res.c_str());
+    std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id");
+    printf("Exec bash result: \n %s\n", bashOutput.c_str());
 
-    return 1;
+    std::string portName = std::string(PortName);
+    size_t maxDiff = 50;
+
+    // Get short name of port, for instance:
+    //   /dev/ttyACM0 ==> /ttyACM0
+    std::string shortPortName = portName.substr(4, 7);
+
+    size_t devicePortPosition = bashOutput.find(shortPortName);
+
+    // Check existance of port in list
+    if (devicePortPosition != std::string::npos) {
+
+        size_t deviceNamePosition = bashOutput.find("E0A2E1");
+        
+        if (deviceNamePosition != std::string::npos && 
+            devicePortPosition - deviceNamePosition < maxDiff) {
+                printf("\nFound NV9 on port %s\n\n", PortName);
+                return 1;
+            } 
+    }
+
+    return 0;
 }
 
 void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortName, int isACM) {
@@ -69,18 +90,19 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     }
     if(!devInList)
     {
-        if (DiaDeviceManager_CheckNV9(PortName) && isACM) {
-            printf("\nFound NV9 on port %s\n\n", PortName);
-            DiaDevice * dev = new DiaDevice(PortName);
+        if (isACM) {
+            if (DiaDeviceManager_CheckNV9(PortName)) {
+                printf("\nFound NV9 on port %s\n\n", PortName);
+                DiaDevice * dev = new DiaDevice(PortName);
 
-            dev->Manager = manager;
-            dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
-            dev->Open();
-            DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
-            DiaNv9Usb_StartDriver(newNv9);
-            manager->_Devices.push_back(dev);
-        }
-        if (!isACM) {
+                dev->Manager = manager;
+                dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
+                dev->Open();
+                DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
+                DiaNv9Usb_StartDriver(newNv9);
+                manager->_Devices.push_back(dev);
+            }
+        } else {
             printf("\nChecking port %s for MicroCoinSp...\n", PortName);
             DiaDevice * dev = new DiaDevice(PortName);
 
