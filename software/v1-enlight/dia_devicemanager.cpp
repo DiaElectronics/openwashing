@@ -61,7 +61,7 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
 
     // Check existance of port in list
     if (devicePortPosition != std::string::npos) {
-        size_t deviceNamePosition = bashOutput.find("E0A2E1");
+        size_t deviceNamePosition = bashOutput.find("NV9USB");
 
         // Compare distance between positions with maxDiff const
         if (deviceNamePosition != std::string::npos && 
