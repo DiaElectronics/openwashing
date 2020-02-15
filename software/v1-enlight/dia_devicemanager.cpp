@@ -9,10 +9,11 @@
 #include "dia_microcoinsp.h"
 #include "dia_cardreader.h"
 #include <wiringPi.h>
+#include <stdexcept>
 #include "money_types.h"
 
 void DiaDeviceManager_AddCardReader(DiaDeviceManager * manager) {
-    printf("Card reader added to Device Manager\n");
+    printf("Abstract card reader added to the Device Manager\n");
     manager->_CardReader = new DiaCardReader(manager, DiaDeviceManager_ReportMoney);
 }
 
@@ -24,6 +25,34 @@ void DiaDeviceManager_StartDeviceScan(DiaDeviceManager * manager)
         (*it)->_CheckStatus = DIAE_DEVICE_STATUS_INITIAL;
     }
     pthread_mutex_unlock(&(manager->_DevicesLock));
+}
+
+std::string DiaDeviceManager_ExecBashCommand(const char* cmd) {
+    char buffer[128];
+    std::string result = "";
+
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) 
+        throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
+}
+
+int DiaDeviceManager_CheckNV9(char* PortName) {
+    printf("\nChecking port %s for NV9 device...\n", PortName);
+
+    std::string res = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id");
+    printf("Exec bash result: \n %s\n", res.c_str());
+
+    return 1;
 }
 
 void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortName, int isACM) {
@@ -40,29 +69,34 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     }
     if(!devInList)
     {
-        DiaDevice * dev = new DiaDevice(PortName);
-        printf("Device manager found device: %s\n", PortName);
-        dev->Manager = manager;
-        dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
-        dev->Open();
+        if (DiaDeviceManager_CheckNV9(PortName) && isACM) {
+            printf("\nFound NV9 on port %s\n\n", PortName);
+            DiaDevice * dev = new DiaDevice(PortName);
 
-        if (isACM)
-        {
-            printf("\nFOUND nv9\n\n");
+            dev->Manager = manager;
+            dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
+            dev->Open();
             DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
             DiaNv9Usb_StartDriver(newNv9);
             manager->_Devices.push_back(dev);
-        } else {
-            printf("found coin acceptor\n");
-           
+        }
+        if (!isACM) {
+            printf("\nChecking port %s for MicroCoinSp...\n", PortName);
+            DiaDevice * dev = new DiaDevice(PortName);
+
+            dev->Manager = manager;
+            dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
+            dev->Open();
+
             int res = DiaMicroCoinSp_Detect(dev);
             if (res)
             {
+                printf("\nFound MicroCoinSp on port %s\n\n", PortName);
                 DiaMicroCoinSp * newMicroCoinSp = new DiaMicroCoinSp(dev, DiaDeviceManager_ReportMoney);
                 DiaMicroCoinSp_StartDriver(newMicroCoinSp);
                 manager->_Devices.push_back(dev);
             } else {
-                printf("coin acceptor check failed\n");
+                printf("MicroCoinSp check failed\n");
             }
         }
     }
