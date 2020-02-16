@@ -27,20 +27,19 @@ void DiaDeviceManager_StartDeviceScan(DiaDeviceManager * manager)
     pthread_mutex_unlock(&(manager->_DevicesLock));
 }
 
-std::string DiaDeviceManager_ExecBashCommand(const char* cmd) {
+std::string DiaDeviceManager_ExecBashCommand(const char* cmd, int* error) {
     char buffer[128];
     std::string result = "";
+    *error = 0;
 
     FILE* pipe = popen(cmd, "r");
-    if (!pipe) 
-        throw std::runtime_error("popen() failed!");
-    try {
-        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
-            result += buffer;
-        }
-    } catch (...) {
-        pclose(pipe);
-        throw;
+    if (!pipe) {
+        *error = 1;
+        return result;
+    } 
+        
+    while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+        result += buffer;
     }
     pclose(pipe);
     return result;
@@ -49,14 +48,26 @@ std::string DiaDeviceManager_ExecBashCommand(const char* cmd) {
 int DiaDeviceManager_CheckNV9(char* PortName) {
     printf("\nChecking port %s for NV9 device...\n", PortName);
 
-    std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id");
+    int error = 0;
+    std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id", &error);
+    if (error) {
+        printf("Error while reading info about serial devices, NV9 check failed\n");
+        return 0;
+    }
+
     std::string portName = std::string(PortName);
     size_t maxDiff = 50;
 
     // Get short name of port, for instance:
     //   /dev/ttyACM0 ==> /ttyACM0
-    std::string shortPortName = portName.substr(4, 8);
+    std::string toCut = portName.substr(0, 4);
 
+    if (toCut != "/dev") {
+        printf("Invlaid port name in NV9 device check: %s\n", PortName);
+        return 0;
+    }
+
+    std::string shortPortName = portName.substr(4, 8);
     size_t devicePortPosition = bashOutput.find(shortPortName);
 
     // Check existance of port in list

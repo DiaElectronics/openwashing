@@ -170,6 +170,11 @@ wait_for_card_mode = function()
         is_transaction_started = true
     end
 
+    pressed_key = get_key()
+    if pressed_key > 0 and pressed_key < 7 then
+        waiting_loops = 0
+    end
+
     update_balance()
     if balance > 0.99 then
         status = get_transaction_status()
