@@ -18,7 +18,7 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
     DiaCardReader * driver = (DiaCardReader *)driverPtr;
 
     printf("Transaction requested for %d RUB...\n", driver->RequestedMoney);
-    std::string commandLine = "./uic_payment_app o1 a0 c" + std::to_string(driver->RequestedMoney);
+    std::string commandLine = "./uic_payment_app o1 a" + std::to_string(driver->RequestedMoney) + " c643";
     int statusCode = system(commandLine.c_str());
 
     printf("Card reader returned status code: %d\n", statusCode);

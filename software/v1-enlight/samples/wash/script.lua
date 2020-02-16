@@ -20,6 +20,7 @@ setup = function()
     wait_card_mode_seconds = 120
     
     hascardreader = false
+    is_transaction_started = false
 
     price_p1 = 0
     price_p2 = 0
@@ -161,26 +162,35 @@ wait_for_card_mode = function()
     -- check animation
     turn_light(0, animation.idle)
 
-    waiting_loops = wait_card_mode_seconds * 10;
+    if is_transaction_started ~= true then
+        waiting_loops = wait_card_mode_seconds * 10;
 
-    request_transaction(electron_balance)
-    electron_balance = 0
-
-    while(waiting_loops > 0)
-    do
-        update_balance()
-        if balance > 0.99 then
-            status = get_transaction_status()
-            if status ~= 0 then 
-                -- need to test this
-                abort_transaction()
-            end
-            return mode_start
-        end
-        smart_delay(100)
-        waiting_loops = waiting_loops - 1
+        request_transaction(electron_balance * 100)
+        electron_balance = 0
+        is_transaction_started = true
     end
-    return mode_choose_method
+
+    update_balance()
+    if balance > 0.99 then
+        status = get_transaction_status()
+        if status ~= 0 then 
+            -- need to test this
+            abort_transaction()
+        end
+        is_transaction_started = false
+        return mode_start
+    end
+
+    if waiting_loops <= 0 then
+        is_transaction_started = false
+        abort_transaction()
+        return mode_choose_method
+    end
+
+    smart_delay(100)
+    waiting_loops = waiting_loops - 1
+    
+    return mode_wait_for_card
 end
 
 ask_for_money_mode = function()
