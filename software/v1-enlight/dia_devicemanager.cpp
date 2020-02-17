@@ -62,7 +62,7 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     //   /dev/ttyACM0 ==> /ttyACM0
     std::string toCut = portName.substr(0, 4);
 
-    if (toCut != "/dev") {
+    if (toCut != std::string("/dev")) {
         printf("Invlaid port name in NV9 device check: %s\n", PortName);
         return 0;
     }
