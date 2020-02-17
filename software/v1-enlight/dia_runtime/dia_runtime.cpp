@@ -19,7 +19,7 @@ int DiaRuntime::Init(std::string folder, json_t * src_json) {
 }
 
 void printMessage(const std::string& s) {
-    std::cout << s << std::endl;
+    fprintf(stderr, "%s\n", s.c_str());
 }
 
 int DiaRuntime::Init(std::string folder, std::string src_str) {

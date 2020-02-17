@@ -19,7 +19,7 @@ setup = function()
     free_pause_seconds = 120
     wait_card_mode_seconds = 120
     
-    hascardreader = false
+    hascardreader = true
     is_transaction_started = false
 
     price_p1 = 0
@@ -166,7 +166,7 @@ wait_for_card_mode = function()
         waiting_loops = wait_card_mode_seconds * 10;
 
         request_transaction(electron_balance * 100)
-        electron_balance = 0
+        electron_balance = min_electron_balance
         is_transaction_started = true
     end
 

@@ -463,7 +463,7 @@ int main(int argc, char ** argv) {
         dia_security_write_file(CENTRALWASH_KEY, centralKey);
         printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
     }
-
+    
     network.SetPublicKey(std::string(centralKey));
     int need_to_find = 1; 
     std::string serverIP = "";
@@ -476,7 +476,7 @@ int main(int argc, char ** argv) {
 	    need_to_find = 0;
     }
     network.SetHostAddress(serverIP);
-    
+
     // Runtime and firmware initialization
     DiaDeviceManager manager;
     DiaDeviceManager_AddCardReader(&manager);
