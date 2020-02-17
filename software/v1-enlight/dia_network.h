@@ -275,7 +275,7 @@ public:
         int res = -1;
 
 	    printf("Looking for Central-wash server ...\n");
-        res = this->SearchCentralServer(&serverIP, "enp0s3");
+        res = this->SearchCentralServer(&serverIP, "eth0");
         
         if (res == 0) {
             printf("Server located on: %s\n", serverIP.c_str());
