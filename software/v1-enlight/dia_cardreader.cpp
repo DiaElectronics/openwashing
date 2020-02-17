@@ -29,9 +29,11 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
         } else {
             printf("No handler to report: %d\n", driver->RequestedMoney);
         }
-    }         
+    }
 
+    pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = 0;
+    pthread_mutex_unlock(&driver->MoneyLock);
 
     pthread_exit(NULL);
     return NULL;

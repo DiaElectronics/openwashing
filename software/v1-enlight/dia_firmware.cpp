@@ -177,6 +177,7 @@ int request_transaction(void *object, int money) {
 int get_transaction_status(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int status = DiaDeviceManager_GetTransactionStatus(manager);
+    fprintf(stderr, "Transaction status: %d\n", status);
     return status;
 }
 

@@ -179,7 +179,6 @@ wait_for_card_mode = function()
     if balance > 0.99 then
         status = get_transaction_status()
         if status ~= 0 then 
-            -- need to test this
             abort_transaction()
         end
         is_transaction_started = false
@@ -188,7 +187,10 @@ wait_for_card_mode = function()
 
     if waiting_loops <= 0 then
         is_transaction_started = false
-        abort_transaction()
+	status = get_transaction_status()
+	if status ~= 0 then
+	    abort_transaction()
+	end
         return mode_choose_method
     end
 

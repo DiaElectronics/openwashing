@@ -248,7 +248,7 @@ void DiaDeviceManager_AbortTransaction(void *manager) {
         printf("DiaDeviceManager Abort Transaction got NULL driver\n");
         return;
     }
-    DiaCardReader_AbortTransaction(&Manager->_CardReader);
+    DiaCardReader_AbortTransaction(Manager->_CardReader);
 }
 
 int DiaDeviceManager_GetTransactionStatus(void *manager) {
@@ -258,5 +258,5 @@ int DiaDeviceManager_GetTransactionStatus(void *manager) {
         printf("DiaDeviceManager Get Transaction Status got NULL driver\n");
         return -1;
     }
-    return DiaCardReader_GetTransactionStatus(&Manager->_CardReader);
+    return DiaCardReader_GetTransactionStatus(Manager->_CardReader);
 }
