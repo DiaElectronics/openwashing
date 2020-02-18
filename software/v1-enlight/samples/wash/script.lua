@@ -196,7 +196,7 @@ wait_for_card_mode = function()
 
     smart_delay(100)
     waiting_loops = waiting_loops - 1
---    printMessage(waiting_loops)
+   
     return mode_wait_for_card
 end
 
