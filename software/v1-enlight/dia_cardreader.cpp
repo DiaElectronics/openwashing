@@ -21,7 +21,6 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
     
     std::string commandLine = "./uic_payment_app o1 a" + std::to_string(driver->RequestedMoney) + " c643";
     int statusCode = system(commandLine.c_str());
-    //printf("Command line: %s\n", commandLine.c_str());
 
     fprintf(stderr, "Card reader returned status code: %d\n", statusCode);
     if (statusCode == 0) {
@@ -56,8 +55,7 @@ int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
 
     driver->RequestedMoney = money;
     printf("Money inside driver: %d\n", driver->RequestedMoney);
-    //int status_code = system("./test.exe");
-    //printf("CODE: %d\n", status_code);
+    
     int err = pthread_create(&driver->ExecuteDriverProgramThread, NULL, DiaCardReader_ExecuteDriverProgramThread, driver);
     if (err != 0) {
         printf("\ncan't create thread :[%s]", strerror(err));
