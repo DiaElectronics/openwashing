@@ -17,7 +17,7 @@ setup = function()
     welcome_mode_seconds = 3
     thanks_mode_seconds = 120
     free_pause_seconds = 120
-    wait_card_mode_seconds = 120
+    wait_card_mode_seconds = 40
     
     hascardreader = true
     is_transaction_started = false
@@ -162,7 +162,7 @@ wait_for_card_mode = function()
     -- check animation
     turn_light(0, animation.idle)
 
-    if is_transaction_started ~= true then
+    if is_transaction_started == false then
         waiting_loops = wait_card_mode_seconds * 10;
 
         request_transaction(electron_balance * 100)
@@ -196,7 +196,7 @@ wait_for_card_mode = function()
 
     smart_delay(100)
     waiting_loops = waiting_loops - 1
-    
+--    printMessage(waiting_loops)
     return mode_wait_for_card
 end
 
@@ -326,7 +326,7 @@ thanks_mode = function()
     send_receipt(post_position, 0, kasse_balance)
     kasse_balance = 0
 
-    return mode_ask_for_money
+    return mode_choose_method
 end
 
 
