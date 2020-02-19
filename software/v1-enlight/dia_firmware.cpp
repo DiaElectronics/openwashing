@@ -177,6 +177,7 @@ int request_transaction(void *object, int money) {
 int get_transaction_status(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int status = DiaDeviceManager_GetTransactionStatus(manager);
+    fprintf(stderr, "Transaction status: %d\n", status);
     return status;
 }
 
@@ -463,7 +464,7 @@ int main(int argc, char ** argv) {
         dia_security_write_file(CENTRALWASH_KEY, centralKey);
         printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
     }
-
+    
     network.SetPublicKey(std::string(centralKey));
     int need_to_find = 1; 
     std::string serverIP = "";
@@ -476,7 +477,7 @@ int main(int argc, char ** argv) {
 	    need_to_find = 0;
     }
     network.SetHostAddress(serverIP);
-    
+
     // Runtime and firmware initialization
     DiaDeviceManager manager;
     DiaDeviceManager_AddCardReader(&manager);

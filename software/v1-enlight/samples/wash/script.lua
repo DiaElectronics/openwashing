@@ -4,7 +4,7 @@ setup = function()
     -- global variables
     balance = 0.0
 
-    min_electron_balance = 100
+    min_electron_balance = 50
     max_electron_balance = 900
     electron_amount_step = 25
     electron_balance = min_electron_balance
@@ -17,9 +17,10 @@ setup = function()
     welcome_mode_seconds = 3
     thanks_mode_seconds = 120
     free_pause_seconds = 120
-    wait_card_mode_seconds = 120
+    wait_card_mode_seconds = 40
     
-    hascardreader = false
+    hascardreader = true
+    is_transaction_started = false
 
     price_p1 = 0
     price_p2 = 0
@@ -161,26 +162,42 @@ wait_for_card_mode = function()
     -- check animation
     turn_light(0, animation.idle)
 
-    waiting_loops = wait_card_mode_seconds * 10;
+    if is_transaction_started == false then
+        waiting_loops = wait_card_mode_seconds * 10;
 
-    request_transaction(electron_balance)
-    electron_balance = 0
-
-    while(waiting_loops > 0)
-    do
-        update_balance()
-        if balance > 0.99 then
-            status = get_transaction_status()
-            if status ~= 0 then 
-                -- need to test this
-                abort_transaction()
-            end
-            return mode_start
-        end
-        smart_delay(100)
-        waiting_loops = waiting_loops - 1
+        request_transaction(electron_balance)
+        electron_balance = min_electron_balance
+        is_transaction_started = true
     end
-    return mode_choose_method
+
+    pressed_key = get_key()
+    if pressed_key > 0 and pressed_key < 7 then
+        waiting_loops = 0
+    end
+
+    update_balance()
+    if balance > 0.99 then
+        status = get_transaction_status()
+        if status ~= 0 then 
+            abort_transaction()
+        end
+        is_transaction_started = false
+        return mode_start
+    end
+
+    if waiting_loops <= 0 then
+        is_transaction_started = false
+	status = get_transaction_status()
+	if status ~= 0 then
+	    abort_transaction()
+	end
+        return mode_choose_method
+    end
+
+    smart_delay(100)
+    waiting_loops = waiting_loops - 1
+   
+    return mode_wait_for_card
 end
 
 ask_for_money_mode = function()
@@ -309,7 +326,7 @@ thanks_mode = function()
     send_receipt(post_position, 0, kasse_balance)
     kasse_balance = 0
 
-    return mode_ask_for_money
+    return mode_choose_method
 end
 
 

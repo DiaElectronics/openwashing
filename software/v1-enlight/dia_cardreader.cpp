@@ -13,28 +13,30 @@
 // If success - uses callback to report money
 // If fail - sets requested money to 0 and stoppes
 void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
-    printf("Card reader execute program thread...\n");
+    fprintf(stderr, "Card reader execute program thread...\n");
 
     DiaCardReader * driver = (DiaCardReader *)driverPtr;
 
-    printf("Transaction requested for %d RUB...\n", driver->RequestedMoney);
-    std::string commandLine = "./uic_payment_app o1 a0 c" + std::to_string(driver->RequestedMoney);
+    fprintf(stderr, "Transaction requested for %d RUB...\n", driver->RequestedMoney);
+    int money_command = driver->RequestedMoney * 100;
+
+    std::string commandLine = "./uic_payment_app o1 a" + std::to_string(money_command) + " c643";
     int statusCode = system(commandLine.c_str());
 
-    printf("Card reader returned status code: %d\n", statusCode);
-    if (statusCode == 0) {
+    fprintf(stderr, "Card reader returned status code: %d\n", statusCode);
+    if (statusCode == 0 || statusCode == 23040) {
         if(driver->IncomingMoneyHandler != NULL) {
             driver->IncomingMoneyHandler(driver->_Manager, DIA_ELECTRON, driver->RequestedMoney);
             printf("Reported money: %d\n", driver->RequestedMoney);
         } else {
             printf("No handler to report: %d\n", driver->RequestedMoney);
         }
-    }         
+    }
 
     pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = 0;
     pthread_mutex_unlock(&driver->MoneyLock);
-        
+
     pthread_exit(NULL);
     return NULL;
 }
@@ -51,16 +53,15 @@ int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
     }
 
     printf("DiaCardReader started Perform Transaction, money = %d\n", money);
-    pthread_mutex_lock(&driver->MoneyLock);
+
     driver->RequestedMoney = money;
     printf("Money inside driver: %d\n", driver->RequestedMoney);
-
+    
     int err = pthread_create(&driver->ExecuteDriverProgramThread, NULL, DiaCardReader_ExecuteDriverProgramThread, driver);
     if (err != 0) {
         printf("\ncan't create thread :[%s]", strerror(err));
         return 1;
     }
-    pthread_mutex_unlock(&driver->MoneyLock);
     
     return DIA_CARDREADER_NO_ERROR;
 }
@@ -74,7 +75,23 @@ int DiaCardReader_StopDriver(void * specificDriver) {
 
     DiaCardReader * driver = (DiaCardReader *) specificDriver;
     driver->RequestedMoney = 0;
+    printf("Trying to kill cardreader thread...\n");
+
+    char line[10];
+    FILE* cmd = popen("pidof -s uic_payment_app", "r");
+    long pid = 0;
+
+    fgets(line, 10, cmd);
+    pid = strtoul(line, NULL, 10);
+
+    if (pid != 0) {
+        std::string kill_line = std::string("kill -INT ") + std::to_string(pid);
+	system(kill_line.c_str());
+    }
+
     pthread_join(driver->ExecuteDriverProgramThread, NULL);
+
+    printf("Cardreader thread killed\n");
     return DIA_CARDREADER_NO_ERROR;
 }
 
