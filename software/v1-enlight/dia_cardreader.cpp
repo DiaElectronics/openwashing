@@ -18,12 +18,13 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
     DiaCardReader * driver = (DiaCardReader *)driverPtr;
 
     fprintf(stderr, "Transaction requested for %d RUB...\n", driver->RequestedMoney);
-    
-    std::string commandLine = "./uic_payment_app o1 a" + std::to_string(driver->RequestedMoney) + " c643";
+    int money_command = driver->RequestedMoney * 100;
+
+    std::string commandLine = "./uic_payment_app o1 a" + std::to_string(money_command) + " c643";
     int statusCode = system(commandLine.c_str());
 
     fprintf(stderr, "Card reader returned status code: %d\n", statusCode);
-    if (statusCode == 0) {
+    if (statusCode == 0 || statusCode == 23040) {
         if(driver->IncomingMoneyHandler != NULL) {
             driver->IncomingMoneyHandler(driver->_Manager, DIA_ELECTRON, driver->RequestedMoney);
             printf("Reported money: %d\n", driver->RequestedMoney);

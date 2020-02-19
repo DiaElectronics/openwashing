@@ -4,7 +4,7 @@ setup = function()
     -- global variables
     balance = 0.0
 
-    min_electron_balance = 100
+    min_electron_balance = 50
     max_electron_balance = 900
     electron_amount_step = 25
     electron_balance = min_electron_balance
@@ -165,7 +165,7 @@ wait_for_card_mode = function()
     if is_transaction_started == false then
         waiting_loops = wait_card_mode_seconds * 10;
 
-        request_transaction(electron_balance * 100)
+        request_transaction(electron_balance)
         electron_balance = min_electron_balance
         is_transaction_started = true
     end
