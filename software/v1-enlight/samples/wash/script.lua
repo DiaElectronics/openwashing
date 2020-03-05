@@ -148,6 +148,10 @@ select_price_mode = function()
             electron_balance = min_electron_balance
         end 
     end
+    --return to choose method
+    if pressed_key == 3 then
+        return mode_choose_method
+    end
     if pressed_key == 6 then
         return mode_wait_for_card
     end
@@ -204,6 +208,10 @@ ask_for_money_mode = function()
     show_ask_for_money()
     run_stop()
     turn_light(0, animation.idle)
+    pressed_key = get_key()
+    if pressed_key > 0 and pressed_key < 7 then
+        return mode_choose_method
+    end
     update_balance()
     if balance > 1.0 then
         return mode_start
