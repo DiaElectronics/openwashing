@@ -98,7 +98,7 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     }
     if(!devInList)
     {
-        if (isACM && !manager->isBanknoteReaderFound) {
+        if (isACM) {
             if (DiaDeviceManager_CheckNV9(PortName)) {
                 printf("\nFound NV9 on port %s\n\n", PortName);
                 DiaDevice * dev = new DiaDevice(PortName);
@@ -109,7 +109,6 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
                 DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
                 DiaNv9Usb_StartDriver(newNv9);
                 manager->_Devices.push_back(dev);
-                manager->isBanknoteReaderFound = 1;
             }
         }
         if (!isACM) { 
@@ -190,7 +189,6 @@ void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
 DiaDeviceManager::DiaDeviceManager()
 {
     NeedWorking = 1;
-    isBanknoteReaderFound = 0;
     CoinMoney = 0;
     BanknoteMoney = 0;
     ElectronMoney = 0;
