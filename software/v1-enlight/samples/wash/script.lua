@@ -347,6 +347,9 @@ show_welcome = function()
 end
 
 show_ask_for_money = function()
+    if hascardreader == true then
+        ask_for_money:Set("return_background.visible", "true")
+    end
     ask_for_money:Display()
 end
 
