@@ -22,5 +22,10 @@ sudo echo "hdmi_mode=14" >> /boot/config.txt
 echo "cd /home/pi/wash" >> /home/pi/run.sh
 echo "./firmware.exe" >> /home/pi/run.sh
 
+cd ..
+make
+mkdir /home/pi/wash
+cp firmware.exe /home/pi/wash
+
 cd /home/pi
 chmod 777 /home/pi/run.sh
