@@ -31,6 +31,7 @@ public:
     DiaNv9Usb(DiaDevice * device, void (*incomingMoneyHandler)(void * nv9, int moneyType, int newMoney) ) {
         _Device = device;
         IncomingMoneyHandler = incomingMoneyHandler;
+	ToBeDeleted = 0;
     }
     
     ~DiaNv9Usb() {

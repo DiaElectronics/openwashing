@@ -380,7 +380,7 @@ int RecoverRegistry() {
 
     int tmp = 0;
     int err = network.SendPingRequest(network.GetHostName(), tmp);
-    std::string default_price = "20";
+    std::string default_price = "15";
 
     if (!err) {
         // Load all prices in online mode
