@@ -56,7 +56,7 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     }
 
     std::string portName = std::string(PortName);
-    size_t maxDiff = 50;
+    size_t maxDiff = 80;
 
     // Get short name of port, for instance:
     //   /dev/ttyACM0 ==> /ttyACM0
@@ -72,7 +72,7 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
 
     // Check existance of port in list
     if (devicePortPosition != std::string::npos) {
-        size_t deviceNamePosition = bashOutput.find("NV9USB");
+        size_t deviceNamePosition = bashOutput.find("arduino");
 
         // Compare distance between positions with maxDiff const
         if (deviceNamePosition != std::string::npos && 

@@ -13,7 +13,10 @@
 #include <list>
 #include <map>
 #include <jansson.h>
+#include <iomanip>
+#include <iostream>
 
+#include <sstream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/ioctl.h>
@@ -94,8 +97,11 @@ public:
         InitCurlAnswer(&raw_answer);
 
         curl_global_init(CURL_GLOBAL_ALL);
+        
         curl = curl_easy_init();
         if (curl == NULL) {
+            DestructCurlAnswer(&raw_answer);
+            curl_global_cleanup();
             return 1;
         }
 
@@ -108,9 +114,9 @@ public:
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            if (res == CURLE_COULDNT_CONNECT) {
-                return SERVER_UNAVAILABLE;
-            }
+            DestructCurlAnswer(&raw_answer);
+            curl_easy_cleanup(curl);
+            curl_global_cleanup();
             return 1;
         }
         *answer = raw_answer.data;
@@ -135,6 +141,8 @@ public:
         curl_global_init(CURL_GLOBAL_ALL);
         curl = curl_easy_init();
         if (curl == NULL) {
+            DestructCurlAnswer(&raw_answer);
+            curl_global_cleanup();
             return 1;
         }
 
@@ -143,8 +151,6 @@ public:
         headers = curl_slist_append(headers, "Content-Type: application/json");
         headers = curl_slist_append(headers, "charsets: utf-8");
 
-	//printf("%s\n",host_addr.c_str());
-
         curl_easy_setopt(curl, CURLOPT_URL, host_addr.c_str());
         curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -152,14 +158,13 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
+	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
-            //fprintf(stderr, "curl_easy_perform() failed: %s\n",curl_easy_strerror(res));
-            if (res == CURLE_COULDNT_CONNECT) {
-                return SERVER_UNAVAILABLE;
-            }
+            DestructCurlAnswer(&raw_answer);
+            curl_easy_cleanup(curl);
+            curl_global_cleanup();
             return 1;
         }
         *answer = raw_answer.data;
@@ -173,38 +178,58 @@ public:
     // Central server searching, if it's IP address is unknown.
     // Gets local machine's IP and starts pinging every address in block.
     // Modifies IP address.
-    int SearchCentralServer(std::string *ip, std::string interface) {
-	char* tmpUrl = new char[16];            	    
-        int fd;
-        struct ifreq ifr;
-
-        fd = socket(AF_INET, SOCK_DGRAM, 0);
-        ifr.ifr_addr.sa_family = AF_INET;
-        strncpy(ifr.ifr_name, interface.c_str(), IFNAMSIZ-1);
-
-        ioctl(fd, SIOCGIFADDR, &ifr);
-        close(fd);
-
-        sscanf(inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr), "%s", tmpUrl);
-
-        int err = 0;
-
+    int SearchCentralServer(std::string &ip) {
         printf("Checking localhost...\n");
-        err = this->SendPingRequestGet("localhost");
+        int err = this->SendPingRequestGet("localhost");
         if (!err) {
-            delete[] tmpUrl;
-            *ip = "localhost";
-	    return 0;
+            ip = "localhost";
+	        return 0;
         }
 
-	std::string baseIP(tmpUrl);
+        int sock = socket(PF_INET, SOCK_DGRAM, 0);
+        sockaddr_in loopback;
+
+        if (sock == -1) {
+            printf("Could not socket\n");
+            return SERVER_UNAVAILABLE;
+        }
+
+        memset(&loopback, 0, sizeof(loopback));
+        loopback.sin_family = AF_INET;
+        loopback.sin_addr.s_addr = INADDR_LOOPBACK;   
+        loopback.sin_port = htons(9);                 
+
+        if (connect(sock, reinterpret_cast<sockaddr*>(&loopback), sizeof(loopback)) == -1) {
+            close(sock);
+            printf("Could not connect\n");
+            return SERVER_UNAVAILABLE;
+        }
+
+        socklen_t addrlen = sizeof(loopback);
+        if (getsockname(sock, reinterpret_cast<sockaddr*>(&loopback), &addrlen) == -1) {
+            close(sock);
+            printf("Could not getsockname\n");
+            return SERVER_UNAVAILABLE;
+        }
+
+        close(sock);
+
+        char buf[INET_ADDRSTRLEN];
+        if (inet_ntop(AF_INET, &loopback.sin_addr, buf, INET_ADDRSTRLEN) == 0x0) {
+            printf("Could not inet_ntop\n");
+            return SERVER_UNAVAILABLE;
+        } else {
+            printf("Local ip address: %s\n", buf);
+        }
+
+	    std::string baseIP(buf);
         std::string reqIP;
 
-	printf("Base IP: %s\n", baseIP.c_str());
+	    printf("Base IP: %s\n", baseIP.c_str());
 
-	// Truncate baseIP to prepare for scan
+	    // Truncate baseIP to prepare for scan
         int dotCount = 0;
-        for (int j = 0; j < 12; j++) {
+        for (int j = 0; j < INET_ADDRSTRLEN; j++) {
             if (baseIP[j] == '.')
                 dotCount++;
             reqIP += baseIP[j];
@@ -216,38 +241,43 @@ public:
         for (int i = 1; i < 255; i++) {
             std::string reqUrl = reqIP + std::to_string(i);
 
+            //printf("%s\n", reqUrl.c_str());
+
             err = this->SendPingRequestGet(reqUrl);
 
             if (!err) {
                 // We found it!
-                *ip = reqIP + std::to_string(i);
+                ip = reqIP + std::to_string(i);
                 return 0;
             }         	
         }   	
 
-	    delete[] tmpUrl;
         return SERVER_UNAVAILABLE;
     }
 
     // Returns local machine's MAC address of eth0 interface.
     // Modfifes out parameter == MAC address without ":" symbols.
-    void GetMacAddress(char * out) {
+    std::string GetMacAddress(const int outSize) {
    	    int fd;
 	
 	    struct ifreq ifr;
-	    const char *iface = "eth0";
-	    char *mac;
+	    const char *iface = "enp0s3";
+	    char *mac = 0;
 	
 	    fd = socket(AF_INET, SOCK_DGRAM, 0);
 	    ifr.ifr_addr.sa_family = AF_INET;
 	    strncpy((char *)ifr.ifr_name , (const char *)iface , IFNAMSIZ-1);
 	    ioctl(fd, SIOCGIFHWADDR, &ifr);
-
 	    close(fd);
 	
 	    mac = (char *)ifr.ifr_hwaddr.sa_data;
 
-	    sprintf((char *)out,(const char *)"%.2x%.2x%.2x%.2x%.2x%.2x" , mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        // Convert MAC bytes to hexagonal with fixed width
+        std::stringstream ss;
+        for(int i = 0; i < outSize; ++i) {
+            ss << std::setw(2) << std::setfill('0') << std::hex << (int)abs(mac[i]);
+        }
+        return ss.str();
     }
 
     // Just key setter.
@@ -274,23 +304,16 @@ public:
         std::string serverIP = "";
         int res = -1;
 
-	    printf("Looking for Central-wash server ...\n");
-        res = this->SearchCentralServer(&serverIP, "eth0");
+	    printf("Looking for Central Wash server ...\n");
+        res = this->SearchCentralServer(serverIP);
         
         if (res == 0) {
             printf("Server located on: %s\n", serverIP.c_str());
-        }
-        else {
-            printf("Failed: no server found on eth0. Looking for wlan0...\n");
-	    res = this->SearchCentralServer(&serverIP, "wlan0");
-
-	    if (res == 0) {
-		printf("Server located on %s\n", serverIP.c_str());
-	    } else {
-		printf("Failed: no server found on wlan0...\n");
-		serverIP = "";
+        } else {
+            printf("Failed: no server found...\n");
+		    serverIP = "";
 	    }
-        }
+        
         return serverIP;
     }
 
