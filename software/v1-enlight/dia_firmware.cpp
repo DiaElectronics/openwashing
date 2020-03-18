@@ -223,11 +223,11 @@ int smart_delay_function(void * arg, int ms) {
 // Sends PING request to Central Server every 2 seconds.
 // May get service money from server.
 int CentralServerDialog() {
-    /*
+    
     if (!config || !config->GetGpio()) {
         return 0;
     }
-    */
+    
     _100MsIntervalsCount++;
     if(_100MsIntervalsCount < 0) {
         printf("Memory corruption on _100MsIntervalsCount\n");
@@ -249,13 +249,13 @@ int CentralServerDialog() {
         int serviceMoney = 0;
         network.SendPingRequest(network.GetHostName(), serviceMoney);
 
-        /*
+        
         if (serviceMoney > 0) {
 	    _Balance += serviceMoney;
             config->_Income.totalIncomeService += serviceMoney;
             SaveIncome();
         } 
-        */     
+           
     }
 
     // Every 5 min (300 sec) we go inside this
@@ -263,7 +263,7 @@ int CentralServerDialog() {
         _100MsIntervalsCountRelay = 0;
         
         printf("Sending relay report to server...\n");
-        /*
+        
         RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
 
         DiaGpio * gpio = config->GetGpio();
@@ -276,7 +276,7 @@ int CentralServerDialog() {
         network.SendRelayReport(relays);
 
         delete relays;
-        */
+        
     }
     return 0;
 }
@@ -432,9 +432,9 @@ int RecoverRegistry() {
 
 // Just compilation of recovers.
 void RecoverData() {
-    //RecoverRegistry();
-    //RecoverMoney();
-    //RecoverRelay();
+    RecoverRegistry();
+    RecoverMoney();
+    RecoverRelay();
 }
 
 int main(int argc, char ** argv) {
@@ -489,12 +489,12 @@ int main(int argc, char ** argv) {
     network.SetHostAddress(serverIP);
 
     // Runtime and firmware initialization
-    DiaDeviceManager manager;
-    DiaDeviceManager_AddCardReader(&manager);
+    DiaDeviceManager *manager = new DiaDeviceManager;
+    DiaDeviceManager_AddCardReader(manager);
 
     SDL_Event event;
     
-    /*
+    
     DiaConfiguration configuration(folder);
     config = &configuration;
     int err = configuration.Init();
@@ -502,15 +502,15 @@ int main(int argc, char ** argv) {
         printf("Can't run due to the configuration error\n");
         return 1;
     }
-    */
+    
     // Get working data from server: money, relays, prices
-    //RecoverData();
+    RecoverData();
 
     printf("Configuration is loaded...\n");
 
     // Screen load
     // DEBUG
-    /*
+    
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
         std::string currentID = it->second->id;
@@ -522,9 +522,9 @@ int main(int argc, char ** argv) {
         screen->display_screen = dia_screen_display_screen;
         configuration.GetRuntime()->AddScreen(screen);
     }
-    */
+    
     // Program load
-    /*
+    
     #ifdef USE_GPIO
     configuration.GetRuntime()->AddPrograms(&configuration.GetGpio()->_ProgramMapping);
     #else
@@ -545,13 +545,13 @@ int main(int argc, char ** argv) {
 
     hardware->send_receipt_function = send_receipt;
 
-    hardware->coin_object = &manager;
+    hardware->coin_object = manager;
     hardware->get_coins_function = get_coins;
 
-    hardware->banknote_object = &manager;
+    hardware->banknote_object = manager;
     hardware->get_banknotes_function = get_banknotes;
 
-    hardware->electronical_object = &manager;
+    hardware->electronical_object = manager;
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
@@ -562,17 +562,17 @@ int main(int argc, char ** argv) {
 
     configuration.GetRuntime()->AddHardware(hardware);
     configuration.GetRuntime()->AddRegistry(&(config->GetRuntime()->Registry));
-    */
+    
     // Runtime start
     int keypress = 0;
 
     // Call Lua setup function
-    //configuration.GetRuntime()->Setup();
+    configuration.GetRuntime()->Setup();
 
     while(!keypress)
     {
         // Call Lua loop function
-        //configuration.GetRuntime()->Loop();
+        configuration.GetRuntime()->Loop();
 
         // Ping server every 2 sec and probably get service money from it
         CentralServerDialog();
@@ -591,7 +591,7 @@ int main(int argc, char ** argv) {
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
-                        /*
+                        
                         case SDLK_UP:
                             // Debug service money addition
                             _Balance += 10;
@@ -602,7 +602,7 @@ int main(int argc, char ** argv) {
 
                             printf("UP\n"); fflush(stdout);
                             break;
-                        */
+                        
                         case SDLK_1:
                             _DebugKey = 1;
                             printf("1\n"); fflush(stdout);
