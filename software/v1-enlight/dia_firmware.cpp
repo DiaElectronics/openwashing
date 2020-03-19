@@ -27,7 +27,7 @@
 //#define USE_GPIO
 #define USE_KEYBOARD
 
-#define CENTRALWASH_KEY "/home/anton/centralwash.key"
+#define CENTRALWASH_KEY "/home/pi/centralwash.key"
 #define BILLION 1000000000
 
 DiaConfiguration * config;
@@ -509,7 +509,6 @@ int main(int argc, char ** argv) {
     printf("Configuration is loaded...\n");
 
     // Screen load
-    // DEBUG
     
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
@@ -578,7 +577,6 @@ int main(int argc, char ** argv) {
         CentralServerDialog();
 
         // Process pressed button
-        // DEBUG
         
         while(SDL_PollEvent(&event))
         {
@@ -646,8 +644,6 @@ int main(int argc, char ** argv) {
                 break;
             }
         }
-        
-       delay(100);
     }
 
     delay(2000);

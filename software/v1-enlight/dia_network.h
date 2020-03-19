@@ -261,7 +261,7 @@ public:
    	    int fd;
 	
 	    struct ifreq ifr;
-	    const char *iface = "enp0s3";
+	    const char *iface = "eth0";
 	    char *mac = 0;
 	
 	    fd = socket(AF_INET, SOCK_DGRAM, 0);
