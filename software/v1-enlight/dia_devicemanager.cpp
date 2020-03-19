@@ -82,6 +82,45 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     return 0;
 }
 
+int DiaDeviceManager_CheckUIC(char* PortName) {
+    printf("\nChecking port %s for UIC device...\n", PortName);
+
+    int error = 0;
+    std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id", &error);
+    if (error) {
+        printf("Error while reading info about serial devices, NV9 check failed\n");
+        return 0;
+    }
+
+    std::string portName = std::string(PortName);
+    size_t maxDiff = 50;
+
+    // Get short name of port, for instance:
+    //   /dev/ttyACM0 ==> /ttyACM0
+    std::string toCut = portName.substr(0, 4);
+
+    if (toCut != std::string("/dev")) {
+        printf("Invlaid port name in UIC device check: %s\n", PortName);
+        return 0;
+    }
+
+    std::string shortPortName = portName.substr(4, 8);
+    size_t devicePortPosition = bashOutput.find(shortPortName);
+
+    // Check existance of port in list
+    if (devicePortPosition != std::string::npos) {
+        size_t deviceNamePosition = bashOutput.find("UIC");
+
+        // Compare distance between positions with maxDiff const
+        if (deviceNamePosition != std::string::npos && 
+            devicePortPosition - deviceNamePosition < maxDiff) {
+                return 1;
+            } 
+    }
+
+    return 0;
+}
+
 void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortName, int isACM) {
     int devInList = 0;
 
@@ -96,7 +135,13 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     if(!devInList)
     {
         if (isACM) {
-            if (DiaDeviceManager_CheckNV9(PortName)) {
+            if (DiaDeviceManager_CheckUIC(PortName)) {
+                printf("\nFound UIC on port %s\n\n", PortName);
+                printf("Ignoring this port...\n");
+                DiaDevice * dev = new DiaDevice(PortName);
+                manager->_Devices.push_back(dev);
+
+            } else if (DiaDeviceManager_CheckNV9(PortName)) {
                 printf("\nFound NV9 on port %s\n\n", PortName);
                 DiaDevice * dev = new DiaDevice(PortName);
 
