@@ -48,7 +48,7 @@ setup = function()
     mode_thanks = 120
     
     currentMode = mode_welcome
-    version = "1.0.0"
+    version = "1.1.0"
 
     printMessage("dia generic wash firmware v." .. version)
     return 0
