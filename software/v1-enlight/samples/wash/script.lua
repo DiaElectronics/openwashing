@@ -322,11 +322,12 @@ show_start = function(balance_rur)
     start:Display()
 end
 
-show_working = function(working_mode, balance_rur)
+show_working = function(sub_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
     working:Set("pause_digits.visible", "false")
-    working:Set("pause_back.visible", "false")
     working:Set("balance.value", balance_int)
+    
+    switch_submodes(sub_mode)
     working:Display()
 end
 
@@ -334,10 +335,20 @@ show_pause = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
     working:Set("pause_digits.visible", "true")
-    working:Set("pause_back.visible", "true")
     working:Set("pause_digits.value", sec_int)
     working:Set("balance.value", balance_int)
+    switch_submodes(6)
     working:Display()
+end
+
+switch_submodes = function(sub_mode) 
+    if sub_mode == 1 then working:Set("p1.visible", "true") else working:Set("p1.visible", "false") end
+    if sub_mode == 2 then working:Set("p2.visible", "true") else working:Set("p2.visible", "false") end
+    if sub_mode == 3 then working:Set("p3.visible", "true") else working:Set("p3.visible", "false") end
+    if sub_mode == 4 then working:Set("p4.visible", "true") else working:Set("p4.visible", "false") end
+    if sub_mode == 5 then working:Set("p5.visible", "true") else working:Set("p5.visible", "false") end
+    if sub_mode == 6 then working:Set("p6.visible", "true") else working:Set("p6.visible", "false") end
+    
 end
 
 show_thanks =  function(seconds_float)

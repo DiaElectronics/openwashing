@@ -75,19 +75,59 @@
         "visible":"true"
       },
       {
-        "id":"pause_back",
+        "id":"p1",
         "type":"image",
-        "position": "100;77",
-        "size":"97;56",
-        "src":"programs/p6/pause_balance.png",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p1/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p2",
+        "type":"image",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p2/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p3",
+        "type":"image",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p3/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p4",
+        "type":"image",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p4/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p5",
+        "type":"image",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p5/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p6",
+        "type":"image",
+        "position": "70;70",
+        "size":"218;208",
+        "src":"programs/p6/ico.png",
         "visible":"true"
       },
       {
         "id":"pause_digits",
         "type": "digits",
-        "position": "90;100",
+        "position": "111;110",
         "font": "standard_number",
-        "symbol_size":"19;35",
+        "symbol_size":"38;70",
         "padding": "5",
         "length": "3",
         "visible":"true"
