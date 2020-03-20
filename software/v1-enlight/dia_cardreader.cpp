@@ -1,32 +1,44 @@
-#include "dia_cardreader.h"
-#include "stdio.h"
+// Copyright 2020, Roman Fedyashov
+
+#include "./dia_cardreader.h"
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <string>
 #include <unistd.h>
-#include "dia_device.h"
-#include "money_types.h"
+
+#include <string>
+
+#include "./dia_device.h"
+#include "./money_types.h"
 
 // Task thread
-// Reads requested money amount and tries to call an executable, which works with card reader hardware
+// Reads requested money amount and tries to call an executable,
+// which works with card reader hardware
 // If success - uses callback to report money
-// If fail - sets requested money to 0 and stoppes
+// If fails then sets requested money to 0 and stoppes
 void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
-    fprintf(stderr, "Card reader execute program thread...\n");
+    fprintf(stderr, "Card reader executes program thread...\n");
+    if (!driverPtr) {
+         fprintf(stderr, "%s", "Card reader driver is empty. Panic!\n")
+    }
 
-    DiaCardReader * driver = (DiaCardReader *)driverPtr;
+    DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(driverPtr);
 
-    fprintf(stderr, "Transaction requested for %d RUB...\n", driver->RequestedMoney);
+    fprintf(stderr, "reader request %d RUB...\n", driver->RequestedMoney);
     int money_command = driver->RequestedMoney * 100;
 
-    std::string commandLine = "./uic_payment_app o1 a" + std::to_string(money_command) + " c643";
+    std::string money = std::to_string(money_command);
+
+    std::string commandLine = "./uic_payment_app o1 a" + money + " c643";
     int statusCode = system(commandLine.c_str());
 
     fprintf(stderr, "Card reader returned status code: %d\n", statusCode);
     if (statusCode == 0 || statusCode == 23040) {
-        if(driver->IncomingMoneyHandler != NULL) {
-            driver->IncomingMoneyHandler(driver->_Manager, DIA_ELECTRON, driver->RequestedMoney);
+        if (driver->IncomingMoneyHandler != NULL) {
+            int sum = driver->RequestedMoney;
+            driver->IncomingMoneyHandler(driver->_Manager, DIA_ELECTRON, sum);
             printf("Reported money: %d\n", driver->RequestedMoney);
         } else {
             printf("No handler to report: %d\n", driver->RequestedMoney);
@@ -44,10 +56,9 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
 // Entry point function
 // Creates task thread with requested parameter (money amount) and exits
 int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
-    DiaCardReader * driver = (DiaCardReader *) specificDriver;
+    DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(specificDriver);
 
-    if(specificDriver == NULL || money == 0)
-    {
+    if (specificDriver == NULL || money == 0) {
         printf("DiaCardReader Perform Transaction got NULL driver\n");
         return DIA_CARDREADER_NULL_PARAMETER;
     }
@@ -56,13 +67,16 @@ int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
 
     driver->RequestedMoney = money;
     printf("Money inside driver: %d\n", driver->RequestedMoney);
-    
-    int err = pthread_create(&driver->ExecuteDriverProgramThread, NULL, DiaCardReader_ExecuteDriverProgramThread, driver);
+
+    int err = pthread_create(&driver->ExecuteDriverProgramThread,
+        NULL,
+        DiaCardReader_ExecuteDriverProgramThread,
+        driver);
     if (err != 0) {
         printf("\ncan't create thread :[%s]", strerror(err));
         return 1;
     }
-    
+
     return DIA_CARDREADER_NO_ERROR;
 }
 
@@ -73,20 +87,20 @@ int DiaCardReader_StopDriver(void * specificDriver) {
         return DIA_CARDREADER_NULL_PARAMETER;
     }
 
-    DiaCardReader * driver = (DiaCardReader *) specificDriver;
+    DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(specificDriver);
     driver->RequestedMoney = 0;
     printf("Trying to kill cardreader thread...\n");
 
     char line[10];
     FILE* cmd = popen("pidof -s uic_payment_app", "r");
-    long pid = 0;
+    int64_t pid = 0;
 
     fgets(line, 10, cmd);
     pid = strtoul(line, NULL, 10);
 
     if (pid != 0) {
         std::string kill_line = std::string("kill -INT ") + std::to_string(pid);
-	system(kill_line.c_str());
+        system(kill_line.c_str());
     }
 
     pthread_join(driver->ExecuteDriverProgramThread, NULL);
@@ -105,15 +119,15 @@ void DiaCardReader_AbortTransaction(void * specificDriver) {
 }
 
 // Get task thread status function
-// If returns result number > 0, then thread is working on money amount == result number
-// If returns 0, then thread is not working (destroyed or not created)
-// If returns -1, then error occurred during call
+// If returned number > 0, thread expects money amount == result number
+// If returned 0, then thread is not working (destroyed or not created)
+// If returned -1, then error occurred during call
 int DiaCardReader_GetTransactionStatus(void * specificDriver) {
     if (specificDriver == NULL) {
         printf("DiaCardReader Get Transaction Status got NULL driver\n");
         return -1;
     }
 
-    DiaCardReader * driver = (DiaCardReader *) specificDriver;
+    DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(specificDriver);
     return driver->RequestedMoney;
 }

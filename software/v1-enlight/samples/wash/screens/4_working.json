@@ -1,0 +1,86 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"848;480",
+        "src":"pic/background.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance_background",
+        "type":"image",
+        "position": "368;36",
+        "size":"422;233",
+        "src":"pic/balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"p1_ico",
+        "type":"image",
+        "position": "36;163",
+        "size":"109;104",
+        "src":"programs/p1/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p2_ico",
+        "type":"image",
+        "position": "171;163",
+        "size":"109;104",
+        "src":"programs/p2/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p3_ico",
+        "type":"image",
+        "position": "306;163",
+        "size":"109;104",
+        "src":"programs/p3/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p4_ico",
+        "type":"image",
+        "position": "441;163",
+        "size":"109;104",
+        "src":"programs/p4/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p5_ico",
+        "type":"image",
+        "position": "576;163",
+        "size":"109;104",
+        "src":"programs/p5/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"p6_ico",
+        "type":"image",
+        "position": "711;163",
+        "size":"109;104",
+        "src":"programs/p6/ico.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "383;74",
+        "font": "standard_number",
+        "symbol_size":"111;180",
+        "padding": "3",
+        "length": "3",
+        "visible":"true"
+      },
+      {
+        "id":"current_label",
+        "type":"image",
+        "position": "62;80",
+        "size":"234;34",
+        "src":"programs/p3/label.png",
+        "visible":"true"
+      }
+    ]
+  }

@@ -22,12 +22,14 @@ setup = function()
     hascardreader = true
     is_transaction_started = false
 
-    price_p1 = 0
-    price_p2 = 0
-    price_p3 = 0
-    price_p4 = 0
-    price_p5 = 0
-    price_p6 = 0
+    price_p = {}
+    
+    price_p[1] = 0
+    price_p[2] = 0
+    price_p[3] = 0
+    price_p[4] = 0
+    price_p[5] = 0
+    price_p[6] = 0
 
     init_prices()
     
@@ -53,25 +55,23 @@ setup = function()
 end
 
 init_prices = function()
+    price_p[1] = get_price("price1")
+    if price_p[1] == 0 then price_p[1] = 18 end
+
+    price_p[2] = get_price("price2")
+    if price_p[2] == 0 then price_p[2] = 18 end
+
+    price_p[3] = get_price("price3")
+    if price_p[3] == 0 then price_p[3] = 18 end
+
+    price_p[4] = get_price("price4")
+    if price_p[4] == 0 then price_p[4] = 18 end
+
+    price_p[5] = get_price("price5")
+    if price_p[5] == 0 then price_p[5] = 18 end
     
-
-    price_p1 = get_price("price1")
-    if price_p1 == 0 then price_p1 = 18 end
-
-    price_p2 = get_price("price2")
-    if price_p2 == 0 then price_p2 = 18 end
-
-    price_p3 = get_price("price3")
-    if price_p3 == 0 then price_p3 = 18 end
-
-    price_p4 = get_price("price4")
-    if price_p4 == 0 then price_p4 = 18 end
-
-    price_p5 = get_price("price5")
-    if price_p5 == 0 then price_p5 = 18 end
-    
-    price_p6 = get_price("price6")
-    if price_p6 == 0 then price_p6 = 18 end
+    price_p[6] = get_price("price6")
+    if price_p[6] == 0 then price_p[6] = 18 end
 end
 
 -- loop is being executed
@@ -87,13 +87,14 @@ run_mode = function(new_mode)
     if new_mode == mode_select_price then return select_price_mode() end
     if new_mode == mode_wait_for_card then return wait_for_card_mode() end
     if new_mode == mode_ask_for_money then return ask_for_money_mode() end
-    if new_mode == mode_start then return start_mode() end
-    if new_mode == mode_p1 then return p1_mode() end
-    if new_mode == mode_p2 then return p2_mode() end
-    if new_mode == mode_p3 then return p3_mode() end
-    if new_mode == mode_p4 then return p4_mode() end
-    if new_mode == mode_p5 then return p5_mode() end
-    if new_mode == mode_p6 then return p6_mode() end
+    
+    if new_mode == mode_start then return program_mode(0) end
+    if new_mode == mode_p1 then return program_mode(1) end
+    if new_mode == mode_p2 then return program_mode(2) end
+    if new_mode == mode_p3 then return program_mode(3) end
+    if new_mode == mode_p4 then return program_mode(4) end
+    if new_mode == mode_p5 then return program_mode(5) end
+    if new_mode == mode_p6 then return pause_mode(6) end
     if new_mode == mode_thanks then return thanks_mode() end
 end
 
@@ -235,10 +236,10 @@ start_mode = function()
     return mode_start
 end
 
-p1_mode = function()
-    show_p1(balance)
-    run_p1()
-    turn_light(1, animation.one_button)
+program_mode = function(working_mode)
+    show_working(working_mode, balance)
+    run_program(working_mode)
+    turn_light(working_mode, animation.one_button)
     charge_balance(price_p1)
     if balance <= 0.01 then return mode_thanks end
     update_balance()
@@ -246,55 +247,6 @@ p1_mode = function()
     if suggested_mode >=0 then return suggested_mode end
     return mode_p1
 end
-
-p2_mode = function()
-    show_p2(balance)
-    run_p2()
-    turn_light(2, animation.one_button)
-    charge_balance(price_p2)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_p2
-end
-
-p3_mode = function()
-    show_p3(balance)
-    run_p3()
-    turn_light(3, animation.one_button)
-    charge_balance(price_p3)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_p3
-end
-
-p4_mode = function()
-    show_p4(balance)
-    run_p4()
-    turn_light(4, animation.one_button)
-    charge_balance(price_p4)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_p4
-end
-
-p5_mode = function()
-    show_p5(balance)
-    run_p5()
-    turn_light(5, animation.one_button)
-    charge_balance(price_p5)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_p5
-end
-
 
 p6_mode = function()
     show_p6(balance, balance_seconds)
