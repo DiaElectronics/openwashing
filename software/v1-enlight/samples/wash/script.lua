@@ -93,7 +93,7 @@ run_mode = function(new_mode)
     if new_mode == mode_ask_for_money then return ask_for_money_mode() end
     
     if is_working_mode (new_mode) then return program_mode(new_mode) end
-    if new_mode == mode_p6 then return pause_mode() end
+    if new_mode == mode_pause then return pause_mode() end
     
     if new_mode == mode_thanks then return thanks_mode() end
 end
@@ -230,6 +230,7 @@ program_mode = function(working_mode)
   show_working(sub_mode, balance)
   
   if sub_mode == 0 then
+    balance_seconds = free_pause_seconds
     turn_light(0, animation.intense)
   else
     turn_light(sub_mode, animation.one_button)
@@ -323,16 +324,20 @@ end
 
 show_working = function(working_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
+    working:Set("pause_digits.visible", "false")
+    working:Set("pause_back.visible", "false")
     working:Set("balance.value", balance_int)
     working:Display()
 end
 
-show_p6 = function(balance_rur, balance_sec)
+show_pause = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
-    p6screen:Set("pause_balance.value", sec_int)
-    p6screen:Set("balance.value", balance_int)
-    p6screen:Display()
+    working:Set("pause_digits.visible", "true")
+    working:Set("pause_back.visible", "true")
+    working:Set("pause_digits.value", sec_int)
+    working:Set("balance.value", balance_int)
+    working:Display()
 end
 
 show_thanks =  function(seconds_float)
@@ -368,27 +373,7 @@ send_receipt = function(post_pos, is_card, amount)
     hardware:SendReceipt(post_pos, is_card, amount)
 end
 
-run_p1 = function()
-    run_program(program.p1relay)
-end
-
-run_p2 = function()
-    run_program(program.p2relay)
-end
-
-run_p3 = function()
-    run_program(program.p3relay)
-end
-
-run_p4 = function()
-    run_program(program.p4relay)
-end
-
-run_p5 = function()
-    run_program(program.p5relay)
-end
-
-run_p6 = function()
+run_pause = function()
     run_program(program.p6relay)
 end
 

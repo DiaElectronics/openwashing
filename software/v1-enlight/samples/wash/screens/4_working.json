@@ -73,6 +73,24 @@
         "padding": "3",
         "length": "3",
         "visible":"true"
+      },
+      {
+        "id":"pause_back",
+        "type":"image",
+        "position": "100;77",
+        "size":"97;56",
+        "src":"programs/p6/pause_balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"pause_digits",
+        "type": "digits",
+        "position": "90;100",
+        "font": "standard_number",
+        "symbol_size":"19;35",
+        "padding": "5",
+        "length": "3",
+        "visible":"true"
       }
     ]
   }
