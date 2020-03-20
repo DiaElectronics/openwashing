@@ -1,5 +1,6 @@
 -- Wash Firmware
 
+-- setup is running at the start just once
 setup = function()
     -- global variables
     balance = 0.0
@@ -24,6 +25,7 @@ setup = function()
 
     price_p = {}
     
+    price_p[0] = 0
     price_p[1] = 0
     price_p[2] = 0
     price_p[3] = 0
@@ -38,19 +40,25 @@ setup = function()
     mode_select_price = 20
     mode_wait_for_card = 30
     mode_ask_for_money = 40
-    mode_start = 50
-    mode_p1 = 60
-    mode_p2 = 70
-    mode_p3 = 80
-    mode_p4 = 90
-    mode_p5 = 100
-    mode_p6 = 110
+    
+    -- all these modes MUST follow each other
+    mode_work = 50
+    mode_pause = 60
+    -- end of modes which MUST follow each other
+    
     mode_thanks = 120
     
     currentMode = mode_welcome
-    version = "1.0.0"
+    version = "2.0.0"
 
     printMessage("dia generic wash firmware v." .. version)
+    return 0
+end
+
+-- loop is being executed
+loop = function()
+    currentMode = run_mode(currentMode)
+    smart_delay(100)
     return 0
 end
 
@@ -74,27 +82,18 @@ init_prices = function()
     if price_p[6] == 0 then price_p[6] = 18 end
 end
 
--- loop is being executed
-loop = function()
-    currentMode = run_mode(currentMode)
-    smart_delay(100)
-    return 0
-end
 
-run_mode = function(new_mode)
+
+run_mode = function(new_mode)   
     if new_mode == mode_welcome then return welcome_mode() end
     if new_mode == mode_choose_method then return choose_method_mode() end
     if new_mode == mode_select_price then return select_price_mode() end
     if new_mode == mode_wait_for_card then return wait_for_card_mode() end
     if new_mode == mode_ask_for_money then return ask_for_money_mode() end
     
-    if new_mode == mode_start then return program_mode(0) end
-    if new_mode == mode_p1 then return program_mode(1) end
-    if new_mode == mode_p2 then return program_mode(2) end
-    if new_mode == mode_p3 then return program_mode(3) end
-    if new_mode == mode_p4 then return program_mode(4) end
-    if new_mode == mode_p5 then return program_mode(5) end
-    if new_mode == mode_p6 then return pause_mode(6) end
+    if is_working_mode (new_mode) then return program_mode(new_mode) end
+    if new_mode == mode_p6 then return pause_mode() end
+    
     if new_mode == mode_thanks then return thanks_mode() end
 end
 
@@ -117,10 +116,10 @@ choose_method_mode = function()
     turn_light(0, animation.idle)
 
     pressed_key = get_key()
-    if pressed_key == 5 then
+    if pressed_key == 4 or pressed_key == 5 or pressed_key == 6 then
         return mode_select_price
     end
-    if pressed_key == 2 then
+    if pressed_key == 1 or pressed_key == 2 or pressed_key == 3 then
         return mode_ask_for_money
     end
 
@@ -187,7 +186,7 @@ wait_for_card_mode = function()
             abort_transaction()
         end
         is_transaction_started = false
-        return mode_start
+        return mode_work
     end
 
     if waiting_loops <= 0 then
@@ -219,52 +218,49 @@ ask_for_money_mode = function()
 
     update_balance()
     if balance > 1.0 then
-        return mode_start
+        return mode_work
     end
     return mode_ask_for_money
 end
 
-start_mode = function()
-    show_start(balance)
-    run_p6()
-    turn_light(0, animation.intense)
-    balance_seconds = free_pause_seconds    
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    -- user has no reason to start with pause here
-    if suggested_mode >= 0 and suggested_mode~=mode_pause then return suggested_mode end
-    return mode_start
-end
-
 program_mode = function(working_mode)
-    show_working(working_mode, balance)
-    run_program(working_mode)
-    turn_light(working_mode, animation.one_button)
-    charge_balance(price_p1)
-    if balance <= 0.01 then return mode_thanks end
-    update_balance()
-    suggested_mode = get_mode_by_pressed_key()
-    if suggested_mode >=0 then return suggested_mode end
-    return mode_p1
+  sub_mode = working_mode - mode_work
+  run_program(sub_mode)
+  show_working(sub_mode, balance)
+  
+  if sub_mode == 0 then
+    turn_light(0, animation.intense)
+  else
+    turn_light(sub_mode, animation.one_button)
+  end
+  
+  charge_balance(price_p[sub_mode])
+  if balance <= 0.01 then 
+    return mode_thanks 
+  end
+  update_balance()
+  suggested_mode = get_mode_by_pressed_key()
+  if suggested_mode >=0 then return suggested_mode end
+  return working_mode
 end
 
-p6_mode = function()
-    show_p6(balance, balance_seconds)
-    run_p6()
+pause_mode = function()
+    show_pause(balance, balance_seconds)
+    run_pause()
     turn_light(6, animation.one_button)
     update_balance()
     if balance_seconds > 0 then
         balance_seconds = balance_seconds - 0.1
     else
         balance_seconds = 0
-        charge_balance(price_p6)         
+        charge_balance(price_p[6])
     end
     
     if balance <= 0.01 then return mode_thanks end
     
     suggested_mode = get_mode_by_pressed_key()
     if suggested_mode >=0 then return suggested_mode end
-    return mode_p6
+    return mode_pause
 end
 
 thanks_mode = function()
@@ -282,7 +278,7 @@ thanks_mode = function()
             waiting_loops = 0
         end
         update_balance()
-        if balance > 0.99 then return mode_start end
+        if balance > 0.99 then return mode_work end
         smart_delay(100)
         waiting_loops = waiting_loops - 1
     end
@@ -292,7 +288,6 @@ thanks_mode = function()
 
     return mode_choose_method
 end
-
 
 show_welcome = function()
     welcome:Display()
@@ -325,34 +320,10 @@ show_start = function(balance_rur)
     start:Display()
 end
 
-show_p1 = function(balance_rur)
+show_working = function(working_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
-    p1screen:Set("balance.value", balance_int)
-    p1screen:Display()
-end
-
-show_p2 = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    p2screen:Set("balance.value", balance_int)
-    p2screen:Display()
-end
-
-show_p3 = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    p3screen:Set("balance.value", balance_int)
-    p3screen:Display()
-end
-
-show_p4 = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    p4screen:Set("balance.value", balance_int)
-    p4screen:Display()
-end
-
-show_p5 = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    p5screen:Set("balance.value", balance_int)
-    p5screen:Display()
+    working:Set("balance.value", balance_int)
+    working:Display()
 end
 
 show_p6 = function(balance_rur, balance_sec)
@@ -363,8 +334,6 @@ show_p6 = function(balance_rur, balance_sec)
     p6screen:Display()
 end
 
-
-
 show_thanks =  function(seconds_float)
     seconds_int = math.ceil(seconds_float)
     thanks:Set("delay_seconds.value", seconds_int)
@@ -373,12 +342,8 @@ end
 
 get_mode_by_pressed_key = function()
     pressed_key = get_key()
-    if pressed_key == 1 then return mode_p1 end
-    if pressed_key == 2 then return mode_p2 end
-    if pressed_key == 3 then return mode_p3 end
-    if pressed_key == 4 then return mode_p4 end
-    if pressed_key == 5 then return mode_p5 end
-    if pressed_key == 6 then return mode_p6 end
+    if pressed_key >= 1 and pressed_key<=5 then return mode_work + pressed_key end
+    if pressed_key == 6 then return mode_pause end
     return -1
 end
 
@@ -462,4 +427,9 @@ end
 charge_balance = function(price)
     balance = balance - price * 0.001666666667
     if balance<0 then balance = 0 end
+end
+
+is_working_mode = function(mode_to_check)
+  if mode_to_check >= mode_work and mode_to_check<mode_work+10 then return true end
+  return false
 end

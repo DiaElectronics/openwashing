@@ -21,7 +21,7 @@
 void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
     fprintf(stderr, "Card reader executes program thread...\n");
     if (!driverPtr) {
-         fprintf(stderr, "%s", "Card reader driver is empty. Panic!\n")
+         fprintf(stderr, "%s", "Card reader driver is empty. Panic!\n");
     }
 
     DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(driverPtr);

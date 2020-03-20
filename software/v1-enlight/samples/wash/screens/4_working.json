@@ -19,7 +19,7 @@
       {
         "id":"p1_ico",
         "type":"image",
-        "position": "36;163",
+        "position": "33;317",
         "size":"109;104",
         "src":"programs/p1/ico.png",
         "visible":"true"
@@ -27,7 +27,7 @@
       {
         "id":"p2_ico",
         "type":"image",
-        "position": "171;163",
+        "position": "169;317",
         "size":"109;104",
         "src":"programs/p2/ico.png",
         "visible":"true"
@@ -35,15 +35,15 @@
       {
         "id":"p3_ico",
         "type":"image",
-        "position": "306;163",
-        "size":"109;104",
+        "position": "304;317",
+        "size":"110;104",
         "src":"programs/p3/ico.png",
         "visible":"true"
       },
       {
         "id":"p4_ico",
         "type":"image",
-        "position": "441;163",
+        "position": "441;317",
         "size":"109;104",
         "src":"programs/p4/ico.png",
         "visible":"true"
@@ -51,7 +51,7 @@
       {
         "id":"p5_ico",
         "type":"image",
-        "position": "576;163",
+        "position": "576;317",
         "size":"109;104",
         "src":"programs/p5/ico.png",
         "visible":"true"
@@ -59,7 +59,7 @@
       {
         "id":"p6_ico",
         "type":"image",
-        "position": "711;163",
+        "position": "711;317",
         "size":"109;104",
         "src":"programs/p6/ico.png",
         "visible":"true"
@@ -72,14 +72,6 @@
         "symbol_size":"111;180",
         "padding": "3",
         "length": "3",
-        "visible":"true"
-      },
-      {
-        "id":"current_label",
-        "type":"image",
-        "position": "62;80",
-        "size":"234;34",
-        "src":"programs/p3/label.png",
         "visible":"true"
       }
     ]

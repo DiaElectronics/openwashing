@@ -13,30 +13,10 @@
     {
       "id": "start",
       "src": "screens/3_start.json"
-    },  
-    {
-      "id": "p1screen",
-      "src": "programs/p1/screen.json"
-    },  
-    {
-      "id": "p2screen",
-      "src": "programs/p2/screen.json"
-    },  
-    {
-      "id": "p3screen",
-      "src": "programs/p3/screen.json"
-    }, 
-    {
-      "id": "p4screen",
-      "src": "programs/p4/screen.json"
     },
     {
-      "id": "p5screen",
-      "src": "programs/p5/screen.json"
-    },
-    {
-      "id": "p6screen",
-      "src": "programs/p6/screen.json"
+      "id": "working",
+      "src": "screens/4_working.json"
     },
     {
       "id": "thanks",
