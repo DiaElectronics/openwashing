@@ -6,8 +6,9 @@ This project is a part of carwashing ecosystem, developing by OpenRobots.
 
 ## Features
 
+- Support of NFC card readers.
 - Reliable runtime software, written in C and C++.
-- Integration of modern payment systems: banknote, coin and NFC card readers. 
+- Integration of common payment systems: banknote and coin readers. 
 - User-friendly interface for car wash clients.
 - Support of fiscalization, according to the laws of the Russian Federation.
 - Easy-editable car wash system behaviour, based on Lua scripts.
