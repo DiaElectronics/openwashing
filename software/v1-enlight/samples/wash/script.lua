@@ -123,6 +123,13 @@ choose_method_mode = function()
     if pressed_key == 1 or pressed_key == 2 or pressed_key == 3 then
         return mode_ask_for_money
     end
+    
+    -- if someone put some money let's switch the mode.
+    -- this should be rebuilt
+    update_balance()
+    if balance > 0.99 then
+        return mode_work
+    end
 
     return mode_choose_method
 end
