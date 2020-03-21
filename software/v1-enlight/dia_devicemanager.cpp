@@ -19,12 +19,10 @@ void DiaDeviceManager_AddCardReader(DiaDeviceManager * manager) {
 
 void DiaDeviceManager_StartDeviceScan(DiaDeviceManager * manager)
 {
-    pthread_mutex_lock(&(manager->_DevicesLock));
-    for (std::list<DiaDevice*>::iterator it=manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
+    for (auto it = manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
     {
         (*it)->_CheckStatus = DIAE_DEVICE_STATUS_INITIAL;
     }
-    pthread_mutex_unlock(&(manager->_DevicesLock));
 }
 
 std::string DiaDeviceManager_ExecBashCommand(const char* cmd, int* error) {
@@ -84,11 +82,49 @@ int DiaDeviceManager_CheckNV9(char* PortName) {
     return 0;
 }
 
-void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortName, int isACM) {
-    pthread_mutex_lock(&(manager->_DevicesLock));
+int DiaDeviceManager_CheckUIC(char* PortName) {
+    printf("\nChecking port %s for UIC device...\n", PortName);
 
+    int error = 0;
+    std::string bashOutput = DiaDeviceManager_ExecBashCommand("ls -l /dev/serial/by-id", &error);
+    if (error) {
+        printf("Error while reading info about serial devices, NV9 check failed\n");
+        return 0;
+    }
+
+    std::string portName = std::string(PortName);
+    size_t maxDiff = 50;
+
+    // Get short name of port, for instance:
+    //   /dev/ttyACM0 ==> /ttyACM0
+    std::string toCut = portName.substr(0, 4);
+
+    if (toCut != std::string("/dev")) {
+        printf("Invlaid port name in UIC device check: %s\n", PortName);
+        return 0;
+    }
+
+    std::string shortPortName = portName.substr(4, 8);
+    size_t devicePortPosition = bashOutput.find(shortPortName);
+
+    // Check existance of port in list
+    if (devicePortPosition != std::string::npos) {
+        size_t deviceNamePosition = bashOutput.find("UIC");
+
+        // Compare distance between positions with maxDiff const
+        if (deviceNamePosition != std::string::npos && 
+            devicePortPosition - deviceNamePosition < maxDiff) {
+                return 1;
+            } 
+    }
+
+    return 0;
+}
+
+void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortName, int isACM) {
     int devInList = 0;
-    for (std::list<DiaDevice*>::iterator it=manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
+
+    for (auto it = manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
     {
         if(strcmp(PortName, (*it)->_PortName ) == 0)
         {
@@ -99,7 +135,13 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     if(!devInList)
     {
         if (isACM) {
-            if (DiaDeviceManager_CheckNV9(PortName)) {
+            if (DiaDeviceManager_CheckUIC(PortName)) {
+                printf("\nFound UIC on port %s\n\n", PortName);
+                printf("Ignoring this port...\n");
+                DiaDevice * dev = new DiaDevice(PortName);
+                manager->_Devices.push_back(dev);
+
+            } else if (DiaDeviceManager_CheckNV9(PortName)) {
                 printf("\nFound NV9 on port %s\n\n", PortName);
                 DiaDevice * dev = new DiaDevice(PortName);
 
@@ -131,33 +173,11 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
             }
         }
     }
-    pthread_mutex_unlock(&(manager->_DevicesLock));
-}
-
-void DiaDeviceManager_FinishDeviceScan(DiaDeviceManager * manager)
-{
-	return;
-    pthread_mutex_lock(&(manager->_DevicesLock));
-
-    for (std::list<DiaDevice*>::iterator it=manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
-    {
-        printf("lst dev: %s\n", (*it)->_PortName);
-        if((*it)->_CheckStatus==DIAE_DEVICE_STATUS_INITIAL)
-        {
-			DiaDevice * dev = (*it);
-			dev->NeedWorking = 0;
-			dev->_PortName[0] = 0;
-			DiaDevice_CloseDevice(dev);
-            //remove device from the list;
-        }
-    }
-
-    pthread_mutex_unlock(&(manager->_DevicesLock));
 }
 
 void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
 {
-    if(manager == NULL)
+    if (manager == NULL)
     {
         return;
     }
@@ -168,7 +188,6 @@ void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
 	{
         while((entry = readdir(dir))!=NULL)
 		{
-		    //if(strstr(entry->d_name,"ttyUSB")||strstr(entry->d_name,"ttyACM"))
             if(strstr(entry->d_name,"ttyACM"))
             {
                 char buf[1024];
@@ -183,7 +202,6 @@ void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
         }
         closedir(dir);
     }
-    DiaDeviceManager_FinishDeviceScan(manager);
 }
 
 DiaDeviceManager::DiaDeviceManager()

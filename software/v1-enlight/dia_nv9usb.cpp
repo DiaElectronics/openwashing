@@ -33,6 +33,7 @@ void * DiaNv9Usb_CommandReadingThread(void * driverPtr) {
         
         delay(100);
     }
+    printf("NV9: Exit from thread\n");
     pthread_exit(NULL);
     return NULL;
 }

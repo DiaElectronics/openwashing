@@ -15,4 +15,4 @@ LIBS+=-l:libjansson.a `curl-config --static-libs` ./3rd/lua53/src/liblua.a -ldl 
 prod:
 	$(CC) -o firmware.exe $(SRC) $(FLGS) $(LIBS) -DUSE_GPIO
 test:
-	$(CC) -o firmware.exe.debug $(SRC) $(FLGS) $(LIBS)
+	$(CC) -o firmware.exe.debug -O0 -ggdb3 $(SRC) $(FLGS) $(LIBS)

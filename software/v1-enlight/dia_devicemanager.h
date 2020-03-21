@@ -17,7 +17,6 @@ public:
     
     int NeedWorking;
     char * _PortName;
-    pthread_mutex_t _DevicesLock = PTHREAD_MUTEX_INITIALIZER;
 
     DiaCardReader* _CardReader;
     

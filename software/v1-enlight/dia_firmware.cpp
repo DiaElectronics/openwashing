@@ -36,7 +36,8 @@ int _100MsIntervalsCount;
 int _100MsIntervalsCountRelay;
 
 // Public key for signing every request to Central Server.
-char centralKey[12];
+const int centralKeySize = 6;
+std::string centralKey;
 
 int _DebugKey = 0;
 
@@ -222,10 +223,11 @@ int smart_delay_function(void * arg, int ms) {
 // Sends PING request to Central Server every 2 seconds.
 // May get service money from server.
 int CentralServerDialog() {
+    
     if (!config || !config->GetGpio()) {
         return 0;
     }
-
+    
     _100MsIntervalsCount++;
     if(_100MsIntervalsCount < 0) {
         printf("Memory corruption on _100MsIntervalsCount\n");
@@ -247,11 +249,13 @@ int CentralServerDialog() {
         int serviceMoney = 0;
         network.SendPingRequest(network.GetHostName(), serviceMoney);
 
+        
         if (serviceMoney > 0) {
 	    _Balance += serviceMoney;
             config->_Income.totalIncomeService += serviceMoney;
             SaveIncome();
-        }      
+        } 
+           
     }
 
     // Every 5 min (300 sec) we go inside this
@@ -259,6 +263,7 @@ int CentralServerDialog() {
         _100MsIntervalsCountRelay = 0;
         
         printf("Sending relay report to server...\n");
+        
         RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
 
         DiaGpio * gpio = config->GetGpio();
@@ -271,6 +276,7 @@ int CentralServerDialog() {
         network.SendRelayReport(relays);
 
         delete relays;
+        
     }
     return 0;
 }
@@ -454,14 +460,18 @@ int main(int argc, char ** argv) {
     // Check public key on disk
     // If it doesn't exist - get it from MAC
     if (file_exists(CENTRALWASH_KEY)) {
-        dia_security_read_file(CENTRALWASH_KEY, centralKey, sizeof(centralKey)+1);
-        printf("Public key read from file: %s \n", centralKey);
+        // Size is multiplied by 2, because of Hex numbers in file with width == 2 
+        char rawKey[centralKeySize * 2 + 1];
+
+        dia_security_read_file(CENTRALWASH_KEY, rawKey, centralKeySize * 2 + 1);
+        centralKey = std::string(rawKey);
+        printf("Public key read from file: %s \n", centralKey.c_str());
 
     } else {
-        network.GetMacAddress(centralKey);
-        printf("MAC address: %s\n", centralKey);
+        centralKey = network.GetMacAddress(centralKeySize);
+        printf("MAC address: %s\n", centralKey.c_str());
 
-        dia_security_write_file(CENTRALWASH_KEY, centralKey);
+        dia_security_write_file(CENTRALWASH_KEY, centralKey.c_str());
         printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
     }
     
@@ -479,11 +489,12 @@ int main(int argc, char ** argv) {
     network.SetHostAddress(serverIP);
 
     // Runtime and firmware initialization
-    DiaDeviceManager manager;
-    DiaDeviceManager_AddCardReader(&manager);
+    DiaDeviceManager *manager = new DiaDeviceManager;
+    DiaDeviceManager_AddCardReader(manager);
 
     SDL_Event event;
-
+    
+    
     DiaConfiguration configuration(folder);
     config = &configuration;
     int err = configuration.Init();
@@ -491,13 +502,14 @@ int main(int argc, char ** argv) {
         printf("Can't run due to the configuration error\n");
         return 1;
     }
-
+    
     // Get working data from server: money, relays, prices
     RecoverData();
 
     printf("Configuration is loaded...\n");
 
     // Screen load
+    
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
         std::string currentID = it->second->id;
@@ -509,8 +521,9 @@ int main(int argc, char ** argv) {
         screen->display_screen = dia_screen_display_screen;
         configuration.GetRuntime()->AddScreen(screen);
     }
-
+    
     // Program load
+    
     #ifdef USE_GPIO
     configuration.GetRuntime()->AddPrograms(&configuration.GetGpio()->_ProgramMapping);
     #else
@@ -531,13 +544,13 @@ int main(int argc, char ** argv) {
 
     hardware->send_receipt_function = send_receipt;
 
-    hardware->coin_object = &manager;
+    hardware->coin_object = manager;
     hardware->get_coins_function = get_coins;
 
-    hardware->banknote_object = &manager;
+    hardware->banknote_object = manager;
     hardware->get_banknotes_function = get_banknotes;
 
-    hardware->electronical_object = &manager;
+    hardware->electronical_object = manager;
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
@@ -564,6 +577,7 @@ int main(int argc, char ** argv) {
         CentralServerDialog();
 
         // Process pressed button
+        
         while(SDL_PollEvent(&event))
         {
             switch (event.type)
@@ -575,6 +589,7 @@ int main(int argc, char ** argv) {
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)
                     {
+                        
                         case SDLK_UP:
                             // Debug service money addition
                             _Balance += 10;
@@ -585,7 +600,7 @@ int main(int argc, char ** argv) {
 
                             printf("UP\n"); fflush(stdout);
                             break;
-
+                        
                         case SDLK_1:
                             _DebugKey = 1;
                             printf("1\n"); fflush(stdout);
