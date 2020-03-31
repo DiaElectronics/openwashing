@@ -105,14 +105,13 @@ int DiaRuntime::AddPrograms(std::map<std::string, int> *programs) {
     lua_settable(Lua, -3);
 
     if (programs) {
-        std::map<std::string, int>::iterator it_p;
-        for(it_p = programs->begin(); it_p!=programs->end(); it_p++) {
+        for(auto it_p = programs->begin(); it_p != programs->end(); it_p++) {
             lua_pushstring(Lua, it_p->first.c_str());
             lua_pushinteger(Lua, it_p->second);
             lua_settable(Lua, -3);
             printf("added program [%s] as [%d] \n", it_p->first.c_str(), it_p->second);
         }
-    }
+    } 
 
     lua_setglobal(Lua, "program");
 

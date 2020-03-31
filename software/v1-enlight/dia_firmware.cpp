@@ -527,7 +527,15 @@ int main(int argc, char ** argv) {
     #ifdef USE_GPIO
     configuration.GetRuntime()->AddPrograms(&configuration.GetGpio()->_ProgramMapping);
     #else
-    configuration.GetRuntime()->AddPrograms(0);
+    printf("NOT USING GPIO - adding FAKE programs...\n");
+    std::map<std::string, int> *fake_programs = new std::map<std::string, int>();
+    fake_programs->insert( std::pair<std::string, int>("p1relay", 1) ); 
+    fake_programs->insert( std::pair<std::string, int>("p2relay", 2) );
+    fake_programs->insert( std::pair<std::string, int>("p3relay", 3) );
+    fake_programs->insert( std::pair<std::string, int>("p4relay", 4) );
+    fake_programs->insert( std::pair<std::string, int>("p5relay", 5) );
+    fake_programs->insert( std::pair<std::string, int>("p6relay", 6) );
+    configuration.GetRuntime()->AddPrograms(fake_programs);
     #endif
 
     configuration.GetRuntime()->AddAnimations();

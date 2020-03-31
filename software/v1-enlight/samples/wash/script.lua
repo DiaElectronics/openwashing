@@ -22,6 +22,7 @@ setup = function()
     
     hascardreader = true
     is_transaction_started = false
+    is_waiting_receipt = false
 
     price_p = {}
     
@@ -50,7 +51,7 @@ setup = function()
     
     currentMode = mode_welcome
 
-    version = "2.0.0"
+    version = "2.1.0"
 
     printMessage("dia generic wash firmware v." .. version)
     return 0
@@ -273,29 +274,37 @@ pause_mode = function()
 end
 
 thanks_mode = function()
-    balance = 0
-    show_thanks(thanks_mode_seconds)
-    turn_light(1, animation.one_button)
-    run_program(program.p6relay)
-    waiting_loops = thanks_mode_seconds * 10;
-    
-    while(waiting_loops>0)
-    do
+    if is_waiting_receipt == false then
+        balance = 0
+        show_thanks(thanks_mode_seconds)
+        turn_light(1, animation.one_button)
+        run_pause()
+        waiting_loops = thanks_mode_seconds * 10;
+        is_waiting_receipt = true
+    end
+ 
+    if waiting_loops > 0 then
         show_thanks(waiting_loops/10)
-	    pressed_key = get_key()
+        pressed_key = get_key()
         if pressed_key > 0 and pressed_key < 7 then
             waiting_loops = 0
         end
         update_balance()
-        if balance > 0.99 then return mode_work end
-        smart_delay(100)
+        if balance > 0.99 then
+            send_receipt(post_position, 0, kasse_balance)
+            kasse_balance = 0
+            is_waiting_receipt = false 
+            return mode_work 
+        end
         waiting_loops = waiting_loops - 1
+    else
+        send_receipt(post_position, 0, kasse_balance)
+        kasse_balance = 0
+        is_waiting_receipt = false
+        return mode_choose_method
     end
 
-    send_receipt(post_position, 0, kasse_balance)
-    kasse_balance = 0
-
-    return mode_choose_method
+    return mode_thanks
 end
 
 show_welcome = function()
