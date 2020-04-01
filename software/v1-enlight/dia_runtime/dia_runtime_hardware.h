@@ -87,6 +87,17 @@ public:
         return 0;
     }
 
+    void * service_object;
+    int (*get_service_function)(void * object);
+    int GetService() {
+        if(service_object && get_service_function) {
+            return get_service_function(banknote_object);
+        } else {
+            printf("error: NIL object or function GetService\n");
+        }
+        return 0;
+    }
+
     void * electronical_object;
     int (*get_electronical_function)(void * object);
     int GetElectronical() {
@@ -169,11 +180,15 @@ public:
         banknote_object = 0;
         get_banknotes_function = 0;
 
+        service_object = 0;
+        get_service_function = 0;
+
         electronical_object = 0;
         get_electronical_function = 0;
         request_transaction_function = 0;
         get_transaction_status_function = 0;
         abort_transaction_function = 0;
+
         increment_cars_function = 0;
 
         keys_object = 0;
