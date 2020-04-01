@@ -123,6 +123,22 @@ int turn_program(void *object, int program) {
     return 0;
 }
 
+int get_service(void *object) {
+    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+    int curMoney = _Balance;
+    _Balance = 0;
+        
+    if (curMoney > 0) {
+        printf("service %d\n", curMoney);
+
+        if (config) {
+            config->_Income.totalIncomeService += curMoney;
+            SaveIncome();
+        }
+    }
+    return curMoney;
+}
+
 int get_coins(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int curMoney = manager->CoinMoney + _Balance;
@@ -254,14 +270,10 @@ int CentralServerDialog() {
 
         int serviceMoney = 0;
         network.SendPingRequest(network.GetHostName(), serviceMoney);
-
         
         if (serviceMoney > 0) {
-	    _Balance += serviceMoney;
-            config->_Income.totalIncomeService += serviceMoney;
-            SaveIncome();
-        } 
-           
+	        _Balance += serviceMoney;
+        }      
     }
 
     // Every 5 min (300 sec) we go inside this
@@ -566,6 +578,7 @@ int main(int argc, char ** argv) {
     hardware->get_banknotes_function = get_banknotes;
 
     hardware->electronical_object = manager;
+    hardware->get_electronical_function = get_service; 
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
@@ -608,10 +621,6 @@ int main(int argc, char ** argv) {
                         case SDLK_UP:
                             // Debug service money addition
                             _Balance += 10;
-                            configuration._Income.totalIncomeService+=10;
-
-                            // Save this in the storage
-                            configuration.GetStorage()->save(configuration.GetStorage()->object, "income", &configuration._Income, sizeof(income));
 
                             printf("UP\n"); fflush(stdout);
                             break;

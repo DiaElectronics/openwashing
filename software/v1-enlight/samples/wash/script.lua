@@ -434,13 +434,16 @@ update_balance = function()
     new_coins = hardware:GetCoins()
     new_banknotes = hardware:GetBanknotes()
     new_electronical = hardware:GetElectronical()
+    new_service = hardware:GetService()
 
     kasse_balance = kasse_balance + new_coins
     kasse_balance = kasse_balance + new_banknotes
     kasse_balance = kasse_balance + new_electronical
+    kasse_balance = kasse_balance + new_service
     balance = balance + new_coins
     balance = balance + new_banknotes
     balance = balance + new_electronical
+    balance = balance + new_service
 end
 
 charge_balance = function(price)
