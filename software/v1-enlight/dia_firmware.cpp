@@ -123,8 +123,7 @@ int turn_program(void *object, int program) {
     return 0;
 }
 
-int get_service(void *object) {
-    DiaDeviceManager * manager = (DiaDeviceManager *)object;
+int get_service() {
     int curMoney = _Balance;
     _Balance = 0;
         
@@ -141,10 +140,8 @@ int get_service(void *object) {
 
 int get_coins(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
-    int curMoney = manager->CoinMoney + _Balance;
-
+    int curMoney = manager->CoinMoney;
     manager->CoinMoney  = 0;
-    _Balance = 0;
         
     if (curMoney > 0) {
         printf("coin %d\n", curMoney);
@@ -578,7 +575,7 @@ int main(int argc, char ** argv) {
     hardware->get_banknotes_function = get_banknotes;
 
     hardware->electronical_object = manager;
-    hardware->get_electronical_function = get_service; 
+    hardware->get_service_function = get_service; 
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
