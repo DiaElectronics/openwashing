@@ -87,11 +87,10 @@ public:
         return 0;
     }
 
-    void * service_object;
-    int (*get_service_function)(void * object);
+    int (*get_service_function)();
     int GetService() {
-        if(service_object && get_service_function) {
-            return get_service_function(banknote_object);
+        if(get_service_function) {
+            return get_service_function();
         } else {
             printf("error: NIL object or function GetService\n");
         }
@@ -180,7 +179,6 @@ public:
         banknote_object = 0;
         get_banknotes_function = 0;
 
-        service_object = 0;
         get_service_function = 0;
 
         electronical_object = 0;
