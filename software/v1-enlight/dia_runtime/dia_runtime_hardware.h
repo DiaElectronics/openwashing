@@ -50,7 +50,17 @@ public:
 	} else {
 	    printf("error: NIL function SendReceipt\n");
 	}
-	return 0;
+	    return 0;
+    }
+
+    int (*increment_cars_function)();
+    int IncrementCars() {
+	if(increment_cars_function) {
+	    increment_cars_function();
+	} else {
+	    printf("error: NIL function IncrementCars\n");
+	}
+	    return 0;
     }
 
     void * coin_object;
@@ -164,6 +174,7 @@ public:
         request_transaction_function = 0;
         get_transaction_status_function = 0;
         abort_transaction_function = 0;
+        increment_cars_function = 0;
 
         keys_object = 0;
         get_keys_function = 0;
