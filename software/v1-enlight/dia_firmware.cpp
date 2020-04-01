@@ -234,10 +234,6 @@ int smart_delay_function(void * arg, int ms) {
 // May get service money from server.
 int CentralServerDialog() {
     
-    if (!config || !config->GetGpio()) {
-        return 0;
-    }
-    
     _100MsIntervalsCount++;
     if(_100MsIntervalsCount < 0) {
         printf("Memory corruption on _100MsIntervalsCount\n");
