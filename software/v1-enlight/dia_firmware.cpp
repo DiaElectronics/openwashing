@@ -22,7 +22,7 @@
 #define WORK 2
 #define PAUSE 3
 
-#define DIA_VERSION "v1.4-enlight"
+#define DIA_VERSION "v1.5-enlight"
 
 //#define USE_GPIO
 #define USE_KEYBOARD
@@ -99,6 +99,16 @@ int turn_light(void *object, int pin, int animation_id) {
 // Creates receipt request to Online Cash Register.
 int send_receipt(int postPosition, int isCard, int amount) {
     return network.ReceiptRequest(postPosition, isCard, amount);
+}
+
+// Increases car counter in config
+int increment_cars() {
+    printf("Cars incremented\n");
+    if (config) {
+        config->_Income.carsTotal += 1;
+        SaveIncome();
+    }
+    return 0;
 }
 
 int turn_program(void *object, int program) {
@@ -551,6 +561,7 @@ int main(int argc, char ** argv) {
     hardware->turn_program_function = turn_program;
 
     hardware->send_receipt_function = send_receipt;
+    hardware->increment_cars_function = increment_cars;
 
     hardware->coin_object = manager;
     hardware->get_coins_function = get_coins;

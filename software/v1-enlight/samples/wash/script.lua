@@ -293,7 +293,8 @@ thanks_mode = function()
         if balance > 0.99 then
             send_receipt(post_position, 0, kasse_balance)
             kasse_balance = 0
-            is_waiting_receipt = false 
+            is_waiting_receipt = false
+            increment_cars() 
             return mode_work 
         end
         waiting_loops = waiting_loops - 1
@@ -301,6 +302,7 @@ thanks_mode = function()
         send_receipt(post_position, 0, kasse_balance)
         kasse_balance = 0
         is_waiting_receipt = false
+        increment_cars() 
         return mode_choose_method
     end
 
@@ -398,6 +400,10 @@ end
 
 send_receipt = function(post_pos, is_card, amount)
     hardware:SendReceipt(post_pos, is_card, amount)
+end
+
+increment_cars = function()
+    hardware:IncrementCars()
 end
 
 run_pause = function()
