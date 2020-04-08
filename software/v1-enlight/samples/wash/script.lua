@@ -20,7 +20,7 @@ setup = function()
     free_pause_seconds = 120
     wait_card_mode_seconds = 40
     
-    hascardreader = true
+    hascardreader = false
     is_transaction_started = false
     is_waiting_receipt = false
 
@@ -302,8 +302,11 @@ thanks_mode = function()
         send_receipt(post_position, 0, kasse_balance)
         kasse_balance = 0
         is_waiting_receipt = false
-        increment_cars() 
-        return mode_choose_method
+        increment_cars()
+	if hascardreader == true then
+        	return mode_choose_method
+    	end
+        return mode_ask_for_money
     end
 
     return mode_thanks
