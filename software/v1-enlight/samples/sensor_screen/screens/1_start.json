@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"1920;1080",
+      "src":"pic/background/1_background_start.png",
+      "visible":"true"
+    },
+    {
+      "id":"button_cash_on",
+      "type":"image",
+      "position": "1383;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_nal_on.png",
+      "visible":"false"
+    },
+    {
+      "id":"button_card_on",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_beznal_on.png",
+      "visible":"false"
+    },
+    {
+      "id":"button_cash",
+      "type":"image",
+      "position": "1383;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_nal.png",
+      "visible":"true"
+    },
+    {
+      "id":"button_card",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_beznal.png",
+      "visible":"true"
+    }
+  ]
+}

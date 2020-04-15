@@ -1,0 +1,72 @@
+{
+  "name": "default configuration",
+  "resolution": "1920x1080",
+  "screens": [
+    {
+      "id": "start",
+      "src": "screens/1_start.json"
+    },
+    {
+      "id": "cash",
+      "src": "screens/2_cash.json"
+    },
+    {
+      "id": "enter_price",
+      "src": "screens/3_enter_price.json"
+    },
+    {
+      "id": "card",
+      "src": "screens/4_card.json"
+    },
+    {
+      "id": "working",
+      "src": "screens/5_working.json"
+    },
+    {
+      "id": "use_red",
+      "src": "screens/6_use_red.json"
+    },
+    {
+      "id": "use_blue",
+      "src": "screens/7_use_blue.json"
+    },
+    {
+      "id": "thanks",
+      "src": "screens/8_thanks.json"
+    },
+    {
+      "id": "not_working",
+      "src": "screens/9_not_working.json"
+    }
+  ],
+  "buttons": 6,
+  "relays": 6,
+  "endpoint": "http://app.diae.ru/v0/gql/",
+  "programs": [
+    {
+      "id": "p1relay",
+      "src": "programs/p1/relay.json"
+    },
+    {
+      "id": "p2relay",
+      "src": "programs/p2/relay.json"
+    },
+    {
+      "id": "p3relay",
+      "src": "programs/p3/relay.json"
+    },
+    {
+      "id": "p4relay",
+      "src": "programs/p4/relay.json"
+    },
+    {
+      "id": "p5relay",
+      "src": "programs/p5/relay.json"
+    },
+    {
+      "id": "p6relay",
+      "src": "programs/p6/relay.json"
+    }
+  ],
+  "script": "script.lua"
+}

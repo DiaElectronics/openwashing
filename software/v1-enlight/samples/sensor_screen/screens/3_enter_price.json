@@ -1,0 +1,44 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"pic/background/3_background_enter_price.png",
+        "visible":"true"
+      },
+      {
+      	"id":"button_begin_washing_on",
+      	"type":"image",
+      	"position": "1383;60",
+      	"size":"118;961",
+      	"src":"pic/buttons/button_start_on.png",
+      	"visible":"false"
+      },
+      {
+      	"id":"button_cancel_on",
+      	"type":"image",
+      	"position": "1543;60",
+      	"size":"118;961",
+      	"src":"pic/buttons/button_cancel_on.png",
+      	"visible":"false"
+      },
+      {
+      	"id":"button_begin_washing",
+      	"type":"image",
+      	"position": "1383;60",
+      	"size":"118;961",
+      	"src":"pic/buttons/button_start.png",
+      	"visible":"true"
+      },
+      {
+      	"id":"button_cancel",
+      	"type":"image",
+      	"position": "1543;60",
+      	"size":"118;961",
+      	"src":"pic/buttons/button_cancel.png",
+      	"visible":"true"
+      }
+    ]
+  }

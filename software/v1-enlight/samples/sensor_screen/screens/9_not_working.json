@@ -1,0 +1,12 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"pic/background/9_background_not_work.png",
+        "visible":"true"
+      }
+    ]
+  }

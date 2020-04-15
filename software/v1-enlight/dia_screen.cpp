@@ -21,7 +21,7 @@ DiaScreen::DiaScreen(int resX, int resY)
 	//printf("trying to set a video mode \n"); fflush(stdout);
 	delay(100);
     //if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_HWSURFACE))) {      
-	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_NOFRAME|SDL_FULLSCREEN|SDL_HWSURFACE))) {
+	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_NOFRAME|SDL_HWSURFACE))) {
         printf("Cant set your videomode\n");
         SDL_Quit();
         InitializedOk = SDL_INIT_ERROR;
