@@ -274,6 +274,16 @@ thanks_mode = function()
 end
 
 show_start = function()
+    start:Set("time_min.value", 25)
+    start:Set("time_hours.value", 13)
+    start:Set("temp_fraction.value", 6)
+    start:Set("temp_degrees.value", 34)
+    start:Set("price_p1.value", 18)
+    start:Set("price_p2.value", 15)
+    start:Set("price_p3.value", 15)
+    start:Set("price_p4.value", 18)
+    start:Set("price_p5.value", 15)
+    start:Set("price_p6.value", 10)
     start:Display()
 end
 

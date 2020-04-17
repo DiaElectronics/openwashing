@@ -39,6 +39,116 @@
       "size":"118;961",
       "src":"pic/buttons/button_beznal.png",
       "visible":"true"
+    },
+    {
+      "id":"time_min",
+      "type": "digits",
+      "position": "413;75",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"time_hours",
+      "type": "digits",
+      "position": "413;117",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"temp_fraction",
+      "type": "digits",
+      "position": "413;954",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "1",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"temp_degrees",
+      "type": "digits",
+      "position": "413;979",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p1",
+      "type": "digits",
+      "position": "820;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p2",
+      "type": "digits",
+      "position": "881;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p3",
+      "type": "digits",
+      "position": "942;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p4",
+      "type": "digits",
+      "position": "1003;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p5",
+      "type": "digits",
+      "position": "1064;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p6",
+      "type": "digits",
+      "position": "1125;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
     }
   ]
 }

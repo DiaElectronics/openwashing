@@ -41,7 +41,6 @@ int DiaScreenItem::Init(json_t * screen_item_json) {
     }
 
     if(type.compare("digits")==0) {
-        //printf("digits object found...\n");
         DiaScreenItemDigits * digits = new DiaScreenItemDigits();
 
 
