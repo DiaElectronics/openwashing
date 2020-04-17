@@ -49,6 +49,9 @@ setup = function()
     version = "3.0.0"
 
     printMessage("dia generic wash firmware v." .. version)
+
+    index = 0
+
     return 0
 end
 
@@ -284,6 +287,11 @@ show_start = function()
     start:Set("price_p4.value", 18)
     start:Set("price_p5.value", 15)
     start:Set("price_p6.value", 10)
+    start:Set("post_numbers.index", index)
+    index = index + 1
+    if index == 12 then
+        index = 0
+    end
     start:Display()
 end
 

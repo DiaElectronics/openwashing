@@ -1,6 +1,7 @@
 #include "dia_screen_item.h"
 #include "dia_screen_item_digits.h"
 #include "dia_screen_item_image.h"
+#include "dia_screen_item_image_array.h"
 
 DiaScreenItem::DiaScreenItem(DiaScreenConfig * newParent) {
     display_ptr = 0;
@@ -59,6 +60,17 @@ int DiaScreenItem::Init(json_t * screen_item_json) {
         this->display_ptr = dia_screen_item_image_display;
 
         image->Init(this, screen_item_json);
+    } else if (type.compare("image_array") == 0) {
+        printf("Image Array found...\n");
+        
+        DiaScreenItemImageArray * image_array = new DiaScreenItemImageArray();
+
+        this->specific_object_ptr = image_array;
+        this->notify_ptr = dia_screen_item_image_array_notify;
+        this->display_ptr = dia_screen_item_image_array_display;
+
+        image_array->Init(this, screen_item_json);
+
     } else {
         printf("unknown type:[%s]\n",type.c_str());
         return 1;

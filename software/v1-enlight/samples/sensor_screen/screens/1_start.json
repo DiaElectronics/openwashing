@@ -149,6 +149,101 @@
       "length": "2",
       "visible":"true",
       "is_vertical":"1"
+    },
+    {
+      "id":"rub_p1",
+      "type":"image",
+      "position": "820;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p2",
+      "type":"image",
+      "position": "881;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p3",
+      "type":"image",
+      "position": "942;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p4",
+      "type":"image",
+      "position": "1003;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p5",
+      "type":"image",
+      "position": "1064;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p6",
+      "type":"image",
+      "position": "1125;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"post_numbers",
+      "type":"image_array",
+      "position": "150;55",
+      "size":"81;81",
+      "visible":"true",
+      "length":"12",
+      "index":"0",
+      "sources": [
+        {
+          "src":"pic/post_number/post_1.png"
+        },
+        {
+          "src":"pic/post_number/post_2.png"
+        },
+        {
+          "src":"pic/post_number/post_3.png"
+        },
+        {
+          "src":"pic/post_number/post_4.png"
+        },
+        {
+          "src":"pic/post_number/post_5.png"
+        },
+        {
+          "src":"pic/post_number/post_6.png"
+        },
+        {
+          "src":"pic/post_number/post_7.png"
+        },
+        {
+          "src":"pic/post_number/post_8.png"
+        },
+        {
+          "src":"pic/post_number/post_9.png"
+        },
+        {
+          "src":"pic/post_number/post_10.png"
+        },
+        {
+          "src":"pic/post_number/post_11.png"
+        },
+        {
+          "src":"pic/post_number/post_12.png"
+        }
+      ]
     }
   ]
 }
