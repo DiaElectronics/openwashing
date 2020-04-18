@@ -10,6 +10,8 @@ setup = function()
     balance_seconds = 0
     kasse_balance = 0.0
 
+    diagram_balance = 200
+
     -- time variables
     time_minutes = 25
     time_hours = 13
@@ -298,6 +300,19 @@ show_start = function()
 end
 
 show_cash = function()
+    balance_to_show = balance
+
+    if balance == 0 then
+        balance_to_show = 1
+    end
+
+    if balance > diagram_balance then
+        balance_to_show = diagram_balance
+    end 
+
+    index = math.ceil((balance_to_show / diagram_balance)*15 - 1)
+    cash:Set("diagrams.index", index)
+
     cash:Set("time_min.value", time_minutes)
     cash:Set("time_hours.value", time_hours)
     cash:Set("temp_fraction.value", temp_fraction)
@@ -336,7 +351,17 @@ show_wait_for_card = function()
 end
 
 show_working = function(sub_mode, balance_rur)
-    index = math.ceil((balance_rur / kasse_balance)*15 - 1)
+    balance_to_show = balance_rur
+
+    if balance_rur == 0 then
+        balance_to_show = 1
+    end
+
+    if balance_rur > diagram_balance then
+        balance_to_show = diagram_balance
+    end 
+
+    index = math.ceil((balance_to_show / diagram_balance)*15 - 1)
     working:Set("diagrams.index", index)
 
     balance_int = math.ceil(balance_rur)
