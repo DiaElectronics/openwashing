@@ -1,18 +1,29 @@
 -- Wash Firmware
 
 setup = function()
-    -- global variables
-    balance = 0.0
+    -- change this constant on every post
+    post_position = 1     
 
+    -- money variables
+    balance = 0.0
     electron_balance = 0
     balance_seconds = 0
     kasse_balance = 0.0
-    post_position = 1      
 
+    -- time variables
+    time_minutes = 25
+    time_hours = 13
+
+    -- temperature variables
+    temp_degrees = 11
+    temp_fraction = 6
+
+    -- delay variables
     thanks_mode_seconds = 20
     free_pause_seconds = 120
     wait_card_mode_seconds = 40
     
+    -- flags
     is_transaction_started = false
     is_waiting_receipt = false
 
@@ -49,8 +60,6 @@ setup = function()
     version = "3.0.0"
 
     printMessage("dia generic wash firmware v." .. version)
-
-    index = 0
 
     return 0
 end
@@ -119,8 +128,6 @@ enter_price_mode = function()
     show_enter_price()
     run_stop()
 
-    -- TO DO: read the screen keyboard here
-    
     pressed_key = get_key()
     if pressed_key == 1 then
         animate_enter_price_begin_wash_button()
@@ -194,8 +201,7 @@ cash_mode = function()
         animate_cash_cancel_button()
         return mode_start
     end
-    
-    -- TO DO: show amount of money on the screen
+
     return mode_cash
 end
 
@@ -244,7 +250,6 @@ thanks_mode = function()
     if is_waiting_receipt == false then
         balance = 0
         show_thanks()
-        turn_light(1, animation.one_button)
         run_pause()
         waiting_loops = thanks_mode_seconds * 10;
         is_waiting_receipt = true
@@ -255,14 +260,6 @@ thanks_mode = function()
         pressed_key = get_key()
         if pressed_key > 0 and pressed_key < 7 then
             waiting_loops = 0
-        end
-        update_balance()
-        if balance > 0.99 then
-            send_receipt(post_position, 0, kasse_balance)
-            kasse_balance = 0
-            is_waiting_receipt = false
-            increment_cars() 
-            return mode_work 
         end
         waiting_loops = waiting_loops - 1
     else
@@ -277,41 +274,81 @@ thanks_mode = function()
 end
 
 show_start = function()
-    start:Set("time_min.value", 25)
-    start:Set("time_hours.value", 13)
-    start:Set("temp_fraction.value", 6)
-    start:Set("temp_degrees.value", 34)
-    start:Set("price_p1.value", 18)
-    start:Set("price_p2.value", 15)
-    start:Set("price_p3.value", 15)
-    start:Set("price_p4.value", 18)
-    start:Set("price_p5.value", 15)
-    start:Set("price_p6.value", 10)
-    start:Set("post_numbers.index", index)
-    index = index + 1
-    if index == 12 then
-        index = 0
-    end
+    start:Set("time_min.value", time_minutes)
+    start:Set("time_hours.value", time_hours)
+    start:Set("temp_fraction.value", temp_fraction)
+    start:Set("temp_degrees.value", temp_degrees)
+
+    price1_int = math.ceil(price_p[1])
+    start:Set("price_p1.value", price1_int)
+    price2_int = math.ceil(price_p[2])
+    start:Set("price_p2.value", price2_int)
+    price3_int = math.ceil(price_p[3])
+    start:Set("price_p3.value", price3_int)
+    price4_int = math.ceil(price_p[4])
+    start:Set("price_p4.value", price4_int)
+    price5_int = math.ceil(price_p[5])
+    start:Set("price_p5.value", price5_int)
+    price6_int = math.ceil(price_p[6])
+    start:Set("price_p6.value", price6_int)
+
+    start:Set("post_numbers.index", post_position-1)
+
     start:Display()
 end
 
 show_cash = function()
+    cash:Set("time_min.value", time_minutes)
+    cash:Set("time_hours.value", time_hours)
+    cash:Set("temp_fraction.value", temp_fraction)
+    cash:Set("temp_degrees.value", temp_degrees)
+
+    cash:Set("post_numbers.index", post_position-1)
+    balance_int = math.ceil(balance)
+    cash:Set("balance.value", balance_int)
+
     cash:Display()
 end
 
 show_enter_price = function()
+    enter_price:Set("time_min.value", time_minutes)
+    enter_price:Set("time_hours.value", time_hours)
+    enter_price:Set("temp_fraction.value", temp_fraction)
+    enter_price:Set("temp_degrees.value", temp_degrees)
+
+    enter_price:Set("post_numbers.index", post_position-1)
+    balance_int = math.ceil(balance)
+    enter_price:Set("balance.value", balance_int)
     enter_price:Display()
 end
 
 show_wait_for_card = function()
+    card:Set("time_min.value", time_minutes)
+    card:Set("time_hours.value", time_hours)
+    card:Set("temp_fraction.value", temp_fraction)
+    card:Set("temp_degrees.value", temp_degrees)
+
+    card:Set("post_numbers.index", post_position-1)
+    balance_int = math.ceil(balance)
+    card:Set("balance.value", balance_int)
+
     card:Display()
 end
 
 show_working = function(sub_mode, balance_rur)
+    index = math.ceil((balance_rur / kasse_balance)*15 - 1)
+    working:Set("diagrams.index", index)
+
     balance_int = math.ceil(balance_rur)
-    working:Set("pause_digits.visible", "false")
     working:Set("balance.value", balance_int)
     
+    working:Set("time_min.value", time_minutes)
+    working:Set("time_hours.value", time_hours)
+    working:Set("temp_fraction.value", temp_fraction)
+    working:Set("temp_degrees.value", temp_degrees)
+
+    working:Set("post_numbers.index", post_position-1)
+
     switch_submodes(sub_mode)
     working:Display()
 end
@@ -327,16 +364,22 @@ show_pause = function(balance_rur, balance_sec)
 end
 
 switch_submodes = function(sub_mode) 
-    if sub_mode == 1 then working:Set("p1.visible", "true") else working:Set("p1.visible", "false") end
-    if sub_mode == 2 then working:Set("p2.visible", "true") else working:Set("p2.visible", "false") end
-    if sub_mode == 3 then working:Set("p3.visible", "true") else working:Set("p3.visible", "false") end
-    if sub_mode == 4 then working:Set("p4.visible", "true") else working:Set("p4.visible", "false") end
-    if sub_mode == 5 then working:Set("p5.visible", "true") else working:Set("p5.visible", "false") end
-    if sub_mode == 6 then working:Set("p6.visible", "true") else working:Set("p6.visible", "false") end
-    
+    if sub_mode == 1 then working:Set("button_p1_on.visible", "true") else working:Set("button_p1_on.visible", "false") end
+    if sub_mode == 2 then working:Set("button_p2_on.visible", "true") else working:Set("button_p2_on.visible", "false") end
+    if sub_mode == 3 then working:Set("button_p3_on.visible", "true") else working:Set("button_p3_on.visible", "false") end
+    if sub_mode == 4 then working:Set("button_p4_on.visible", "true") else working:Set("button_p4_on.visible", "false") end
+    if sub_mode == 5 then working:Set("button_p5_on.visible", "true") else working:Set("button_p5_on.visible", "false") end
+    if sub_mode == 6 then working:Set("button_p6_on.visible", "true") else working:Set("button_p6_on.visible", "false") end
 end
 
-show_thanks =  function(seconds_float)
+show_thanks =  function()
+    thanks:Set("time_min.value", time_minutes)
+    thanks:Set("time_hours.value", time_hours)
+    thanks:Set("temp_fraction.value", temp_fraction)
+    thanks:Set("temp_degrees.value", temp_degrees)
+
+    thanks:Set("post_numbers.index", post_position-1)
+
     thanks:Display()
 end
 

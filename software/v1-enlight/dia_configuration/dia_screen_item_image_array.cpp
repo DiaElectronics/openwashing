@@ -110,12 +110,12 @@ int dia_screen_item_image_array_display(DiaScreenItem * base_item, void * image_
 }
 
 int dia_screen_item_image_array_notify(DiaScreenItem * base_item, void * image_array_ptr, std::string key) {
-    printf("Notification in Image Array for '%s' key\n", key.c_str());
+    //printf("Notification in Image Array for '%s' key\n", key.c_str());
 
     int error = 0;
     std::string value = base_item->GetValue(key, &error);
 
-    printf("GetValue: %s\n", value.c_str());
+    //printf("GetValue: %s\n", value.c_str());
 
     if (error != 0) {
         printf("notification on non-existing key '%s'\n", key.c_str());

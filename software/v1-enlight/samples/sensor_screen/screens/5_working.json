@@ -5,8 +5,270 @@
         "type":"image",
         "position": "0;0",
         "size":"1920;1080",
-        "src":"pic/background/5_background_program.png",
+        "src":"pic/background/5_background_work.png",
         "visible":"true"
+      },
+      {	
+        "id":"button_p1_on",
+        "type":"image",
+        "position": "743;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_foam_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p2_on",
+        "type":"image",
+        "position": "903;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_water_and_shampoo_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p3_on",
+        "type":"image",
+        "position": "1063;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_rinsing_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p4_on",
+        "type":"image",
+        "position": "1223;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_wax_and_protection_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p5_on",
+        "type":"image",
+        "position": "1383;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_drying_and_shine_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p6_on",
+        "type":"image",
+        "position": "1543;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_pause_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p1",
+        "type":"image",
+        "position": "743;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_foam.png",
+        "visible":"true"
+      },
+      {	
+        "id":"button_p2",
+        "type":"image",
+        "position": "903;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_water_and_shampoo.png",
+        "visible":"true"
+      },
+      {	
+        "id":"button_p3",
+        "type":"image",
+        "position": "1063;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_rinsing.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_p4",
+        "type":"image",
+        "position": "1223;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_wax_and_protection.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_p5",
+        "type":"image",
+        "position": "1383;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_drying_and_shine.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_p6",
+        "type":"image",
+        "position": "1543;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_pause.png",
+        "visible":"true"
+      },
+      {
+        "id":"post_numbers",
+        "type":"image_array",
+        "position": "150;55",
+        "size":"81;81",
+        "visible":"true",
+        "length":"12",
+        "index":"0",
+        "sources": [
+        {
+          "src":"pic/post_number/post_1.png"
+        },
+        {
+          "src":"pic/post_number/post_2.png"
+        },
+        {
+          "src":"pic/post_number/post_3.png"
+        },
+        {
+          "src":"pic/post_number/post_4.png"
+        },
+        {
+          "src":"pic/post_number/post_5.png"
+        },
+        {
+          "src":"pic/post_number/post_6.png"
+        },
+        {
+          "src":"pic/post_number/post_7.png"
+        },
+        {
+          "src":"pic/post_number/post_8.png"
+        },
+        {
+          "src":"pic/post_number/post_9.png"
+        },
+        {
+          "src":"pic/post_number/post_10.png"
+        },
+        {
+          "src":"pic/post_number/post_11.png"
+        },
+        {
+          "src":"pic/post_number/post_12.png"
+        }
+        ]
+      },
+      {
+        "id":"diagrams",
+        "type":"image_array",
+        "position": "385;28",
+        "size":"227;1040",
+        "visible":"true",
+        "length":"15",
+        "index":"0",
+        "sources": [
+        {
+          "src":"pic/diagram/diagram_0.png"
+        },
+        {
+          "src":"pic/diagram/diagram_1.png"
+        },
+        {
+          "src":"pic/diagram/diagram_2.png"
+        },
+        {
+          "src":"pic/diagram/diagram_3.png"
+        },
+        {
+          "src":"pic/diagram/diagram_4.png"
+        },
+        {
+          "src":"pic/diagram/diagram_5.png"
+        },
+        {
+          "src":"pic/diagram/diagram_6.png"
+        },
+        {
+          "src":"pic/diagram/diagram_7.png"
+        },
+        {
+          "src":"pic/diagram/diagram_8.png"
+        },
+        {
+          "src":"pic/diagram/diagram_9.png"
+        },
+        {
+          "src":"pic/diagram/diagram_10.png"
+        },
+        {
+          "src":"pic/diagram/diagram_11.png"
+        },
+        {
+          "src":"pic/diagram/diagram_12.png"
+        },
+        {
+          "src":"pic/diagram/diagram_13.png"
+        },
+        {
+          "src":"pic/diagram/diagram_14.png"
+        }
+        ]
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "330;447",
+        "font": "balance_number",
+        "symbol_size":"104;75",
+        "padding": "0",
+        "length": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"balance_rub_sign",
+        "type":"image",
+        "position": "330;360",
+        "size":"102;75",
+        "src":"pic/fonts/balance_rubl.png",
+        "visible":"true"
+      },
+      {
+        "id":"time_min",
+        "type": "digits",
+        "position": "413;75",
+        "font": "time_number",
+        "symbol_size":"24;16",
+        "padding": "0",
+        "length": "2",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"time_hours",
+        "type": "digits",
+        "position": "413;117",
+        "font": "time_number",
+        "symbol_size":"24;16",
+        "padding": "0",
+        "length": "2",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"temp_fraction",
+        "type": "digits",
+        "position": "413;954",
+        "font": "time_number",
+        "symbol_size":"24;16",
+        "padding": "0",
+        "length": "1",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"temp_degrees",
+        "type": "digits",
+        "position": "413;979",
+        "font": "time_number",
+        "symbol_size":"24;16",
+        "padding": "0",
+        "length": "2",
+        "visible":"true",
+        "is_vertical":"1"
       }
     ]
   }
