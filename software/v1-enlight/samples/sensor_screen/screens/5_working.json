@@ -269,6 +269,22 @@
         "length": "2",
         "visible":"true",
         "is_vertical":"1"
+      },
+      {
+        "id":"blue_pistol",
+        "type":"image",
+        "position": "930;160",
+        "size":"390;690",
+        "src":"pic/fonts/blue_pistol.png",
+        "visible":"false"
+      },
+      {
+        "id":"red_pistol",
+        "type":"image",
+        "position": "930;195",
+        "size":"390;690",
+        "src":"pic/fonts/red_pistol.png",
+        "visible":"false"
       }
     ]
   }

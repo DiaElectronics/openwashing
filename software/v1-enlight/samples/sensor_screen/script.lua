@@ -24,10 +24,12 @@ setup = function()
     thanks_mode_seconds = 20
     free_pause_seconds = 120
     wait_card_mode_seconds = 40
+    show_pistol_seconds = 5
     
     -- flags
     is_transaction_started = false
     is_waiting_receipt = false
+    is_showing_pistol = false
 
     price_p = {}
     
@@ -50,14 +52,13 @@ setup = function()
     mode_work = 40
     mode_pause = 50
     -- end of modes which MUST follow each other
-
-    mode_use_red = 60
-    mode_use_blue = 70
     
     mode_thanks = 80
-    mode_not_working = 90
     
     currentMode = mode_start
+
+    sub_mode = 0
+    old_sub_mode = 0
 
     version = "3.0.0"
 
@@ -98,15 +99,10 @@ run_mode = function(new_mode)
     if new_mode == mode_enter_price then return enter_price_mode() end
     if new_mode == mode_wait_for_card then return wait_for_card_mode() end
     
-    -- TO DO: check working mode
     if is_working_mode (new_mode) then return program_mode(new_mode) end
     if new_mode == mode_pause then return pause_mode() end
-
-    if new_mode == mode_use_red then return use_red_mode() end
-    if new_mode == mode_use_blue then return use_blue_mode() end
     
     if new_mode == mode_thanks then return thanks_mode() end
-    if new_mode == mode_not_working then return not_working_mode() end
 end
 
 start_mode = function()
@@ -208,6 +204,7 @@ cash_mode = function()
 end
 
 program_mode = function(working_mode)
+  old_sub_mode = sub_mode
   sub_mode = working_mode - mode_work
   run_program(sub_mode)
   show_working(sub_mode, balance)
@@ -230,9 +227,11 @@ program_mode = function(working_mode)
 end
 
 pause_mode = function()
+    old_sub_mode = 6
+    sub_mode = 6
     show_pause(balance, balance_seconds)
     run_pause()
-    turn_light(6, animation.one_button)
+
     update_balance()
     if balance_seconds > 0 then
         balance_seconds = balance_seconds - 0.1
@@ -381,20 +380,66 @@ end
 show_pause = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
-    working:Set("pause_digits.visible", "true")
-    working:Set("pause_digits.value", sec_int)
     working:Set("balance.value", balance_int)
     switch_submodes(6)
     working:Display()
 end
 
 switch_submodes = function(sub_mode) 
-    if sub_mode == 1 then working:Set("button_p1_on.visible", "true") else working:Set("button_p1_on.visible", "false") end
-    if sub_mode == 2 then working:Set("button_p2_on.visible", "true") else working:Set("button_p2_on.visible", "false") end
-    if sub_mode == 3 then working:Set("button_p3_on.visible", "true") else working:Set("button_p3_on.visible", "false") end
-    if sub_mode == 4 then working:Set("button_p4_on.visible", "true") else working:Set("button_p4_on.visible", "false") end
-    if sub_mode == 5 then working:Set("button_p5_on.visible", "true") else working:Set("button_p5_on.visible", "false") end
-    if sub_mode == 6 then working:Set("button_p6_on.visible", "true") else working:Set("button_p6_on.visible", "false") end
+    -- new mode swithed, so we need to show pistol
+    if sub_mode ~= old_sub_mode and sub_mode ~= 6 then
+        printMessage("PISTOL IS SHOWING")
+        is_showing_pistol = true
+
+        pistol_waiting_loops = show_pistol_seconds * 10;
+
+        working:Set("button_p1_on.visible", "false")
+        working:Set("button_p2_on.visible", "false")
+        working:Set("button_p3_on.visible", "false")
+        working:Set("button_p4_on.visible", "false")
+        working:Set("button_p5_on.visible", "false")
+        working:Set("button_p6_on.visible", "false")
+        working:Set("button_p1.visible", "false")
+        working:Set("button_p2.visible", "false")
+        working:Set("button_p3.visible", "false")
+        working:Set("button_p4.visible", "false")
+        working:Set("button_p5.visible", "false")
+        working:Set("button_p6.visible", "false")
+
+        if sub_mode == 1 then
+            working:Set("red_pistol.visible", "true")
+        else
+            working:Set("blue_pistol.visible", "true")
+        end
+    end
+
+    if is_showing_pistol == true then
+        if pistol_waiting_loops > 0 then
+            pistol_waiting_loops = pistol_waiting_loops - 1
+        else
+            is_showing_pistol = false
+
+            working:Set("button_p1.visible", "true")
+            working:Set("button_p2.visible", "true")
+            working:Set("button_p3.visible", "true")
+            working:Set("button_p4.visible", "true")
+            working:Set("button_p5.visible", "true")
+            working:Set("button_p6.visible", "true")
+
+            if sub_mode == 1 then
+                working:Set("red_pistol.visible", "false")
+            else
+                working:Set("blue_pistol.visible", "false")
+            end
+        end     
+    else 
+        if sub_mode == 1 then working:Set("button_p1_on.visible", "true") else working:Set("button_p1_on.visible", "false") end
+        if sub_mode == 2 then working:Set("button_p2_on.visible", "true") else working:Set("button_p2_on.visible", "false") end
+        if sub_mode == 3 then working:Set("button_p3_on.visible", "true") else working:Set("button_p3_on.visible", "false") end
+        if sub_mode == 4 then working:Set("button_p4_on.visible", "true") else working:Set("button_p4_on.visible", "false") end
+        if sub_mode == 5 then working:Set("button_p5_on.visible", "true") else working:Set("button_p5_on.visible", "false") end
+        if sub_mode == 6 then working:Set("button_p6_on.visible", "true") else working:Set("button_p6_on.visible", "false") end
+    end
 end
 
 show_thanks =  function()
