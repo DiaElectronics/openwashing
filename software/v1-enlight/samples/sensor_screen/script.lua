@@ -211,9 +211,6 @@ program_mode = function(working_mode)
   
   if sub_mode == 0 then
     balance_seconds = free_pause_seconds
-    turn_light(0, animation.intense)
-  else
-    turn_light(sub_mode, animation.one_button)
   end
   
   charge_balance(price_p[sub_mode])
