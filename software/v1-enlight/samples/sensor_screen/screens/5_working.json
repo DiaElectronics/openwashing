@@ -62,7 +62,8 @@
         "position": "743;60",
         "size":"118;961",
         "src":"pic/buttons/button_foam.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"1"
       },
       {	
         "id":"button_p2",
@@ -70,7 +71,8 @@
         "position": "903;60",
         "size":"118;961",
         "src":"pic/buttons/button_water_and_shampoo.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"2"
       },
       {	
         "id":"button_p3",
@@ -78,7 +80,8 @@
         "position": "1063;60",
         "size":"118;961",
         "src":"pic/buttons/button_rinsing.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"3"
       },
       {
         "id":"button_p4",
@@ -86,7 +89,8 @@
         "position": "1223;60",
         "size":"118;961",
         "src":"pic/buttons/button_wax_and_protection.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"4"
       },
       {
         "id":"button_p5",
@@ -94,7 +98,8 @@
         "position": "1383;60",
         "size":"118;961",
         "src":"pic/buttons/button_drying_and_shine.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"5"
       },
       {
         "id":"button_p6",
@@ -102,7 +107,8 @@
         "position": "1543;60",
         "size":"118;961",
         "src":"pic/buttons/button_pause.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"6"
       },
       {
         "id":"post_numbers",

@@ -30,7 +30,8 @@
       "position": "1383;60",
       "size":"118;961",
       "src":"pic/buttons/button_nal.png",
-      "visible":"true"
+      "visible":"true",
+      "click_id":"1"
     },
     {
       "id":"button_card",
@@ -38,7 +39,8 @@
       "position": "1543;60",
       "size":"118;961",
       "src":"pic/buttons/button_beznal.png",
-      "visible":"true"
+      "visible":"true",
+      "click_id":"2"
     },
     {
       "id":"time_min",

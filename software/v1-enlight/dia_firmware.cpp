@@ -17,6 +17,8 @@
 #include <map>
 #include <time.h>
 #include <unistd.h>
+#include "dia_screen_item.h"
+#include "dia_screen_item_image.h"
 
 #define IDLE 1
 #define WORK 2
@@ -452,6 +454,33 @@ void RecoverData() {
     RecoverRelay();
 }
 
+/*
+// Tries to find and collect images, which support touch screen 
+void InitSensorButtons() {
+    
+
+    // Iterate over all screens
+    for (auto it_screen = config->ScreenConfigs.begin(); it_screen != config->ScreenConfigs.end(); ++it_screen) {
+        // Iterate over all items
+        for (auto it_item = (*it_screen).second->items_map.begin(); it_item != (*it_screen).second->items_map.end(); ++it_item) {
+            DiaScreenItem * current_item = (*it_item).second;
+
+            // Find images only
+            if (current_item->type == "image") {
+                DiaScreenItemImage * current_image = (DiaScreenItemImage *)((*it_item).second->specific_object_ptr);
+
+                // Find images with support of touch screen
+                if (current_image->group.value != "0") {
+                    printf("SENSOR IMAGE FOUND\n");
+                    printf("SRC: %s\n", current_image->src.value.c_str());
+
+                    
+                }
+            }
+        }
+    }
+}
+*/
 int main(int argc, char ** argv) {
     config = 0;
 
@@ -587,8 +616,11 @@ int main(int argc, char ** argv) {
     configuration.GetRuntime()->AddHardware(hardware);
     configuration.GetRuntime()->AddRegistry(&(config->GetRuntime()->Registry));
     
+    //InitSensorButtons();
+
     // Runtime start
     int keypress = 0;
+    int mousepress = 0;
 
     // Call Lua setup function
     configuration.GetRuntime()->Setup();
@@ -601,7 +633,26 @@ int main(int argc, char ** argv) {
         // Ping server every 2 sec and probably get service money from it
         CentralServerDialog();
 
+        int x = 0;
+        int y = 0;
+        SDL_GetMouseState(&x, &y);
+        printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
+
         // Process pressed button
+        DiaScreen* screen = config->GetScreen();
+        std::string last = screen->LastDisplayed;
+
+        printf("\n\n\n");
+        printf("LAST DISPLAYED: %s\n", last.c_str());
+        printf("CLICKABLE OBJECTS: %s\n", last.c_str());
+
+        for (auto it = config->ScreenConfigs[last]->clickAreas.begin(); it != config->ScreenConfigs[last]->clickAreas.end(); ++it) {
+            if (x >= (*it).X && x <= (*it).X + (*it).Width && y >= (*it).Y && y <= (*it).Y + (*it).Height && mousepress == 1) {
+                mousepress = 0;
+                _DebugKey = std::stoi((*it).ID);    
+            }
+        }
+        printf("\n\n\n");
         
         while(SDL_PollEvent(&event))
         {
@@ -610,6 +661,9 @@ int main(int argc, char ** argv) {
                 case SDL_QUIT:
                     keypress = 1;
                     printf("Quitting by sdl_quit\n");
+                break;
+                case SDL_MOUSEBUTTONDOWN:
+                    mousepress = 1;
                 break;
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)

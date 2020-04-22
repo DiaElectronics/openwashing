@@ -30,7 +30,8 @@
       	"position": "1383;60",
       	"size":"118;961",
       	"src":"pic/buttons/button_start.png",
-      	"visible":"true"
+		"visible":"true",
+		"click_id":"1"
       },
       {
       	"id":"button_cancel",
@@ -38,7 +39,8 @@
       	"position": "1543;60",
       	"size":"118;961",
       	"src":"pic/buttons/button_cancel.png",
-      	"visible":"true"
+		"visible":"true",
+		"click_id":"2"
 	  },
 	  {
 		"id":"diagram",
@@ -164,7 +166,8 @@
 		"position": "821;721",
 		"size":"115;115",
 		"src":"pic/buttons/button_1.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"11"
 	  },
 	  {
 		"id":"button_2",
@@ -172,7 +175,8 @@
 		"position": "821;561",
 		"size":"115;115",
 		"src":"pic/buttons/button_2.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"12"
 	  },
 	  {
 		"id":"button_3",
@@ -180,7 +184,8 @@
 		"position": "821;401",
 		"size":"115;115",
 		"src":"pic/buttons/button_3.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"13"
 	  },
 	  {
 		"id":"button_4",
@@ -188,7 +193,8 @@
 		"position": "821;241",
 		"size":"115;115",
 		"src":"pic/buttons/button_4.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"14"
 	  },
 	  {
 		"id":"button_5",
@@ -196,7 +202,8 @@
 		"position": "981;721",
 		"size":"115;115",
 		"src":"pic/buttons/button_5.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"15"
 	  },
 	  {
 		"id":"button_6",
@@ -204,7 +211,8 @@
 		"position": "981;561",
 		"size":"115;115",
 		"src":"pic/buttons/button_6.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"16"
 	  },
 	  {
 		"id":"button_7",
@@ -212,7 +220,8 @@
 		"position": "981;401",
 		"size":"115;115",
 		"src":"pic/buttons/button_7.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"17"
 	  },
 	  {
 		"id":"button_8",
@@ -220,7 +229,8 @@
 		"position": "981;241",
 		"size":"115;115",
 		"src":"pic/buttons/button_8.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"18"
 	  },
 	  {
 		"id":"button_9",
@@ -228,7 +238,8 @@
 		"position": "1141;561",
 		"size":"115;115",
 		"src":"pic/buttons/button_9.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"19"
 	  },
 	  {
 		"id":"button_0",
@@ -236,7 +247,8 @@
 		"position": "1141;401",
 		"size":"115;115",
 		"src":"pic/buttons/button_0.png",
-		"visible":"true"
+		"visible":"true",
+		"click_id":"20"
 	  }
     ]
   }

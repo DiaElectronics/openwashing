@@ -33,10 +33,6 @@
     {
       "id": "thanks",
       "src": "screens/8_thanks.json"
-    },
-    {
-      "id": "not_working",
-      "src": "screens/9_not_working.json"
     }
   ],
   "buttons": 6,

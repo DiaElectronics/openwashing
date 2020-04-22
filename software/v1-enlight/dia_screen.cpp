@@ -16,7 +16,7 @@ DiaScreen::DiaScreen(int resX, int resY)
     //printf("SDLInitStart\n"); fflush(stdout);
     if (SDL_Init(SDL_INIT_VIDEO) < 0 ) return;
     //printf("SDLInit finished properly, SDLShowCursor started\n"); fflush(stdout);
-    SDL_ShowCursor(SDL_DISABLE);
+    //SDL_ShowCursor(SDL_DISABLE);
     //printf("SDLShowCursor_2\n"); fflush(stdout);
 	//printf("trying to set a video mode \n"); fflush(stdout);
 	delay(100);

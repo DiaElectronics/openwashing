@@ -517,6 +517,10 @@ get_key = function()
     return hardware:GetKey()
 end
 
+get_button = function()
+    return hardware:GetButton()
+end
+
 smart_delay = function(ms)
     hardware:SmartDelay(ms)
 end

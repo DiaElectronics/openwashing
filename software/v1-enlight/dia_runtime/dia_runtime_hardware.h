@@ -138,6 +138,26 @@ public:
         return 0;
     }
 
+    void (*get_click_function)(int *x, int *y);
+
+    int GetButton() {
+        if (get_click_function) {
+            int x = -1;
+            int y = -1;
+            get_click_function(&x, &y);
+
+            int button_id = 0;
+
+            // We have initialized vector of buttons
+            // Interate over vector and find button, which matches coords
+            // Return ID of this button to Lua
+
+            return button_id;
+        }
+        printf("error: NIL object or function GetButton\n");
+        return 0;
+    }
+
     void * keys_object;
     int (*get_keys_function)(void * object);
     
@@ -188,6 +208,8 @@ public:
         abort_transaction_function = 0;
 
         increment_cars_function = 0;
+
+        get_click_function = 0;
 
         keys_object = 0;
         get_keys_function = 0;
