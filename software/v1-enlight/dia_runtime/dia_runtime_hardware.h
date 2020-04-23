@@ -189,8 +189,6 @@ public:
 
         increment_cars_function = 0;
 
-        get_click_function = 0;
-
         keys_object = 0;
         get_keys_function = 0;
 

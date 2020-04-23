@@ -609,6 +609,7 @@ int main(int argc, char ** argv) {
         int x = 0;
         int y = 0;
         SDL_GetMouseState(&x, &y);
+        
         printf("\n\n\n");
         printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
 
