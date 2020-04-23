@@ -23,14 +23,6 @@
       "src": "screens/5_working.json"
     },
     {
-      "id": "use_red",
-      "src": "screens/6_use_red.json"
-    },
-    {
-      "id": "use_blue",
-      "src": "screens/7_use_blue.json"
-    },
-    {
       "id": "thanks",
       "src": "screens/8_thanks.json"
     }

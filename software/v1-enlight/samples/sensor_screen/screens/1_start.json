@@ -9,22 +9,6 @@
       "visible":"true"
     },
     {
-      "id":"button_cash_on",
-      "type":"image",
-      "position": "1383;60",
-      "size":"118;961",
-      "src":"pic/buttons/button_nal_on.png",
-      "visible":"false"
-    },
-    {
-      "id":"button_card_on",
-      "type":"image",
-      "position": "1543;60",
-      "size":"118;961",
-      "src":"pic/buttons/button_beznal_on.png",
-      "visible":"false"
-    },
-    {
       "id":"button_cash",
       "type":"image",
       "position": "1383;60",
@@ -41,6 +25,22 @@
       "src":"pic/buttons/button_beznal.png",
       "visible":"true",
       "click_id":"2"
+    },
+    {
+      "id":"button_cash_on",
+      "type":"image",
+      "position": "1383;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_nal_on.png",
+      "visible":"false"
+    },
+    {
+      "id":"button_card_on",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_beznal_on.png",
+      "visible":"false"
     },
     {
       "id":"time_min",

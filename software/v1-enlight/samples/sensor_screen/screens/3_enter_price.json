@@ -9,22 +9,6 @@
         "visible":"true"
       },
       {
-      	"id":"button_begin_washing_on",
-      	"type":"image",
-      	"position": "1383;60",
-      	"size":"118;961",
-      	"src":"pic/buttons/button_start_on.png",
-      	"visible":"false"
-      },
-      {
-      	"id":"button_cancel_on",
-      	"type":"image",
-      	"position": "1543;60",
-      	"size":"118;961",
-      	"src":"pic/buttons/button_cancel_on.png",
-      	"visible":"false"
-      },
-      {
       	"id":"button_begin_washing",
       	"type":"image",
       	"position": "1383;60",
@@ -42,6 +26,22 @@
 		"visible":"true",
 		"click_id":"2"
 	  },
+	  {
+		"id":"button_begin_washing_on",
+		"type":"image",
+		"position": "1383;60",
+		"size":"118;961",
+		"src":"pic/buttons/button_start_on.png",
+		"visible":"false"
+	},
+	{
+		"id":"button_cancel_on",
+		"type":"image",
+		"position": "1543;60",
+		"size":"118;961",
+		"src":"pic/buttons/button_cancel_on.png",
+		"visible":"false"
+	},
 	  {
 		"id":"diagram",
 		"type":"image",
@@ -235,7 +235,7 @@
 	  {
 		"id":"button_9",
 		"type":"image",
-		"position": "1141;561",
+		"position": "1141;721",
 		"size":"115;115",
 		"src":"pic/buttons/button_9.png",
 		"visible":"true",
@@ -245,10 +245,19 @@
 		"id":"button_0",
 		"type":"image",
 		"position": "1141;401",
-		"size":"115;115",
+		"size":"115;275",
 		"src":"pic/buttons/button_0.png",
 		"visible":"true",
 		"click_id":"20"
+	  },
+	  {
+		"id":"button_delete",
+		"type":"image",
+		"position": "1141;241",
+		"size":"115;115",
+		"src":"pic/buttons/button_delete.png",
+		"visible":"true",
+		"click_id":"21"
 	  }
     ]
   }

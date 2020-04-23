@@ -8,14 +8,6 @@
       "src":"pic/background/4_background_card.png",
       "visible":"true"
     },
-    {	
-      "id":"button_cancel_on",
-      "type":"image",
-      "position": "1543;60",
-      "size":"118;961",
-      "src":"pic/buttons/button_cancel_on.png",
-      "visible":"false"
-    },
     {
       "id":"button_cancel",
       "type":"image",
@@ -23,6 +15,14 @@
       "size":"118;961",
       "src":"pic/buttons/button_cancel.png",
       "visible":"true"
+    },
+    {	
+      "id":"button_cancel_on",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_cancel_on.png",
+      "visible":"false"
     },
     {
       "id":"diagram",

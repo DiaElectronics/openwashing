@@ -9,54 +9,6 @@
         "visible":"true"
       },
       {	
-        "id":"button_p1_on",
-        "type":"image",
-        "position": "743;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_foam_on2.png",
-        "visible":"false"
-      },
-      {	
-        "id":"button_p2_on",
-        "type":"image",
-        "position": "903;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_water_and_shampoo_on2.png",
-        "visible":"false"
-      },
-      {	
-        "id":"button_p3_on",
-        "type":"image",
-        "position": "1063;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_rinsing_on2.png",
-        "visible":"false"
-      },
-      {	
-        "id":"button_p4_on",
-        "type":"image",
-        "position": "1223;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_wax_and_protection_on2.png",
-        "visible":"false"
-      },
-      {	
-        "id":"button_p5_on",
-        "type":"image",
-        "position": "1383;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_drying_and_shine_on2.png",
-        "visible":"false"
-      },
-      {	
-        "id":"button_p6_on",
-        "type":"image",
-        "position": "1543;60",
-        "size":"118;961",
-        "src":"pic/buttons/button_pause_on2.png",
-        "visible":"false"
-      },
-      {	
         "id":"button_p1",
         "type":"image",
         "position": "743;60",
@@ -109,6 +61,54 @@
         "src":"pic/buttons/button_pause.png",
         "visible":"true",
         "click_id":"6"
+      },
+      {	
+        "id":"button_p1_on",
+        "type":"image",
+        "position": "743;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_foam_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p2_on",
+        "type":"image",
+        "position": "903;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_water_and_shampoo_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p3_on",
+        "type":"image",
+        "position": "1063;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_rinsing_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p4_on",
+        "type":"image",
+        "position": "1223;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_wax_and_protection_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p5_on",
+        "type":"image",
+        "position": "1383;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_drying_and_shine_on.png",
+        "visible":"false"
+      },
+      {	
+        "id":"button_p6_on",
+        "type":"image",
+        "position": "1543;60",
+        "size":"118;961",
+        "src":"pic/buttons/button_pause_on.png",
+        "visible":"false"
       },
       {
         "id":"post_numbers",
