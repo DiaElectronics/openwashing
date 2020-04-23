@@ -454,33 +454,6 @@ void RecoverData() {
     RecoverRelay();
 }
 
-/*
-// Tries to find and collect images, which support touch screen 
-void InitSensorButtons() {
-    
-
-    // Iterate over all screens
-    for (auto it_screen = config->ScreenConfigs.begin(); it_screen != config->ScreenConfigs.end(); ++it_screen) {
-        // Iterate over all items
-        for (auto it_item = (*it_screen).second->items_map.begin(); it_item != (*it_screen).second->items_map.end(); ++it_item) {
-            DiaScreenItem * current_item = (*it_item).second;
-
-            // Find images only
-            if (current_item->type == "image") {
-                DiaScreenItemImage * current_image = (DiaScreenItemImage *)((*it_item).second->specific_object_ptr);
-
-                // Find images with support of touch screen
-                if (current_image->group.value != "0") {
-                    printf("SENSOR IMAGE FOUND\n");
-                    printf("SRC: %s\n", current_image->src.value.c_str());
-
-                    
-                }
-            }
-        }
-    }
-}
-*/
 int main(int argc, char ** argv) {
     config = 0;
 
