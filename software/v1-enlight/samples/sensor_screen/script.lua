@@ -26,6 +26,11 @@ setup = function()
     wait_card_mode_seconds = 40
     show_pistol_seconds = 5
     
+
+    frame_delay = 50
+    frames_per_second = 1000 / 50
+    balance_reduce_rate = 1 / (frames_per_second * 60)
+
     -- flags
     is_transaction_started = false
     is_waiting_receipt = false
@@ -69,7 +74,7 @@ end
 
 loop = function()
     currentMode = run_mode(currentMode)
-    smart_delay(100)
+    smart_delay(frame_delay)
     return 0
 end
 
@@ -144,7 +149,7 @@ wait_for_card_mode = function()
     run_stop()
 
     if is_transaction_started == false then
-        waiting_loops = wait_card_mode_seconds * 10;
+        waiting_loops = wait_card_mode_seconds * frames_per_second;
 
         request_transaction(electron_balance)
         electron_balance = min_electron_balance
@@ -176,7 +181,7 @@ wait_for_card_mode = function()
         return mode_start
     end
 
-    smart_delay(100)
+    smart_delay(frame_delay)
     waiting_loops = waiting_loops - 1
    
     return mode_wait_for_card
@@ -249,7 +254,7 @@ thanks_mode = function()
         balance = 0
         show_thanks()
         run_pause()
-        waiting_loops = thanks_mode_seconds * 10;
+        waiting_loops = thanks_mode_seconds * frames_per_second;
         is_waiting_receipt = true
     end
  
@@ -385,17 +390,24 @@ end
 switch_submodes = function(sub_mode) 
     -- new mode swithed, so we need to show pistol
     if sub_mode ~= old_sub_mode and sub_mode ~= 6 then
-        printMessage("PISTOL IS SHOWING")
-        is_showing_pistol = true
-
-        pistol_waiting_loops = show_pistol_seconds * 10;
-
         working:Set("button_p1_on.visible", "false")
         working:Set("button_p2_on.visible", "false")
         working:Set("button_p3_on.visible", "false")
         working:Set("button_p4_on.visible", "false")
         working:Set("button_p5_on.visible", "false")
         working:Set("button_p6_on.visible", "false")
+
+        if sub_mode == 1 then animate_p1_button() else working:Set("button_p1_on.visible", "false") end
+        if sub_mode == 2 then animate_p2_button() else working:Set("button_p2_on.visible", "false") end
+        if sub_mode == 3 then animate_p3_button() else working:Set("button_p3_on.visible", "false") end
+        if sub_mode == 4 then animate_p4_button() else working:Set("button_p4_on.visible", "false") end
+        if sub_mode == 5 then animate_p5_button() else working:Set("button_p5_on.visible", "false") end
+        if sub_mode == 6 then animate_p6_button() else working:Set("button_p6_on.visible", "false") end
+
+        is_showing_pistol = true
+
+        pistol_waiting_loops = show_pistol_seconds * frames_per_second;
+
         working:Set("button_p1.visible", "false")
         working:Set("button_p2.visible", "false")
         working:Set("button_p3.visible", "false")
@@ -428,6 +440,13 @@ switch_submodes = function(sub_mode)
             else
                 working:Set("blue_pistol.visible", "false")
             end
+
+            if sub_mode == 1 then working:Set("button_p1_on.visible", "true") else working:Set("button_p1_on.visible", "false") end
+            if sub_mode == 2 then working:Set("button_p2_on.visible", "true") else working:Set("button_p2_on.visible", "false") end
+            if sub_mode == 3 then working:Set("button_p3_on.visible", "true") else working:Set("button_p3_on.visible", "false") end
+            if sub_mode == 4 then working:Set("button_p4_on.visible", "true") else working:Set("button_p4_on.visible", "false") end
+            if sub_mode == 5 then working:Set("button_p5_on.visible", "true") else working:Set("button_p5_on.visible", "false") end
+            if sub_mode == 6 then working:Set("button_p6_on.visible", "true") else working:Set("button_p6_on.visible", "false") end
         end     
     else 
         if sub_mode == 1 then working:Set("button_p1_on.visible", "true") else working:Set("button_p1_on.visible", "false") end
@@ -506,6 +525,54 @@ animate_wait_for_card_cancel_button = function()
     card:Display()
 end
 
+animate_p1_button = function()
+    working:Set("button_p1_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p1_on.visible", "false")
+    working:Display()
+end
+
+animate_p2_button = function()
+    working:Set("button_p2_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p2_on.visible", "false")
+    working:Display()
+end
+
+animate_p3_button = function()
+    working:Set("button_p3_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p3_on.visible", "false")
+    working:Display()
+end
+
+animate_p4_button = function()
+    working:Set("button_p4_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p4_on.visible", "false")
+    working:Display()
+end
+
+animate_p5_button = function()
+    working:Set("button_p5_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p5_on.visible", "false")
+    working:Display()
+end
+
+animate_p6_button = function()
+    working:Set("button_p6_on.visible", "true")
+    working:Display()
+    smart_delay(700)
+    working:Set("button_p6_on.visible", "false")
+    working:Display()
+end
+
 get_mode_by_pressed_key = function()
     pressed_key = get_key()
     if pressed_key >= 1 and pressed_key<=5 then return mode_work + pressed_key end
@@ -582,7 +649,7 @@ update_balance = function()
 end
 
 charge_balance = function(price)
-    balance = balance - price * 0.001666666667
+    balance = balance - price * balance_reduce_rate
     if balance<0 then balance = 0 end
 end
 
