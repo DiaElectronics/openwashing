@@ -26,7 +26,6 @@ setup = function()
     wait_card_mode_seconds = 40
     show_pistol_seconds = 5
     
-
     frame_delay = 50
     frames_per_second = 1000 / 50
     balance_reduce_rate = 1 / (frames_per_second * 60)
@@ -119,10 +118,10 @@ start_mode = function()
         animate_start_cash_button()
         return mode_cash
     end
-    if pressed_key == 2 then
-        animate_start_card_button()
-        return mode_enter_price
-    end
+    --if pressed_key == 2 then
+    --    animate_start_card_button()
+    --    return mode_enter_price
+    --end
 
     return mode_start
 end
@@ -224,7 +223,10 @@ program_mode = function(working_mode)
   end
   update_balance()
   suggested_mode = get_mode_by_pressed_key()
-  if suggested_mode >=0 then return suggested_mode end
+  if is_showing_pistol == false then
+    if suggested_mode >=0 then return suggested_mode end
+  end
+  
   return working_mode
 end
 
