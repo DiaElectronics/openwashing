@@ -271,6 +271,9 @@ thanks_mode = function()
         send_receipt(post_position, 0, kasse_balance)
         kasse_balance = 0
         is_waiting_receipt = false
+        is_showing_pistol = false
+        sub_mode = 0
+        old_sub_mode = 0
         increment_cars()
         return mode_start	
     end
