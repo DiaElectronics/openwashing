@@ -67,7 +67,7 @@
       {
         "id":"balance",
         "type": "digits",
-        "position": "867;166",
+        "position": "867;374",
         "font": "standard_number",
         "symbol_size":"251;166",
         "padding": "3",
