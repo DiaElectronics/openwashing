@@ -1,6 +1,6 @@
 {
   "name": "default configuration",
-  "resolution": "848x480",
+  "resolution": "1920x1080",
   "screens": [
     {
       "id": "welcome",
