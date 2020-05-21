@@ -5,5 +5,5 @@ echo "@xset -dpms" >> /etc/xdg/lxsession/LXDE-pi/autostart
 echo "@xset s noblank" >> /etc/xdg/lxsession/LXDE-pi/autostart
 echo "@/home/pi/run.sh" >> /etc/xdg/lxsession/LXDE-pi/autostart
 
-echo "hdmi_group=2" >> /boot/config.txt
-echo "hdmi_mode=14" >> /boot/config.txt
+echo "hdmi_group=1" >> /boot/config.txt
+echo "hdmi_mode=16" >> /boot/config.txt
