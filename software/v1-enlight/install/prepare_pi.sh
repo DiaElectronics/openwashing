@@ -2,7 +2,7 @@
 
 # copy the actual firmare to .hi
 sudo apt-get update -y && sudo apt-get upgrade -y
-sudo apt install -y redis-server libssl-dev libsdl-image1.2-dev libevent-dev libsdl1.2-dev
+sudo apt install -y libssl-dev libsdl-image1.2-dev libevent-dev libsdl1.2-dev
 sudo ./update_system.sh
 
 echo "cd /home/pi/wash" >> /home/pi/run.sh
