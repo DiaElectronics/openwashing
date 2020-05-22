@@ -11,7 +11,7 @@
       {
         "id":"delay_seconds",
         "type": "digits",
-        "position": "761;490",
+        "position": "630;472",
         "font": "standard_number",
         "symbol_size":"75;108",
         "padding": "2",
