@@ -226,7 +226,7 @@ ask_for_money_mode = function()
     end
 
     update_balance()
-    if balance > 1.0 then
+    if balance > 0.99 then
         return mode_work
     end
     return mode_ask_for_money

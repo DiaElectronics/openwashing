@@ -17,6 +17,12 @@ int DiaScreenItemImage::Init(DiaScreenItem *base_item, json_t * item_json) {
     json_t * src_j = json_object_get(item_json,"src");
     if (base_item->SetValue("src",src_j)) return 1;
 
+    json_t * click_id_j = json_object_get(item_json,"click_id");
+    if (base_item->SetValue("click_id", click_id_j)) {
+        printf("digits: default CLICK ID set to 0\n");
+        base_item->SetValue("click_id", "0");
+    }
+
     Rescale();
     return 0;
 }
@@ -126,7 +132,10 @@ int dia_screen_item_image_notify(DiaScreenItem * base_item, void * image_ptr, st
         obj->OutputRectangle->h = obj->size.y;
         obj->Rescale();
     } else
-    if (key.compare("src")==0) {
+    if (key.compare("click_id") == 0) {
+        obj->click_id.Init(value);
+    } else 
+    if (key.compare("src") == 0) {
         obj->src.Init(value);
         std::string full_name = base_item->Parent->Folder;
         full_name+="/";

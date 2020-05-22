@@ -12,6 +12,8 @@ public:
     DiaIntPair position;
     DiaIntPair size;
     DiaString src;
+    DiaString click_id;
+
     SDL_Rect * OutputRectangle;
     SDL_Surface * Picture;
     SDL_Surface * ScaledPicture;

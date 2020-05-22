@@ -1,0 +1,251 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"1920;1080",
+      "src":"pic/background/1_background_start.png",
+      "visible":"true"
+    },
+    {
+      "id":"button_cash",
+      "type":"image",
+      "position": "1383;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_nal.png",
+      "visible":"true",
+      "click_id":"1"
+    },
+    {
+      "id":"button_card",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_beznal.png",
+      "visible":"true",
+      "click_id":"2"
+    },
+    {
+      "id":"button_cash_on",
+      "type":"image",
+      "position": "1383;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_nal_on.png",
+      "visible":"false"
+    },
+    {
+      "id":"button_card_on",
+      "type":"image",
+      "position": "1543;60",
+      "size":"118;961",
+      "src":"pic/buttons/button_beznal_on.png",
+      "visible":"false"
+    },
+    {
+      "id":"time_min",
+      "type": "digits",
+      "position": "413;75",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"time_hours",
+      "type": "digits",
+      "position": "413;117",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"temp_fraction",
+      "type": "digits",
+      "position": "413;954",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "1",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"temp_degrees",
+      "type": "digits",
+      "position": "413;979",
+      "font": "time_number",
+      "symbol_size":"24;16",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p1",
+      "type": "digits",
+      "position": "820;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p2",
+      "type": "digits",
+      "position": "881;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p3",
+      "type": "digits",
+      "position": "942;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p4",
+      "type": "digits",
+      "position": "1003;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p5",
+      "type": "digits",
+      "position": "1064;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"price_p6",
+      "type": "digits",
+      "position": "1125;160",
+      "font": "price_number",
+      "symbol_size":"30;24",
+      "padding": "0",
+      "length": "2",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
+      "id":"rub_p1",
+      "type":"image",
+      "position": "820;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p2",
+      "type":"image",
+      "position": "881;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p3",
+      "type":"image",
+      "position": "942;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p4",
+      "type":"image",
+      "position": "1003;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p5",
+      "type":"image",
+      "position": "1064;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"rub_p6",
+      "type":"image",
+      "position": "1125;120",
+      "size":"30;24",
+      "src":"pic/fonts/price_rubl.png",
+      "visible":"true"
+    },
+    {
+      "id":"post_numbers",
+      "type":"image_array",
+      "position": "150;55",
+      "size":"81;81",
+      "visible":"true",
+      "length":"12",
+      "index":"0",
+      "sources": [
+        {
+          "src":"pic/post_number/post_1.png"
+        },
+        {
+          "src":"pic/post_number/post_2.png"
+        },
+        {
+          "src":"pic/post_number/post_3.png"
+        },
+        {
+          "src":"pic/post_number/post_4.png"
+        },
+        {
+          "src":"pic/post_number/post_5.png"
+        },
+        {
+          "src":"pic/post_number/post_6.png"
+        },
+        {
+          "src":"pic/post_number/post_7.png"
+        },
+        {
+          "src":"pic/post_number/post_8.png"
+        },
+        {
+          "src":"pic/post_number/post_9.png"
+        },
+        {
+          "src":"pic/post_number/post_10.png"
+        },
+        {
+          "src":"pic/post_number/post_11.png"
+        },
+        {
+          "src":"pic/post_number/post_12.png"
+        }
+      ]
+    }
+  ]
+}

@@ -6,11 +6,13 @@
 #include "global_settings.h"
 #include <wiringPi.h>
 #include <string>
+
 class DiaScreen
 {
     public:
     DiaScreen(int resX, int resY);
     ~DiaScreen();
+
     int InitializedOk;
     int Number;
     std::string LastDisplayed;

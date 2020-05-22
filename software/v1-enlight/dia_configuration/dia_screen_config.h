@@ -6,9 +6,20 @@
 
 #include <string>
 #include <jansson.h>
+#include <string>
 #include "dia_screen_item.h"
 #include "dia_screen.h"
 #include "dia_all_items.h"
+
+class AreaItem
+{
+    public:
+    int X;
+    int Y;
+    int Width;
+    int Height;
+    std::string ID; 
+};
 
 class DiaScreenConfig {
 public:
@@ -20,6 +31,7 @@ public:
 
     std::list<DiaScreenItem *> items_list;
     std::map<std::string, DiaScreenItem *> items_map;
+    std::list<AreaItem> clickAreas;
 
     int Init(std::string folder, json_t * screen_json); //Will never be a virtual function
     int InitDetails(json_t *screen_json);

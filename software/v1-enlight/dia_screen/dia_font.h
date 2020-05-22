@@ -6,6 +6,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "dia_all_items.h"
+#include <math.h>
 
 class DiaFont {
 public:
@@ -17,9 +18,10 @@ public:
 
     int Init(json_t * font_json);
     int Init(std::string folder, std::string newValue);
+    int InitSymbols(int is_vertical);
     DiaFont();
     ~DiaFont();
-    int Scale(double xScale, double yScale);
+    int Scale(double xScale, double yScale, int is_vertical);
 };
 
 #endif
