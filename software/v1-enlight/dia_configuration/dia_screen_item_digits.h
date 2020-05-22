@@ -18,6 +18,8 @@ public:
     DiaNumber padding;
     DiaNumber length;
     DiaNumber value;
+    DiaNumber is_vertical;
+
     SDL_Rect * OutputRectangles[MAX_DIGITS];
     int Init(DiaScreenItem * base_item,json_t * item_json);
     ~DiaScreenItemDigits();

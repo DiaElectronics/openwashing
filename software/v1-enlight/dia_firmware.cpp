@@ -17,23 +17,20 @@
 #include <map>
 #include <time.h>
 #include <unistd.h>
+#include "dia_screen_item.h"
+#include "dia_screen_item_image.h"
 
-#define IDLE 1
-#define WORK 2
-#define PAUSE 3
-
-#define DIA_VERSION "v1.5-enlight"
+#define DIA_VERSION "v1.6-enlight"
 
 //#define USE_GPIO
 #define USE_KEYBOARD
 
-#define CENTRALWASH_KEY "/home/pi/centralwash.key"
 #define BILLION 1000000000
 
 DiaConfiguration * config;
 
-int _100MsIntervalsCount;
-int _100MsIntervalsCountRelay;
+int _IntervalsCount;
+int _IntervalsCountRelay;
 
 // Public key for signing every request to Central Server.
 const int centralKeySize = 6;
@@ -247,21 +244,21 @@ int smart_delay_function(void * arg, int ms) {
 // May get service money from server.
 int CentralServerDialog() {
     
-    _100MsIntervalsCount++;
-    if(_100MsIntervalsCount < 0) {
-        printf("Memory corruption on _100MsIntervalsCount\n");
-        _100MsIntervalsCount = 0;
+    _IntervalsCount++;
+    if(_IntervalsCount < 0) {
+        printf("Memory corruption on _IntervalsCount\n");
+        _IntervalsCount = 0;
     }
 
-    _100MsIntervalsCountRelay++;
-    if(_100MsIntervalsCountRelay < 0) {
-        printf("Memory corruption on _100MsIntervalsCountRelay\n");
-        _100MsIntervalsCountRelay = 0;
+    _IntervalsCountRelay++;
+    if(_IntervalsCountRelay < 0) {
+        printf("Memory corruption on _IntervalsCountRelay\n");
+        _IntervalsCountRelay = 0;
     }
 
     // Every 2 seconds we go inside this
-    if (_100MsIntervalsCount > 20) {
-        _100MsIntervalsCount = 0;
+    if (_IntervalsCount > 20) {
+        _IntervalsCount = 0;
         
         printf("Sending another PING request to server...\n");
 
@@ -274,8 +271,8 @@ int CentralServerDialog() {
     }
 
     // Every 5 min (300 sec) we go inside this
-    if (_100MsIntervalsCountRelay > 3000) {
-        _100MsIntervalsCountRelay = 0;
+    if (_IntervalsCountRelay > 3000) {
+        _IntervalsCountRelay = 0;
         
         printf("Sending relay report to server...\n");
         
@@ -469,28 +466,15 @@ int main(int argc, char ** argv) {
     if (argc == 2) {
         folder = argv[1];
     }
+    
     printf("Looking for firmware in [%s]\n", folder.c_str());
     printf("Version: %s\n", DIA_VERSION);
 
-    // Check public key on disk
-    // If it doesn't exist - get it from MAC
-    if (file_exists(CENTRALWASH_KEY)) {
-        // Size is multiplied by 2, because of Hex numbers in file with width == 2 
-        char rawKey[centralKeySize * 2 + 1];
-
-        dia_security_read_file(CENTRALWASH_KEY, rawKey, centralKeySize * 2 + 1);
-        centralKey = std::string(rawKey);
-        printf("Public key read from file: %s \n", centralKey.c_str());
-
-    } else {
-        centralKey = network.GetMacAddress(centralKeySize);
-        printf("MAC address: %s\n", centralKey.c_str());
-
-        dia_security_write_file(CENTRALWASH_KEY, centralKey.c_str());
-        printf("Public key wrote to file: %s \n", CENTRALWASH_KEY);
-    }
-    
+    centralKey = network.GetMacAddress(centralKeySize);
     network.SetPublicKey(std::string(centralKey));
+
+    printf("MAC address or KEY: %s\n", centralKey.c_str());
+    
     int need_to_find = 1; 
     std::string serverIP = "";
 
@@ -587,8 +571,11 @@ int main(int argc, char ** argv) {
     configuration.GetRuntime()->AddHardware(hardware);
     configuration.GetRuntime()->AddRegistry(&(config->GetRuntime()->Registry));
     
+    //InitSensorButtons();
+
     // Runtime start
     int keypress = 0;
+    int mousepress = 0;
 
     // Call Lua setup function
     configuration.GetRuntime()->Setup();
@@ -601,7 +588,29 @@ int main(int argc, char ** argv) {
         // Ping server every 2 sec and probably get service money from it
         CentralServerDialog();
 
+        int x = 0;
+        int y = 0;
+        SDL_GetMouseState(&x, &y);
+
+        printf("\n\n\n");
+        printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
+
         // Process pressed button
+        DiaScreen* screen = config->GetScreen();
+        std::string last = screen->LastDisplayed;
+
+        printf("LAST DISPLAYED: %s\n", last.c_str());
+        printf("CLICKABLE OBJECTS: %s\n", last.c_str());
+
+        for (auto it = config->ScreenConfigs[last]->clickAreas.begin(); it != config->ScreenConfigs[last]->clickAreas.end(); ++it) {
+            if (x >= (*it).X && x <= (*it).X + (*it).Width && y >= (*it).Y && y <= (*it).Y + (*it).Height && mousepress == 1) {
+                printf("CLICK!!!\n");
+                mousepress = 0;
+                _DebugKey = std::stoi((*it).ID);
+                printf("DEBUG KEY = %d\n", _DebugKey);    
+            }
+        }
+        printf("\n\n\n");
         
         while(SDL_PollEvent(&event))
         {
@@ -610,6 +619,9 @@ int main(int argc, char ** argv) {
                 case SDL_QUIT:
                     keypress = 1;
                     printf("Quitting by sdl_quit\n");
+                break;
+                case SDL_MOUSEBUTTONDOWN:
+                    mousepress = 1;
                 break;
                 case SDL_KEYDOWN:
                     switch(event.key.keysym.sym)

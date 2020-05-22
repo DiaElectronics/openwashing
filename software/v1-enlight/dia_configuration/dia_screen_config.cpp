@@ -1,11 +1,15 @@
 #include "dia_screen_config.h"
 #include "dia_functions.h"
+#include "dia_screen_item_image.h"
 
 int DiaScreenConfig::Display(DiaScreen * screen) {
     Changed = 0;
     printf("Displaying screen '%s' ..........,,, \n", this->id.c_str());
     screen->FillBackground(255,255,255);
-    for (std::list<DiaScreenItem *>::iterator it=items_list.begin(); it != items_list.end(); ++it) {
+
+    clickAreas.clear();
+
+    for (auto it = items_list.begin(); it != items_list.end(); ++it) {
         DiaScreenItem * currentItem = *it;
         if (currentItem->display_ptr == 0) {
             printf("error: can't display object with empty display\n");
@@ -15,6 +19,22 @@ int DiaScreenConfig::Display(DiaScreen * screen) {
             printf("error: can't display empty object\n");
             return 1;
         }
+
+        if (currentItem->type == "image") {
+            DiaScreenItemImage * currentItemImage = (DiaScreenItemImage *)(currentItem->specific_object_ptr);
+
+            // Image is a clickable button
+            if (currentItemImage->click_id.value != "0") {
+                AreaItem button;
+                button.X = currentItemImage->position.x;
+                button.Y = currentItemImage->position.y;
+                button.Width = currentItemImage->size.x;
+                button.Height = currentItemImage->size.y;
+                button.ID = currentItemImage->click_id.value;
+                clickAreas.push_back(button);
+            }
+        }
+
         printf("--item '%s' of type '%s' --- \n", currentItem->id.c_str(), currentItem->type.c_str());
         if (currentItem->visible.value) {
             int err = currentItem->display_ptr(currentItem, currentItem->specific_object_ptr, screen);

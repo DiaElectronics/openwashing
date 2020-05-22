@@ -5,7 +5,6 @@ int DiaScreenItemDigits::Init(DiaScreenItem *base_item, json_t * item_json) {
         printf("item digits nil parameter\n");
         return 1;
     }
-    //printf("digits init started \n");
 
     json_t * position_j = json_object_get(item_json,"position");
     if (base_item->SetValue("position", position_j)) return 1;
@@ -28,40 +27,62 @@ int DiaScreenItemDigits::Init(DiaScreenItem *base_item, json_t * item_json) {
         base_item->SetValue("value", "0");
     }
 
-    //////
-    if(length.value>MAX_DIGITS) {
-        printf("maximum allowed size of digits is %d, while configuration file has %d\n", MAX_DIGITS, length.value );
+    json_t * orient_j = json_object_get(item_json,"is_vertical");
+    if (base_item->SetValue("is_vertical", orient_j)) {
+        printf("digits: default is_vertical set to 0\n");
+        base_item->SetValue("is_vertical", "0");
+    }    
+
+    if (length.value > MAX_DIGITS) {
+        printf("maximum allowed size of digits is %d, while configuration file has %d\n", MAX_DIGITS, length.value);
         return 1;
     }
 
-    for(int i=0;i<length.value;i++) {
-        OutputRectangles[i]= (SDL_Rect *)malloc(sizeof(SDL_Rect));
-        OutputRectangles[i]->x=position.x + (symbol_size.x + padding.value) * i;
-        printf("INIT: positionX %d, sizeX %d, padding %d\n", position.x, symbol_size.x, padding.value);
-        OutputRectangles[i]->y=position.y;
-        OutputRectangles[i]->w=symbol_size.x;
-        OutputRectangles[i]->h=symbol_size.y;
-    }
-    //////
+    printf("Dia Screen Item: is_vertical = %d\n", is_vertical.value);
 
-    // Let's check if scaling required
-    if (symbol_size.x != font.SymbolSize.x || symbol_size.y!=font.SymbolSize.y) {
+    font.InitSymbols(is_vertical.value);
+
+    // This code is adapted for vertical HD screen
+    if (is_vertical.value) {
+        for (int i = 0; i < length.value; i++) {
+            OutputRectangles[i] = (SDL_Rect *)malloc(sizeof(SDL_Rect));
+
+            OutputRectangles[i]->x = position.x;
+            printf("INIT: positionX %d, sizeX %d, padding %d\n", position.x, symbol_size.x, padding.value);
+            OutputRectangles[i]->y = position.y + (symbol_size.y + padding.value) * i;
+            OutputRectangles[i]->w = symbol_size.x;
+            OutputRectangles[i]->h = symbol_size.y;
+        }
+
+    // This code is for legacy horizontal screen
+    } else {
+        for(int i=0;i<length.value;i++) {
+            OutputRectangles[i]= (SDL_Rect *)malloc(sizeof(SDL_Rect));
+            OutputRectangles[i]->x=position.x + (symbol_size.x + padding.value) * i;
+            printf("INIT: positionX %d, sizeX %d, padding %d\n", position.x, symbol_size.x, padding.value);
+            OutputRectangles[i]->y=position.y;
+            OutputRectangles[i]->w=symbol_size.x;
+            OutputRectangles[i]->h=symbol_size.y;
+        }
+    }
+    
+    if (symbol_size.x != font.SymbolSize.x || symbol_size.y != font.SymbolSize.y) {
         double xScale = (double)symbol_size.x / (double)font.SymbolSize.x;
         double yScale = (double)symbol_size.y / (double)font.SymbolSize.y;
-        font.Scale(xScale, yScale);
+        font.Scale(xScale, yScale, is_vertical.value);
     }
 
     return 0;
 }
 
 DiaScreenItemDigits::DiaScreenItemDigits() {
-    for(int i=0;i<MAX_DIGITS;i++) {
-        OutputRectangles[i]=0;
+    for (int i = 0; i < MAX_DIGITS; i++) {
+        OutputRectangles[i] = 0;
     }
 }
 DiaScreenItemDigits::~DiaScreenItemDigits() {
-    for(int i=0;i<MAX_DIGITS;i++) {
-        if(OutputRectangles[i]!=0) {
+    for (int i = 0; i < MAX_DIGITS; i++) {
+        if (OutputRectangles[i] != 0) {
             free(OutputRectangles[i]);
             OutputRectangles[i] = 0;
         }
@@ -81,24 +102,46 @@ int dia_screen_item_digits_display(DiaScreenItem * base_item, void * digits_ptr,
     DiaScreenItemDigits * digits = (DiaScreenItemDigits *)digits_ptr;
 
     int numberToDisplay = digits->value.value;
+
     SDL_Surface * fontImage = digits->font.FontImage;
-    if (digits->font.ScaledFontImage!=0) {
-        fontImage=digits->font.ScaledFontImage;
+    if (digits->font.ScaledFontImage != 0) {
+        fontImage = digits->font.ScaledFontImage;
     }
-    for(int i = digits->length.value-1; i>=0; i--) {
-        int curPiece = numberToDisplay % 10;
-        numberToDisplay = numberToDisplay / 10;
-        if (curPiece<0) {
-            curPiece = 0;
-        } else if (curPiece>9) {
-            curPiece = 9;
-        }
-        SDL_BlitSurface(fontImage,
+
+    // This code is adapted for vertical HD screen
+    if (digits->is_vertical.value) {
+        for (int i = 0; i < digits->length.value; i++) {
+            int curPiece = 9 - (numberToDisplay % 10);
+
+            numberToDisplay = numberToDisplay / 10;
+
+            if (curPiece<0) {
+                curPiece = 0;
+            } else if (curPiece>9) {
+                curPiece = 9;
+            }
+            SDL_BlitSurface(fontImage,
                 digits->font.SymbolRect[curPiece],
                 screen->Canvas,
                 digits->OutputRectangles[i]);
-    }
+        }
 
+    // This code is for legacy horizontal screen
+    } else {
+        for(int i = digits->length.value-1; i>=0; i--) {
+            int curPiece = numberToDisplay % 10;
+            numberToDisplay = numberToDisplay / 10;
+            if (curPiece<0) {
+                curPiece = 0;
+            } else if (curPiece>9) {
+                curPiece = 9;
+            }
+            SDL_BlitSurface(fontImage,
+                digits->font.SymbolRect[curPiece],
+                screen->Canvas,
+                digits->OutputRectangles[i]);
+        }
+    }
 
     return 0;
 }
@@ -130,6 +173,9 @@ int dia_screen_item_digits_notify(DiaScreenItem * base_item, void * digits_ptr, 
     } else
     if (key.compare("value")==0) {
         obj->value.Init(value);
+    } else 
+    if (key.compare("is_vertical")==0) {
+        obj->is_vertical.Init(value);
     } else {
         printf("unknown key for digits object: '%s' \n", key.c_str());
         return 1;
