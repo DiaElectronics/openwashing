@@ -20,49 +20,55 @@
         "id":"p1_ico",
         "type":"image",
         "position": "75;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p1/ico.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"1"
       },
       {
         "id":"p2_ico",
         "type":"image",
         "position": "383;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p2/ico.png",
-        "visible":"true"
+        "visible":"true", 
+        "click_id":"2"
       },
       {
         "id":"p3_ico",
         "type":"image",
         "position": "688;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p3/ico.png",
-        "visible":"true"
+        "visible":"true", 
+        "click_id":"3"
       },
       {
         "id":"p4_ico",
         "type":"image",
         "position": "998;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p4/ico.png",
-        "visible":"true"
+        "visible":"true", 
+        "click_id":"4"
       },
       {
         "id":"p5_ico",
         "type":"image",
         "position": "1304;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p5/ico.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"5"
       },
       {
         "id":"p6_ico",
         "type":"image",
         "position": "1610;713",
-        "size":"249;234",
+        "size":"249;249",
         "src":"programs/p6/ico.png",
-        "visible":"true"
+        "visible":"true",
+        "click_id":"6"
       },
       {
         "id":"balance",
@@ -75,52 +81,33 @@
         "visible":"true"
       },
       {
-        "id":"p1",
-        "type":"image",
-        "position": "158;157",
+        "id":"cur_p",
+        "type":"image_array",
+        "position": "158;137",
         "size":"494;468",
-        "src":"programs/p1/ico.png",
-        "visible":"true"
-      },
-      {
-        "id":"p2",
-        "type":"image",
-        "position": "158;157",
-        "size":"494;468",
-        "src":"programs/p2/ico.png",
-        "visible":"true"
-      },
-      {
-        "id":"p3",
-        "type":"image",
-        "position": "158;157",
-        "size":"494;468",
-        "src":"programs/p3/ico.png",
-        "visible":"true"
-      },
-      {
-        "id":"p4",
-        "type":"image",
-        "position": "158;157",
-        "size":"494;468",
-        "src":"programs/p4/ico.png",
-        "visible":"true"
-      },
-      {
-        "id":"p5",
-        "type":"image",
-        "position": "158;157",
-        "size":"494;468",
-        "src":"programs/p5/ico.png",
-        "visible":"true"
-      },
-      {
-        "id":"p6",
-        "type":"image",
-        "position": "158;157",
-        "size":"494;468",
-        "src":"programs/p6/ico.png",
-        "visible":"true"
+        "visible":"true",
+        "index":"0",
+        "length":"6",
+        "sources": [
+          {
+            "src":"programs/p1/ico.png"
+          },
+          {
+            "src":"programs/p2/ico.png"
+          },
+          {
+            "src":"programs/p3/ico.png"
+          },
+          {
+            "src":"programs/p4/ico.png"
+          },
+          {
+            "src":"programs/p5/ico.png"
+          },
+          {
+            "src":"programs/p6/ico.png"
+          }
+        ]
       },
       {
         "id":"pause_digits",

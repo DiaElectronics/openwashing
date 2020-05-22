@@ -10,7 +10,7 @@
 class DiaScreen
 {
     public:
-    DiaScreen(int resX, int resY);
+    DiaScreen(int resX, int resY, int hideCursor, int fullScreen);
     ~DiaScreen();
 
     int InitializedOk;
