@@ -5,7 +5,7 @@
 int DiaScreenConfig::Display(DiaScreen * screen) {
     Changed = 0;
     printf("Displaying screen '%s' ..........,,, \n", this->id.c_str());
-    screen->FillBackground(255,255,255);
+    //screen->FillBackground(255,255,255);
 
     clickAreas.clear();
 
