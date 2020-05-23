@@ -47,7 +47,13 @@ int DiaConfiguration::Init() {
     }
     _Gpio =0;
     if (!err) {
-        _Screen = new DiaScreen(GetResX(), GetResY());
+        int hideMouse = 0;
+        int fullScreen = 0;
+        #ifdef USE_GPIO
+        hideMouse = 1;
+        fullScreen = 1;
+        #endif
+        _Screen = new DiaScreen(GetResX(), GetResY(), hideMouse, fullScreen);
         _Gpio = 0;
         #ifdef USE_GPIO
         _Gpio = new DiaGpio(GetButtonsNumber(), GetRelaysNumber(), GetStorage());

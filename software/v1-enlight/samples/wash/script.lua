@@ -362,14 +362,8 @@ show_pause = function(balance_rur, balance_sec)
     working:Display()
 end
 
-switch_submodes = function(sub_mode) 
-    if sub_mode == 1 then working:Set("p1.visible", "true") else working:Set("p1.visible", "false") end
-    if sub_mode == 2 then working:Set("p2.visible", "true") else working:Set("p2.visible", "false") end
-    if sub_mode == 3 then working:Set("p3.visible", "true") else working:Set("p3.visible", "false") end
-    if sub_mode == 4 then working:Set("p4.visible", "true") else working:Set("p4.visible", "false") end
-    if sub_mode == 5 then working:Set("p5.visible", "true") else working:Set("p5.visible", "false") end
-    if sub_mode == 6 then working:Set("p6.visible", "true") else working:Set("p6.visible", "false") end
-    
+switch_submodes = function(sub_mode)
+    working:Set("cur_p.index", sub_mode-1)  
 end
 
 show_thanks =  function(seconds_float)
