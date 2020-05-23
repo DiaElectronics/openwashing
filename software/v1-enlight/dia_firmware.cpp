@@ -452,17 +452,26 @@ void RecoverData() {
 }
 
 int onlyOneInstanceCheck() {
-  const char * lockedFile = "one_instance.lock";
-  int fd = open(lockedFile, O_CREAT|O_WRONLY);
-  if (fd<0) {
-      printf("no access to the lock file [%s], please check\n", lockedFile);
+  int socket_desc;
+  socket_desc=socket(AF_INET,SOCK_STREAM,0);
+  if (socket_desc==-1) {
+    perror("Create socket");
+  }
+  struct sockaddr_in address;
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = INADDR_ANY;
+  //Port defined Here:
+  address.sin_port=htons(2223);
+  //Bind
+  int res = bind(socket_desc,(struct sockaddr *)&address,sizeof(address));
+  if (res < 0) {
+      printf("bind failed :(\n");
       return 0;
   }
-  if (lockf(fd, F_TLOCK, 0) == 0) {
-      printf("The file [%s] was locked, congratulations!\n", lockedFile);
-      return 1;
-  }
-  return 0;
+  listen(socket_desc,32);
+//Do other stuff (includes accepting connections)
+
+  return 1;
 }
 
 int main(int argc, char ** argv) {
