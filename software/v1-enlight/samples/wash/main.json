@@ -19,10 +19,6 @@
       "src": "screens/4_working.json"
     },
     {
-      "id": "working_back",
-      "src": "screens/4_working_back.json"
-    },
-    {
       "id": "thanks",
       "src": "screens/10_thanks.json"
     },
