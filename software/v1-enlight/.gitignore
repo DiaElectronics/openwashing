@@ -25,6 +25,8 @@
 *.la
 *.a
 *.lib
+*src/lua
+*src/luac
 
 # Executables
 *.exe
