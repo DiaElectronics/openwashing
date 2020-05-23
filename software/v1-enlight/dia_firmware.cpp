@@ -8,6 +8,7 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include <sys/file.h>
 #include "dia_security.h"
 #include "dia_functions.h"
 #include "dia_configuration.h"
@@ -19,6 +20,7 @@
 #include <unistd.h>
 #include "dia_screen_item.h"
 #include "dia_screen_item_image.h"
+
 
 #define DIA_VERSION "v1.6-enlight"
 
@@ -449,8 +451,26 @@ void RecoverData() {
     RecoverRelay();
 }
 
+int onlyOneInstanceCheck() {
+  const char * lockedFile = "one_instance.lock";
+  int fd = open(lockedFile, O_CREAT|O_WRONLY);
+  if (fd<0) {
+      printf("no access to the lock file [%s], please check\n", lockedFile);
+      return 0;
+  }
+  if (lockf(fd, F_TLOCK, 0) == 0) {
+      printf("The file [%s] was locked, congratulations!\n", lockedFile);
+      return 1;
+  }
+  return 0;
+}
+
 int main(int argc, char ** argv) {
     config = 0;
+    if (!onlyOneInstanceCheck()) {
+        printf("sorry, just one instance of the application allowed\n");
+        return 0;
+    }
 
     // Timer initialization
     struct timespec stored_time;

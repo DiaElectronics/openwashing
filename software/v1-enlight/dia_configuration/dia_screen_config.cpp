@@ -7,7 +7,7 @@ int DiaScreenConfig::Display(DiaScreen * screen) {
     Changed = 0;
     printf("Displaying screen '%s' ..........,,, \n", this->id.c_str());
 
-    auto time_begin = std::chrono::high_resolution_clock::now();
+    // auto time_begin = std::chrono::high_resolution_clock::now();
     clickAreas.clear();
 
 
@@ -49,8 +49,8 @@ int DiaScreenConfig::Display(DiaScreen * screen) {
     }
     
     screen->FlipFrame();
-    auto time_end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( time_end - time_begin ).count();
+    // auto time_end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>( time_end - time_begin ).count();
 //    printf("\n\nRENDERING DURATION: %ld\n\n\n", duration);
     return 0;
 }
