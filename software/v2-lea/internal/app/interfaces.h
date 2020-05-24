@@ -10,33 +10,46 @@ namespace DiaApp {
     class Application;
     class Renderer;
     class Image;
-    class FloatPair;
+    
+    // FloatPair is just a pair of floats... using for coordinates or 
+    // rectangle size
+    class FloatPair {
+    private:
+        float x, y;
+    public:
+        inline float X() { return x;}
+        inline float Y() { return y;}
+        inline float SetX(float X) { return x=X; }
+        inline float SetY(float Y) { return y=Y; }
+        FloatPair() { x = 0; y = 0; }
+        FloatPair(float _X, float _Y) { x=_X;y=_Y; }
+    };
 
     // Let's never use inheritance... I hate it so much because of dependencies its creating...
     // Application describes what application can do. 
     class Application {
         private:
             void * originalObject;
-            Error *(*run)(void *);
-            Error *(*stop)(void *);
-            Error *(*loadFirmware)(void *, std::string);
-            Error *(*setXMode)(void *, int);
+            int(*run)(void *);
+            int(*stop)(void *);
+            int(*loadFirmware)(void *, std::string);
+            int(*setXMode)(void *, int);
         public:
-        Error * Run() {
+        int Run() {
             return run(originalObject);
         }
-        Error * Stop() {
+        int Stop() {
             return stop(originalObject);
         }
-        Error * LoadFirmware(std::string folder) {
+        int LoadFirmware(std::string folder) {
             return loadFirmware(originalObject, folder);
         }
         // SetXMode is used to set a graphical mode for loading screens
-        Error * SetXMode(int isGraphical) {
+        int SetXMode(int isGraphical) {
             return setXMode(originalObject, isGraphical);
         }
-        Application(void * originalObject, Error *(*run)(void *), Error *(*stop)(void *), 
-            Error *(*loadFirmware)(void *, std::string), Error *(*setXMode)(void *, int)) {
+        Application(void * originalObject, int(*run)(void *), int(*stop)(void *), 
+            int(*loadFirmware)(void *, std::string), int(*setXMode)(void *, int)) {
         }
     };
     
@@ -66,21 +79,21 @@ namespace DiaApp {
     class Renderer {
     private:
         void *originalObject;
-        int (*initScreen)(Size physicalSize. Size logicalSize);
-        int (*displayImage)(img Image, FloatPair offset, FloatPair size);
-        int (*swapFrame)();
+        int (*initScreen)(void *, FloatPair);
+        int (*displayImage)(void *, Image* , FloatPair, FloatPair);
+        void (*swapFrame)(void *);
     public:
-        Error * InitScreen(originalObject, Size physicalSize. Size logicalSize) {
-            return initScreen(originalObject, physicalSize, logicalSize);
+        int InitScreen(void *originalObject, FloatPair logicalSize) {
+            return initScreen(originalObject, logicalSize);
         }
-        Error * DisplayImage(originalObject, img Image, FloatPair offset, FloatPair size) {
-            return displayImage(img, offset, size);
+        int DisplayImage(void *originalObject, Image *img, FloatPair offset, FloatPair size) {
+            return displayImage(originalObject, img, offset, size);
         }
         void SwapFrame() {
             return swapFrame(originalObject);
         }
-        Renderer(void *_originalObject,int (*_initScreen)(Size physicalSize. Size logicalSize), 
-        int (*_displayImage)(img Image, FloatPair offset, FloatPair size), int (*_swapFrame)()) {
+        Renderer(void *_originalObject,int (*_initScreen)(void *, FloatPair), 
+        int (*_displayImage)(void *, Image*, FloatPair, FloatPair), void (*_swapFrame)(void *)) {
             originalObject = _originalObject;
             initScreen = _initScreen;
             displayImage = _displayImage;
@@ -91,19 +104,7 @@ namespace DiaApp {
         }
     };
     
-    // FloatPair is just a pair of floats... using for coordinates or 
-    // rectangle size
-    class FloatPair {
-    private:
-        float x, y;
-    public:
-        inline float X() { return X;}
-        inline float Y() { return Y;}
-        inline float SetX(float X) { return x=X; }
-        inline float SetY(float Y) { return y=Y; }
-        FloatPair() { x = 0; y = 0; }
-        FloatPair(float X, Y) { x=X;y=Y; }
-    };
+    
     
     // Image is something that can be displayed by Renderer
     class Image {
@@ -112,7 +113,7 @@ namespace DiaApp {
     public:
         inline FloatPair Size() { return size; } 
         Image() {
-        };
-    }
+        }
+    };
 }
 #endif
