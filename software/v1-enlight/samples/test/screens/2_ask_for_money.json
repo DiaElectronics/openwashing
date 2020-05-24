@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"1920;1080",
+      "src":"pic/2/background.png",
+      "visible":"true"
+    },
+    {
+      "id":"return_background",
+      "type":"image",
+      "position": "1245;720",
+      "size":"543;112",
+      "src":"pic/return_background.png",
+      "visible":"false"
+    }
+  ]
+}

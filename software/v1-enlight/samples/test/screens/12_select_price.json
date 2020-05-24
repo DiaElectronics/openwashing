@@ -1,0 +1,22 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"pic/2/background_select_price.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "867;165",
+        "font": "standard_number",
+        "symbol_size":"251;405",
+        "padding": "3",
+        "length": "3",
+        "visible":"true"
+      }
+    ]
+  }

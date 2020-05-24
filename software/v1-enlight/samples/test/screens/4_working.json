@@ -1,0 +1,123 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"848;480",
+        "src":"pic/background.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance_background",
+        "type":"image",
+        "position": "10;10",
+        "size":"600;300",
+        "src":"pic/balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"p1_ico",
+        "type":"image",
+        "position": "10;300",
+        "size":"100;100",
+        "src":"programs/p1/ico.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"p2_ico",
+        "type":"image",
+        "position": "110;300",
+        "size":"100;100",
+        "src":"programs/p2/ico.png",
+        "visible":"true",
+        "click_id":"2"
+      },
+      {
+        "id":"p3_ico",
+        "type":"image",
+        "position": "210;300",
+        "size":"100;100",
+        "src":"programs/p3/ico.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"p4_ico",
+        "type":"image",
+        "position": "310;300",
+        "size":"100;100",
+        "src":"programs/p4/ico.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"p5_ico",
+        "type":"image",
+        "position": "410;300",
+        "size":"100;100",
+        "src":"programs/p5/ico.png",
+        "visible":"true",
+        "click_id":"5"
+      },
+      {
+        "id":"p6_ico",
+        "type":"image",
+        "position": "510;300",
+        "size":"100;100",
+        "src":"programs/p6/ico.png",
+        "visible":"true",
+        "click_id":"6"
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "10;16",
+        "font": "standard_number",
+        "symbol_size":"120;200",
+        "padding": "3",
+        "length": "3",
+        "visible":"true"
+      },
+      {
+        "id":"cur_p",
+        "type":"image_array",
+        "position": "610;137",
+        "size":"494;468",
+        "visible":"true",
+        "index":"0",
+        "length":"6",
+        "sources": [
+          {
+            "src":"programs/p1/ico.png"
+          },
+          {
+            "src":"programs/p2/ico.png"
+          },
+          {
+            "src":"programs/p3/ico.png"
+          },
+          {
+            "src":"programs/p4/ico.png"
+          },
+          {
+            "src":"programs/p5/ico.png"
+          },
+          {
+            "src":"programs/p6/ico.png"
+          }
+        ]
+      },
+      {
+        "id":"pause_digits",
+        "type": "digits",
+        "position": "251;247",
+        "font": "standard_number",
+        "symbol_size":"86;157",
+        "padding": "5",
+        "length": "3",
+        "visible":"true"
+      }
+    ]
+  }
