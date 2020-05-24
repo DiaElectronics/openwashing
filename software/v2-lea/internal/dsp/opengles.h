@@ -131,16 +131,25 @@ namespace DiaDSP {
       OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
       return r->InitScreen(logicalSize);
     }
+
     int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
+    }
+    static int _displayImage(void *obj, , DiaApp::FloatPair offset, DiaApp::FloatPair size) {
+      OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
+      return r->DisplayImage(offset, size);
     }
 
     void SwapFrame() {
         eglSwapBuffers(GDisplay,GSurface);
     }
+    static void _swapFrame(void *obj) {
+      OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
+      r->SwapFrame();
+    }
 
     DiaApp::Renderer ToAppRenderer() {
-      DiaApp::Renderer renderer(this, _initScreen, DisplayImage, SwapFrame);
+      DiaApp::Renderer renderer(this, _initScreen, _displayImage, _swapFrame);
       return renderer;
     }        
   };
