@@ -107,16 +107,16 @@ namespace DiaDSP {
       nativewindow.height = GScreenHeight;
       vc_dispmanx_update_submit_sync( dispman_update );
 
-      check();
+      if (glGetError()) return glGetError();
 
       GSurface = eglCreateWindowSurface(GDisplay, config, &nativewindow, NULL);
       assert(GSurface != EGL_NO_SURFACE);
-      check();
+      if (glGetError()) return glGetError();
 
       // connect the context to the surface
       result = eglMakeCurrent(GDisplay, GSurface, GSurface, DGContext);
       assert(EGL_FALSE != result);
-      check();
+      if (glGetError()) return glGetError();
 
       // Set background color and clear buffers
       glClearColor(0.15f, 0.25f, 0.35f, 1.0f);
@@ -124,7 +124,8 @@ namespace DiaDSP {
 
       glViewport ( 0, 0, logicalSize.X(), logicalSize.Y());
 
-      check();
+      if (glGetError()) return glGetError();
+      return 0;
     }
     int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
