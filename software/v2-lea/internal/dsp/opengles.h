@@ -64,22 +64,22 @@ namespace DiaDSP {
       // initialize the EGL display connection
       result = eglInitialize(GDisplay, NULL, NULL);
       assert(EGL_FALSE != result);
-      check();
+      if (glGetError()) return glGetError();
 
       // get an appropriate EGL frame buffer configuration
       result = eglChooseConfig(GDisplay, attribute_list, &config, 1, &num_config);
       assert(EGL_FALSE != result);
-      check();
+      if (glGetError()) return glGetError();
 
       // get an appropriate EGL frame buffer configuration
       result = eglBindAPI(EGL_OPENGL_ES_API);
       assert(EGL_FALSE != result);
-      check();
+      if (glGetError()) return glGetError();
 
       // create an EGL rendering context
       DGContext = eglCreateContext(GDisplay, config, EGL_NO_CONTEXT, context_attributes);
       assert(DGContext!=EGL_NO_CONTEXT);
-      check();
+      if (glGetError()) return glGetError();
 
       // create an EGL window surface
       success = graphics_get_display_size(0 /* LCD */, &GScreenWidth, &GScreenHeight);
@@ -135,7 +135,7 @@ namespace DiaDSP {
     }
 
     DiaApp::Renderer ToAppRenderer() {
-      DiaApp::Renderer renderer(this, InitScreen, DisplayImage, SwapFrame);
+      DiaApp::Renderer renderer(this, DiaDSP::OpenGLESRenderer::InitScreen, DisplayImage, SwapFrame);
       return renderer;
     }        
   };
