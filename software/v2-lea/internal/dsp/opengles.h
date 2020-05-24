@@ -127,15 +127,20 @@ namespace DiaDSP {
       if (glGetError()) return glGetError();
       return 0;
     }
+    static int _initScreen(void *obj, DiaApp::FloatPair logicalSize) {
+      OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
+      return->InitScreen(logicalSize);
+    }
     int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
     }
+    
     void SwapFrame() {
         eglSwapBuffers(GDisplay,GSurface);
     }
 
     DiaApp::Renderer ToAppRenderer() {
-      DiaApp::Renderer renderer(this, DiaDSP::OpenGLESRenderer::InitScreen, DisplayImage, SwapFrame);
+      DiaApp::Renderer renderer(this, _initScreen, DisplayImage, SwapFrame);
       return renderer;
     }        
   };
