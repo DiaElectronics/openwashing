@@ -25,7 +25,7 @@ namespace DiaDSP {
       EGLSurface GSurface;
       EGLContext DGContext;
     public: 
-    int InitScreen(FloatPair logicalSize) {
+    int InitScreen(DiaApp::FloatPair logicalSize) {
       bcm_host_init();
 	    int32_t success = 0;
 	    EGLBoolean result;
@@ -98,7 +98,7 @@ namespace DiaDSP {
       dispman_display = vc_dispmanx_display_open( 0 /* LCD */);
       dispman_update = vc_dispmanx_update_start( 0 );
 
-      dispman_element = vc_dispmanx_element_add ( dispman_update, dispman_display,
+      dispman_element = vc_dispmanx_element_add (dispman_update, dispman_display,
         0/*layer*/, &dst_rect, 0/*src*/,
         &src_rect, DISPMANX_PROTECTION_NONE, 0 /*alpha*/, 0/*clamp*/, (DISPMANX_TRANSFORM_T)0/*transform*/);
 
@@ -109,7 +109,7 @@ namespace DiaDSP {
 
       check();
 
-      GSurface = eglCreateWindowSurface( GDisplay, config, &nativewindow, NULL );
+      GSurface = eglCreateWindowSurface(GDisplay, config, &nativewindow, NULL);
       assert(GSurface != EGL_NO_SURFACE);
       check();
 
@@ -122,11 +122,11 @@ namespace DiaDSP {
       glClearColor(0.15f, 0.25f, 0.35f, 1.0f);
       glClear( GL_COLOR_BUFFER_BIT );
 
-      glViewport ( 0, 0, logicalX, logicalY);
+      glViewport ( 0, 0, logicalSize.X(), logicalSize.Y());
 
       check();
     }
-    int DisplayImage(Image *img, FloatPair offset, FloatPair size) {
+    int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
     }
     void SwapFrame() {
@@ -134,8 +134,8 @@ namespace DiaDSP {
     }
 
     DiaApp::Renderer ToAppRenderer() {
-      (void *_originalObject,int (*_initScreen)(void *, FloatPair), 
-        int (*_displayImage)(void *, Image*, FloatPair, FloatPair), void (*_swapFrame)(void *))
+      (void *_originalObject,int (*_initScreen)(void *, DiaApp::FloatPair), 
+        int (*_displayImage)(void *, DiaApp::Image*, DiaApp::FloatPair, DiaApp::FloatPair), void (*_swapFrame)(void *))
       DiaApp::Renderer renderer(this, InitScreen, DisplayImage, SwapFrame);
       return renderer;
     }        
