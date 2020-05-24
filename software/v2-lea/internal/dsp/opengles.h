@@ -59,7 +59,7 @@ namespace DiaDSP {
       // get an EGL display connection
       GDisplay = eglGetDisplay(EGL_DEFAULT_DISPLAY);
       assert(GDisplay!=EGL_NO_DISPLAY);
-      check();
+      if (glGetError()) return glGetError();
 
       // initialize the EGL display connection
       result = eglInitialize(GDisplay, NULL, NULL);
@@ -135,8 +135,6 @@ namespace DiaDSP {
     }
 
     DiaApp::Renderer ToAppRenderer() {
-      (void *_originalObject,int (*_initScreen)(void *, DiaApp::FloatPair), 
-        int (*_displayImage)(void *, DiaApp::Image*, DiaApp::FloatPair, DiaApp::FloatPair), void (*_swapFrame)(void *))
       DiaApp::Renderer renderer(this, InitScreen, DisplayImage, SwapFrame);
       return renderer;
     }        
