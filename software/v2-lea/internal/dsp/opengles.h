@@ -1,5 +1,8 @@
 #ifndef _LEA_OPENGLES_RENDERER_H
 #define _LEA_OPENGLES_RENDERER_H
+#include "GLES2/gl2.h"
+#include "EGL/egl.h"
+#include "EGL/eglext.h"
 
 #include "interfaces.h"
 #include <stdio.h>
