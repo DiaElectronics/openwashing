@@ -135,7 +135,7 @@ namespace DiaDSP {
     int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
     }
-    static int _displayImage(void *obj, , DiaApp::FloatPair offset, DiaApp::FloatPair size) {
+    static int _displayImage(void *obj, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
       OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
       return r->DisplayImage(offset, size);
     }
