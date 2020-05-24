@@ -129,12 +129,12 @@ namespace DiaDSP {
     }
     static int _initScreen(void *obj, DiaApp::FloatPair logicalSize) {
       OpenGLESRenderer *r = (OpenGLESRenderer *) obj;
-      return->InitScreen(logicalSize);
+      return r->InitScreen(logicalSize);
     }
     int DisplayImage(DiaApp::Image *img, DiaApp::FloatPair offset, DiaApp::FloatPair size) {
         return -1;
     }
-    
+
     void SwapFrame() {
         eglSwapBuffers(GDisplay,GSurface);
     }
