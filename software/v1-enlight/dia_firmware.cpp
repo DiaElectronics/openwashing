@@ -22,10 +22,18 @@
 #include "dia_screen_item_image.h"
 
 
-#define DIA_VERSION "v1.6-enlight"
+#define DIA_VERSION "v1.7-enlight"
+
 
 //#define USE_GPIO
 #define USE_KEYBOARD
+
+
+// TODO: must be set via API
+#define COIN_MULTIPLICATOR 1
+#define BANKNOTE_MULTIPLICATOR 10
+#define ALLOW_PULSE 1
+// END must be set via API
 
 #define BILLION 1000000000
 
@@ -140,32 +148,52 @@ int get_service() {
 int get_coins(void *object) {
     DiaDeviceManager * manager = (DiaDeviceManager *)object;
     int curMoney = manager->CoinMoney;
-    manager->CoinMoney  = 0;
-        
-    if (curMoney > 0) {
-        printf("coin %d\n", curMoney);
+    manager->CoinMoney  = 0;        
+    
+    int gpioCoin = 0;
 
-        if (config) {
-            config->_Income.totalIncomeCoins += curMoney;
-            SaveIncome();
-        }
+    if (ALLOW_PULSE && config) {
+      DiaGpio *g = config->GetGpio();
+      if (g) {
+        gpioCoin = COIN_MULTIPLICATOR * g->CoinsHandler->Money;
+        g->CoinsHandler->Money = 0;
+      }
     }
-    return curMoney;
+
+    if (curMoney > 0) printf("coins from manager %d\n", curMoney);
+    if (gpioCoin > 0) printf("coins from gpio %d\n", gpioCoin);
+
+    int totalMoney = curMoney + gpioCoin;
+    if (totalMoney>0 && config) {
+        config->_Income.totalIncomeCoins += curMoney;
+        SaveIncome();
+    }
+
+    return totalMoney;
 }
 
 int get_banknotes(void *object) {
-    DiaDeviceManager * manager = (DiaDeviceManager *)object;
-    int curMoney = manager->BanknoteMoney;
-    if (curMoney > 0) {
-        printf("bank %d\n", curMoney);
-        if (config) {
-            config->_Income.totalIncomeBanknotes += curMoney;
-            SaveIncome();
-        }
-        manager->BanknoteMoney  = 0;
-        _Balance = 0;
+  DiaDeviceManager * manager = (DiaDeviceManager *)object;
+  int curMoney = manager->BanknoteMoney;
+  manager->BanknoteMoney = 0;
+
+  int gpioBanknote = 0;
+  if (ALLOW_PULSE && config) {
+    DiaGpio *g = config->GetGpio();
+    if (g) {
+      gpioBanknote = BANKNOTE_MULTIPLICATOR * g->BanknotesHandler->Money;
+      g->BanknotesHandler->Money = 0;
     }
-    return curMoney;
+  }
+
+  if (curMoney > 0) printf("banknotes from manager %d\n", curMoney);
+  if (gpioBanknote > 0) printf("banknotes from GPIO %d\n", gpioBanknote);
+  int totalMoney = curMoney + gpioBanknote;
+  if (totalMoney > 0 && config) {
+    config->_Income.totalIncomeBanknotes += curMoney;
+    SaveIncome();
+  }
+  return totalMoney;
 }
 
 int get_electronical(void *object) {
@@ -178,7 +206,6 @@ int get_electronical(void *object) {
             SaveIncome();
         }
         manager->ElectronMoney  = 0;
-        _Balance = 0;
     }
     return curMoney;
 }
@@ -269,7 +296,7 @@ int CentralServerDialog() {
         
         if (serviceMoney > 0) {
 	        _Balance += serviceMoney;
-        }      
+        }
     }
 
     // Every 5 min (300 sec) we go inside this
@@ -659,6 +686,12 @@ int main(int argc, char ** argv) {
                         case SDLK_UP:
                             // Debug service money addition
                             _Balance += 10;
+
+                            printf("UP\n"); fflush(stdout);
+                            break;
+                        case SDLK_DOWN:
+                            // Debug service money addition
+                            _Balance += 1;
 
                             printf("UP\n"); fflush(stdout);
                             break;

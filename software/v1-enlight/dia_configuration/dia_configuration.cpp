@@ -53,6 +53,10 @@ int DiaConfiguration::Init() {
         hideMouse = 1;
         fullScreen = 1;
         #endif
+        #ifdef DEBUG
+        hideMouse = 0;
+        fullScreen = 0;
+        #endif
         _Screen = new DiaScreen(GetResX(), GetResY(), hideMouse, fullScreen);
         _Gpio = 0;
         #ifdef USE_GPIO

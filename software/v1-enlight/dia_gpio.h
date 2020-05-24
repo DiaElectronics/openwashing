@@ -6,6 +6,8 @@
 
 #define COIN_TOTAL 6
 #define COIN_SWITCH 4
+#define COIN_PIN 29
+#define BANKNOTE_PIN 28
 
 #define NO_ANIMATION 0
 #define ONE_BUTTON_ANIMATION 1
@@ -26,8 +28,55 @@ struct relay_stat {
     int relay_switch[PIN_COUNT];
 };
 
-class DiaGpio
-{
+class PulseHandler {
+public:
+  int PinNumber;
+  int Money;
+  int Status[COIN_TOTAL];
+  int Status_;
+  int Loop;
+private:
+  int calcONPins() {
+    int res = 0;
+    for(int i=0;i < COIN_TOTAL;i++) {
+      if(Status[i]) res++;
+    }
+    return res;
+  }
+
+public:
+  PulseHandler(int pinNumber) {
+    Money = 0;
+    PinNumber=pinNumber;
+    pinMode(PinNumber, INPUT);
+    for(int i=0;i<COIN_TOTAL;i++) {
+      Status[i] = digitalRead(PinNumber);
+      Status_ = digitalRead(PinNumber);
+    }
+    Loop = 0;
+  }
+
+  void Tick() {
+    int curState = digitalRead(PinNumber);
+    Status[Loop] = curState;
+
+    Loop++;
+    if(Loop>=COIN_TOTAL) Loop=0;
+
+    int curSwitchedOnPins = calcONPins();
+    
+    if(Status_) {
+      if(curSwitchedOnPins<(COIN_TOTAL-COIN_SWITCH)) Status_ = 0;
+    } else {
+      if(curSwitchedOnPins>COIN_SWITCH) {
+          Money++;
+          Status_ = 1;
+      }
+    }
+  }
+};
+
+class DiaGpio {
 public:
     int MaxButtons;
     int MaxRelays;
@@ -57,20 +106,16 @@ public:
 
 
     int NeedWorking;
-    int CoinMoney;
-    int CoinStatus[COIN_TOTAL];
-    int CoinStatus_;
-    int CoinLoop;
 
-
-    int CoinPin;
-    int DoorPin;
+    PulseHandler * CoinsHandler;
+    PulseHandler * BanknotesHandler;
 
     int CurrentProgram;
     int AllTurnedOff;
 
     pthread_t WorkingThread;
     pthread_t LedSwitchingThread;
+
 
     DiaRelayConfig Programs[MAX_PROGRAMS_COUNT];
     std::map<std::string, int> _ProgramMapping;
@@ -95,6 +140,5 @@ int DiaGpio_ReadButton(DiaGpio * gpio, int ButtonNumber);
 void DiaGpio_Test(DiaGpio * gpio);
 void * DiaGpio_WorkingThread(void * gpio);
 inline int DiaGpio_Abs(int from, int to);
-void DiaGpio_CheckCoin(DiaGpio * gpio);
 //void DiaGpio
 #endif

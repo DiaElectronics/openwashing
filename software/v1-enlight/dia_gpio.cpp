@@ -6,7 +6,8 @@
 #include <assert.h>
 
 DiaGpio::~DiaGpio() {
-
+  delete CoinsHandler;
+  delete BanknotesHandler;
 }
 
 int DiaGpio_GetLastKey(DiaGpio * gpio) {
@@ -87,9 +88,11 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     LastPressedKey = -1;
     InitializedOk = 0;
     NeedWorking = 1;
-    CoinMoney = 0;
 
     if (wiringPiSetup () == -1) return;
+
+    CoinsHandler = new PulseHandler(COIN_PIN);
+    BanknotesHandler = new PulseHandler(BANKNOTE_PIN);
 
     ButtonPin[0] = -1;
     ButtonPin[1] = 13;
@@ -120,11 +123,6 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     RelayPin[6] = 6; // Light
     RelayPin[7] = -1;
     RelayPin[8] = -1;
-
-    CoinPin = 29;
-    DoorPin = 28;
-
-    pinMode(CoinPin, INPUT);
 
     for(int i=0;i<PIN_COUNT;i++) {
         if(RelayPin[i] >= 0) {
@@ -225,46 +223,13 @@ void DiaGpio_CheckRelays(DiaGpio * gpio, long curTime) {
 }
 
 int DiaGpio_ReadButton(DiaGpio * gpio, int ButtonNumber) {
-    if(ButtonNumber>=0 && ButtonNumber<=gpio->MaxButtons) {
-        if(gpio->ButtonPin[ButtonNumber]>=0) {
-            // Please notice
-            return !digitalRead(gpio->ButtonPin[ButtonNumber]);
-        }
+  if(ButtonNumber>=0 && ButtonNumber<=gpio->MaxButtons) {
+    if(gpio->ButtonPin[ButtonNumber]>=0) {
+      return !digitalRead(gpio->ButtonPin[ButtonNumber]);
     }
-    return 0;
+  }
+  return 0;
 }
-
-void DiaGpio_CheckCoin(DiaGpio * gpio) {
-    // DEBUG coins turned off
-    return;
-    int curState = digitalRead(gpio->CoinPin);
-    gpio->CoinStatus[gpio->CoinLoop] = curState;
-    gpio->CoinLoop = gpio->CoinLoop + 1;
-
-    if(gpio->CoinLoop>=COIN_TOTAL) {
-         gpio->CoinLoop=0;
-    }
-    int curSwitchedOnPins = 0;
-    for(int i=0;i < COIN_TOTAL;i++) {
-         if( gpio->CoinStatus[i]) {
-              curSwitchedOnPins++;
-         }
-    }
-    if(gpio->CoinStatus_) {
-        if(curSwitchedOnPins<(COIN_TOTAL-COIN_SWITCH)) {
-            gpio->CoinStatus_ = 0;
-            printf("%d\n", gpio->CoinMoney);
-        }
-    } else {
-        if(curSwitchedOnPins>COIN_SWITCH) {
-            gpio->CoinMoney = gpio->CoinMoney + 1;
-            printf("%d\n", gpio->CoinMoney);
-            //printf("k");
-            gpio->CoinStatus_ = 1;
-        }
-    }
-}
-
 
 void DiaGpio_ButtonAnimation(DiaGpio * gpio, long curTime) {
 	if(gpio->AnimationCode == ONE_BUTTON_ANIMATION) {
@@ -367,35 +332,36 @@ void * DiaGpio_LedSwitcher(void * gpio)
 
 void * DiaGpio_WorkingThread(void * gpio) {
     DiaGpio *Gpio = (DiaGpio *)gpio;
-    for(int i=0;i<COIN_TOTAL;i++) {
-        Gpio->CoinStatus[i] = digitalRead(Gpio->CoinPin);
-        Gpio->CoinStatus_ = digitalRead(Gpio->CoinPin);
-    }
-    Gpio->CoinLoop = 0;
 
     long curTime = 0;
 
     while(Gpio->NeedWorking) {
-        delay(1);//This code will run once per ms
-        curTime+=1;
-        DiaGpio_CheckRelays(Gpio, curTime);
-        DiaGpio_CheckCoin(Gpio);
-        DiaGpio_ButtonAnimation(Gpio, curTime);
-        if(curTime % 25 == 0) {
-            for(int i=0;i<=Gpio->MaxButtons;i++) {
-                if(DiaGpio_ReadButton(Gpio, i)) {
-                    if(!Gpio->ButtonStatus[i]) {
-                        Gpio->ButtonStatus[i] = 1;
-                        Gpio->ButtonLastStatusChangeTime[i] = curTime + 100;
-                        Gpio->LastPressedKey = i;
-                    }
-                } else {
-					if(Gpio->ButtonStatus[i] && curTime > Gpio->ButtonLastStatusChangeTime[i]) {
-                        Gpio->ButtonStatus[i] = 0;
-                    }
-				}
+      delay(1);//This code will run once per ms
+      curTime+=1;
+      DiaGpio_CheckRelays(Gpio, curTime);
+
+      Gpio->CoinsHandler->Tick();
+      Gpio->BanknotesHandler->Tick();
+
+      DiaGpio_ButtonAnimation(Gpio, curTime);
+
+      // noise reduction code ... 
+      // not really sure how its working :(
+      if(curTime % 25 == 0) {
+        for(int i=0;i<=Gpio->MaxButtons;i++) {
+          if(DiaGpio_ReadButton(Gpio, i)) {
+              if(!Gpio->ButtonStatus[i]) {
+                  Gpio->ButtonStatus[i] = 1;
+                  Gpio->ButtonLastStatusChangeTime[i] = curTime + 100;
+                  Gpio->LastPressedKey = i;
+              }
+          } else {
+            if(Gpio->ButtonStatus[i] && curTime > Gpio->ButtonLastStatusChangeTime[i]) {
+              Gpio->ButtonStatus[i] = 0;
             }
+          }
         }
+      }
     }
     pthread_exit(NULL);
     return NULL;

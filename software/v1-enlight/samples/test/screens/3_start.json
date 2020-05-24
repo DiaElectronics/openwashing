@@ -1,0 +1,46 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"pic/background.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance_background",
+        "type":"image",
+        "position": "833;81",
+        "size":"955;524",
+        "src":"pic/balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "867;166",
+        "font": "standard_number",
+        "symbol_size":"251;405",
+        "padding": "3",
+        "length": "3",
+        "visible":"true"
+      },
+      {
+        "id":"recommend_label",
+        "type":"image",
+        "position": "140;436",
+        "size":"487;106",
+        "src":"pic/recommend.png",
+        "visible":"true"
+      },
+      {
+        "id":"recommend_arrow",
+        "type":"image",
+        "position": "168;1001",
+        "size":"68;38",
+        "src":"pic/arrow.png",
+        "visible":"true"
+      }
+    ]
+  }
