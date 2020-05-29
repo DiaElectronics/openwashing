@@ -362,7 +362,7 @@ get_mode_by_pressed_key = function(current_mode)
     pressed_key = get_key()
     
     if pressed_key < 1 then return -1 end
-    if current_mode~=mode_pause then return mode_pause end
+    if is_working_mode(current_mode) and current_mode~=mode_work then return mode_pause end
     return mode_work + 1
 end
 
