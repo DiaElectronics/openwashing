@@ -20,7 +20,6 @@ DiaScreen::DiaScreen(int resX, int resY, int hideCursor, int fullScreen) {
         int32_t cursorData[2] = {0,0};
         cursor = SDL_CreateCursor((uint8_t *)cursorData, (uint8_t *)cursorData, 8, 8, 4, 4);
         SDL_SetCursor(cursor);
-        //SDL_ShowCursor(SDL_DISABLE); 
     }
     //printf("SDLShowCursor_2\n"); fflush(stdout);
 	//printf("trying to set a video mode \n"); fflush(stdout);
