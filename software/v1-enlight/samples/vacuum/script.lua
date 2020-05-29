@@ -379,8 +379,8 @@ get_price = function(key)
 end
 
 switch_submodes = function(val)
-    if val == 1 then working:Set("p1_img.visible", "false") else working:Set("p1_img.visible", "true") end 
-    if val == 2 then working:Set("p6_img.visible", "false") else working:Set("p6_img.visible", "true") end 
+    if val == 1 then working:Set("p1_img.visible", "true") else working:Set("p1_img.visible", "false") end 
+    if val == 2 then working:Set("p6_img.visible", "true") else working:Set("p6_img.visible", "false") end 
 end
 
 turn_light = function(rel_num, animation_code)
