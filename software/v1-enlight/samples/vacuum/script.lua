@@ -340,7 +340,7 @@ end
 show_working = function(sub_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
     working:Set("balance.value", balance_int)
-    
+    if sub_mode>0 then switch_submodes(1) else switch_submodes(0) end    
     working:Display()
 end
 
@@ -348,7 +348,7 @@ show_pause = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
     working:Set("balance.value", balance_int)
-  
+    switch_submodes(2)
     working:Display()
 end
 
@@ -376,6 +376,11 @@ end
 
 get_price = function(key)
     return registry:ValueInt(key)
+end
+
+switch_submodes = function(val)
+    if val == 1 then working:Set("p1_img.visible", "false") else working:Set("p1_img.visible", "true") end 
+    if val == 2 then working:Set("p6_img.visible", "false") else working:Set("p6_img.visible", "true") end 
 end
 
 turn_light = function(rel_num, animation_code)

@@ -12,7 +12,7 @@
         "id":"balance_background",
         "type":"image",
         "position": "368;36",
-        "size":"410;524",
+        "size":"410;233",
         "src":"pic/balance.png",
         "visible":"true"
       },
@@ -33,6 +33,22 @@
         "src":"programs/p6/ico.png",
         "visible":"true",
         "click_id":"6"
+      },
+      {
+        "id":"p1_img",
+        "type":"image",
+        "position": "70;61",
+        "size":"218;218",
+        "src":"programs/p1/ico.png",
+        "visible":"false"
+      },
+      {
+        "id":"p6_img",
+        "type":"image",
+        "position": "70;61",
+        "size":"218;218",
+        "src":"programs/p6/ico.png",
+        "visible":"false"
       },
       {
         "id":"balance",
