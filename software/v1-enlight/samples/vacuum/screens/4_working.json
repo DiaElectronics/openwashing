@@ -4,68 +4,32 @@
         "id":"background",
         "type":"image",
         "position": "0;0",
-        "size":"1920;1080",
+        "size":"848;480",
         "src":"pic/background.png",
         "visible":"true"
       },
       {
         "id":"balance_background",
         "type":"image",
-        "position": "833;81",
-        "size":"955;524",
+        "position": "57;50",
+        "size":"720;250",
         "src":"pic/balance.png",
         "visible":"true"
       },
       {
         "id":"p1_ico",
         "type":"image",
-        "position": "75;713",
-        "size":"249;249",
+        "position": "33;317",
+        "size":"110;110",
         "src":"programs/p1/ico.png",
         "visible":"true",
         "click_id":"1"
       },
       {
-        "id":"p2_ico",
-        "type":"image",
-        "position": "383;713",
-        "size":"249;249",
-        "src":"programs/p2/ico.png",
-        "visible":"true", 
-        "click_id":"2"
-      },
-      {
-        "id":"p3_ico",
-        "type":"image",
-        "position": "688;713",
-        "size":"249;249",
-        "src":"programs/p3/ico.png",
-        "visible":"true", 
-        "click_id":"3"
-      },
-      {
-        "id":"p4_ico",
-        "type":"image",
-        "position": "998;713",
-        "size":"249;249",
-        "src":"programs/p4/ico.png",
-        "visible":"true", 
-        "click_id":"4"
-      },
-      {
-        "id":"p5_ico",
-        "type":"image",
-        "position": "1304;713",
-        "size":"249;249",
-        "src":"programs/p5/ico.png",
-        "visible":"true",
-        "click_id":"5"
-      },
-      {
         "id":"p6_ico",
         "type":"image",
-        "position": "1610;713",
-        "size":"249;249",
+        "position": "711;317",
+        "size":"110;110",
         "src":"programs/p6/ico.png",
         "visible":"true",
         "click_id":"6"
@@ -73,49 +37,10 @@
       {
         "id":"balance",
         "type": "digits",
-        "position": "867;166",
+        "position": "50;50",
         "font": "standard_number",
-        "symbol_size":"251;405",
+        "symbol_size":"220;250",
         "padding": "3",
-        "length": "3",
-        "visible":"true"
-      },
-      {
-        "id":"cur_p",
-        "type":"image_array",
-        "position": "158;137",
-        "size":"494;468",
-        "visible":"true",
-        "index":"0",
-        "length":"6",
-        "sources": [
-          {
-            "src":"programs/p1/ico.png"
-          },
-          {
-            "src":"programs/p2/ico.png"
-          },
-          {
-            "src":"programs/p3/ico.png"
-          },
-          {
-            "src":"programs/p4/ico.png"
-          },
-          {
-            "src":"programs/p5/ico.png"
-          },
-          {
-            "src":"programs/p6/ico.png"
-          }
-        ]
-      },
-      {
-        "id":"pause_digits",
-        "type": "digits",
-        "position": "251;247",
-        "font": "standard_number",
-        "symbol_size":"86;157",
-        "padding": "5",
         "length": "3",
         "visible":"true"
       }

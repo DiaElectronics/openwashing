@@ -5,9 +5,9 @@ setup = function()
     -- global variables
     balance = 0.0
 
-    min_electron_balance = 50
+    min_electron_balance = 10
     max_electron_balance = 900
-    electron_amount_step = 25
+    electron_amount_step = 10
     electron_balance = min_electron_balance
     
     balance_seconds = 0
@@ -17,7 +17,6 @@ setup = function()
     -- constants
     welcome_mode_seconds = 3
     thanks_mode_seconds = 120
-    free_pause_seconds = 120
     wait_card_mode_seconds = 40
     
     hascardreader = false
@@ -66,22 +65,22 @@ end
 
 init_prices = function()
     price_p[1] = get_price("price1")
-    if price_p[1] == 0 then price_p[1] = 18 end
+    if price_p[1] == 0 then price_p[1] = 12 end
 
     price_p[2] = get_price("price2")
-    if price_p[2] == 0 then price_p[2] = 18 end
+    if price_p[2] == 0 then price_p[2] = 12 end
 
     price_p[3] = get_price("price3")
-    if price_p[3] == 0 then price_p[3] = 18 end
+    if price_p[3] == 0 then price_p[3] = 12 end
 
     price_p[4] = get_price("price4")
-    if price_p[4] == 0 then price_p[4] = 18 end
+    if price_p[4] == 0 then price_p[4] = 12 end
 
     price_p[5] = get_price("price5")
-    if price_p[5] == 0 then price_p[5] = 18 end
+    if price_p[5] == 0 then price_p[5] = 12 end
     
     price_p[6] = get_price("price6")
-    if price_p[6] == 0 then price_p[6] = 18 end
+    if price_p[6] == 0 then price_p[6] = 12 end
 end
 
 
@@ -249,7 +248,7 @@ program_mode = function(working_mode)
     return mode_thanks 
   end
   update_balance()
-  suggested_mode = get_mode_by_pressed_key()
+  suggested_mode = get_mode_by_pressed_key(working_mode)
   if suggested_mode >=0 then return suggested_mode end
   return working_mode
 end
@@ -268,7 +267,7 @@ pause_mode = function()
     
     if balance <= 0.01 then return mode_thanks end
     
-    suggested_mode = get_mode_by_pressed_key()
+    suggested_mode = get_mode_by_pressed_key(mode_pause)
     if suggested_mode >=0 then return suggested_mode end
     return mode_pause
 end
@@ -337,18 +336,11 @@ show_wait_for_card = function()
     wait_for_card:Display()
 end
 
-show_start = function(balance_rur)
-    balance_int = math.ceil(balance_rur)
-    start:Set("balance.value", balance_int)
-    start:Display()
-end
-
 show_working = function(sub_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
     working:Set("pause_digits.visible", "false")
     working:Set("balance.value", balance_int)
     
-    switch_submodes(sub_mode)
     working:Display()
 end
 
@@ -358,12 +350,8 @@ show_pause = function(balance_rur, balance_sec)
     working:Set("pause_digits.visible", "true")
     working:Set("pause_digits.value", sec_int)
     working:Set("balance.value", balance_int)
-    switch_submodes(6)
+  
     working:Display()
-end
-
-switch_submodes = function(sub_mode)
-    working:Set("cur_p.index", sub_mode-1)  
 end
 
 show_thanks =  function(seconds_float)
@@ -372,11 +360,12 @@ show_thanks =  function(seconds_float)
     thanks:Display()
 end
 
-get_mode_by_pressed_key = function()
+get_mode_by_pressed_key = function(current_mode)
     pressed_key = get_key()
-    if pressed_key >= 1 and pressed_key<=5 then return mode_work + pressed_key end
-    if pressed_key == 6 then return mode_pause end
-    return -1
+    
+    if pressed_key < 1 then return -1 end
+    if current_mode!=mode_pause then return mode_pause end
+    return mode_work + 1
 end
 
 get_key = function()

@@ -4,19 +4,9 @@
       "id":"background",
       "type":"image",
       "position": "0;0",
-      "size":"800;480",
+      "size":"848;480",
       "src":"pic/1/background.png",
       "visible":"true"
-    },
-    {
-      "id":"post_number",
-      "type": "digits",
-      "position": "1347;839",
-      "font": "standard_number",
-      "symbol_size":"57;90",
-      "padding": "1",
-      "length": "1",
-      "visible":"false"
     }
   ]
 }
