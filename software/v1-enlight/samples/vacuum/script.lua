@@ -17,7 +17,7 @@ setup = function()
 
     -- constants
     welcome_mode_seconds = 3
-    thanks_mode_seconds = 120
+    thanks_mode_seconds = 0
     wait_card_mode_seconds = 40
     
     hascardreader = false
