@@ -1,0 +1,64 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"848;480",
+        "src":"pic/background.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance_background",
+        "type":"image",
+        "position": "368;36",
+        "size":"422;233",
+        "src":"pic/balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"balance",
+        "type": "digits",
+        "position": "383;144",
+        "font": "standard_number",
+        "symbol_size":"65;110",
+        "padding": "25",
+        "length": "3",
+        "visible":"true"
+      },
+      {
+        "id":"pause_balance_label",
+        "type":"image",
+        "position": "670;77",
+        "size":"97;56",
+        "src":"programs/p6/pause_balance.png",
+        "visible":"true"
+      },
+      {
+        "id":"pause_balance",
+        "type": "digits",
+        "position": "660;100",
+        "font": "standard_number",
+        "symbol_size":"19;35",
+        "padding": "5",
+        "length": "3",
+        "visible":"true"
+      },    
+      {
+        "id":"current_label",
+        "type":"image",
+        "position": "62;80",
+        "size":"222;33",
+        "src":"programs/p6/label.png",
+        "visible":"true"
+      },
+      {
+        "id":"free_120_label",
+        "type":"image",
+        "position": "61;141",
+        "size":"246;21",
+        "src":"programs/p6/120_free.png",
+        "visible":"true"
+      }
+    ]
+  }
