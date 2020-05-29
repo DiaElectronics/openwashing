@@ -9,6 +9,7 @@ setup = function()
     max_electron_balance = 900
     electron_amount_step = 10
     electron_balance = min_electron_balance
+    free_pause_seconds = 0
     
     balance_seconds = 0
     kasse_balance = 0.0
@@ -338,7 +339,6 @@ end
 
 show_working = function(sub_mode, balance_rur)
     balance_int = math.ceil(balance_rur)
-    working:Set("pause_digits.visible", "false")
     working:Set("balance.value", balance_int)
     
     working:Display()
@@ -347,8 +347,6 @@ end
 show_pause = function(balance_rur, balance_sec)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
-    working:Set("pause_digits.visible", "true")
-    working:Set("pause_digits.value", sec_int)
     working:Set("balance.value", balance_int)
   
     working:Display()
