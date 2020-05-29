@@ -4,16 +4,16 @@
         "id":"background",
         "type":"image",
         "position": "0;0",
-        "size":"1920;1080",
+        "size":"848;480",
         "src":"pic/2/background_select_price.png",
         "visible":"true"
       },
       {
         "id":"balance",
         "type": "digits",
-        "position": "867;165",
+        "position": "383;73",
         "font": "standard_number",
-        "symbol_size":"251;405",
+        "symbol_size":"110;180",
         "padding": "3",
         "length": "3",
         "visible":"true"

@@ -9,6 +9,14 @@
         "visible":"true"
       },
       {
+        "id":"balance_background",
+        "type":"image",
+        "position": "368;36",
+        "size":"410;524",
+        "src":"pic/balance.png",
+        "visible":"true"
+      },
+      {
         "id":"p1_ico",
         "type":"image",
         "position": "33;317",
@@ -20,7 +28,7 @@
       {
         "id":"p6_ico",
         "type":"image",
-        "position": "711;317",
+        "position": "169;317",
         "size":"110;110",
         "src":"programs/p6/ico.png",
         "visible":"true",
@@ -29,9 +37,9 @@
       {
         "id":"balance",
         "type": "digits",
-        "position": "50;60",
+        "position": "382;74",
         "font": "standard_number",
-        "symbol_size":"180;250",
+        "symbol_size":"110;180",
         "padding": "5",
         "length": "3",
         "visible":"true"
