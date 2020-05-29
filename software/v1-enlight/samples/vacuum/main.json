@@ -44,22 +44,6 @@
       "src": "programs/p1/relay.json"
     },
     {
-      "id": "p2relay",
-      "src": "programs/p2/relay.json"
-    },
-    {
-      "id": "p3relay",
-      "src": "programs/p3/relay.json"
-    },
-    {
-      "id": "p4relay",
-      "src": "programs/p4/relay.json"
-    },
-    {
-      "id": "p5relay",
-      "src": "programs/p5/relay.json"
-    },
-    {
       "id": "p6relay",
       "src": "programs/p6/relay.json"
     }
