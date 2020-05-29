@@ -54,6 +54,9 @@ int DiaConfiguration::Init() {
         fullScreen = 1;
         #endif
         _Screen = new DiaScreen(GetResX(), GetResY(), hideMouse, fullScreen);
+        if (_Screen.InitializedOk!=1) {
+            return _Screen.InitializedOk;
+        }
         _Gpio = 0;
         #ifdef USE_GPIO
         _Gpio = new DiaGpio(GetButtonsNumber(), GetRelaysNumber(), GetStorage());

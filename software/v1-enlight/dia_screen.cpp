@@ -27,10 +27,12 @@ DiaScreen::DiaScreen(int resX, int resY, int hideCursor, int fullScreen) {
         additionalOption = SDL_FULLSCREEN;
     }    
 	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, additionalOption|SDL_NOFRAME|SDL_HWSURFACE))) {
-        printf("Cant set your videomode\n");
-        SDL_Quit();
-        InitializedOk = SDL_INIT_ERROR;
-        return;
+        printf("Cant set your videomode, attempt #2, without fullscreen\n");
+    	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_NOFRAME|SDL_HWSURFACE))) {
+            SDL_Quit();
+            InitializedOk = SDL_INIT_ERROR;
+            return;
+        }
     }
     printf("video mode is set properly \n"); fflush(stdout);
 	delay(100);
