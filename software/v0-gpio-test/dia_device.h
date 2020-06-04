@@ -49,11 +49,12 @@ public:
     void (*IncomingDataHandler)(void * specificDriver, int buffer_size, char * buffer);
     void * IncomingDataObject;
 
+    int Open();
     DiaDevice(char *portName);
     ~DiaDevice();
 };
 
-int DiaDevice_StartDevice(DiaDevice * device);
+int DiaDevice_StartDeviceThread(DiaDevice * device);
 void DiaDevice_DataReceivedHandler(int x, short int y, void *pargs);
 void DiaNv9Usb_CommandReadingThread(void * devicePtr, int size, char * buf);
 void DiaDevice_SetDriver(DiaDevice *device, void (*IncomingDataHandler)(void * specificDriver, int buffer_size, char * buffer), void  * incomingDataObject);

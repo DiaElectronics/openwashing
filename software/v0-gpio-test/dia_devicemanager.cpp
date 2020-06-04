@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "dia_nv9usb.h"
 #include <wiringPi.h>
+#include "dia_ccnet.h"
 
 
 void DiaDeviceManager_StartDeviceScan(DiaDeviceManager * manager)
@@ -23,24 +24,37 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
     pthread_mutex_lock(&(manager->_DevicesLock));
 
     int devInList = 0;
-    for (std::list<DiaDevice*>::iterator it=manager->_Devices.begin(); it != manager->_Devices.end(); ++it)
-    {
-        if(strcmp(PortName, (*it)->_PortName ) == 0)
-        {
+    for (std::list<DiaDevice*>::iterator it=manager->_Devices.begin(); it != manager->_Devices.end(); ++it) {
+        if(strcmp(PortName, (*it)->_PortName ) == 0) {
             devInList = 1;
             (*it)->_CheckStatus = DIAE_DEVICE_STATUS_IN_LIST;
         }
     }
-    if(!devInList)
-    {
+    if(!devInList) {
         DiaDevice * dev = new DiaDevice(PortName);
         dev->Manager = manager;
         dev->_CheckStatus = DIAE_DEVICE_STATUS_JUST_ADDED;
-        printf("found nv9\n");
-        DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
-        DiaNv9Usb_StartDriver(newNv9);
-        DiaNv9Usb_TurnOn(newNv9);
-        manager->_Devices.push_back(dev);
+        int err = dev->Open();
+        if (!err) {
+            if (strstr(dev->_PortName, "ttyACM")) {
+                DiaDevice_StartDeviceThread(dev);
+                printf("found nv9\n");
+                DiaNv9Usb * newNv9 = new DiaNv9Usb(dev, DiaDeviceManager_ReportMoney);
+                DiaNv9Usb_StartDriver(newNv9);
+                DiaNv9Usb_TurnOn(newNv9);
+            } else {
+                // let's check CCNET here
+                DiaCcnet * ccnet = new DiaCcnet(dev, DiaDeviceManager_ReportMoney);
+                if (ccnet->IsCcnet()) {
+                    ccnet->Run();
+                } else {
+                    delete ccnet;
+                }
+            }
+            manager->_Devices.push_back(dev);
+        } else {
+            delete dev;
+        }
     }
     pthread_mutex_unlock(&(manager->_DevicesLock));
 }
@@ -55,7 +69,7 @@ void DiaDeviceManager_FinishDeviceScan(DiaDeviceManager * manager)
     {
         printf("lst dev: %s\n", (*it)->_PortName);
         if((*it)->_CheckStatus==DIAE_DEVICE_STATUS_INITIAL)
-        {	
+        {
 			DiaDevice * dev = (*it);
 			dev->NeedWorking = 0;
 			dev->_PortName[0] = 0;
@@ -63,7 +77,7 @@ void DiaDeviceManager_FinishDeviceScan(DiaDeviceManager * manager)
             //remove device from the list;
         }
     }
-    
+
     pthread_mutex_unlock(&(manager->_DevicesLock));
 }
 
@@ -80,9 +94,14 @@ void DiaDeviceManager_ScanDevices(DiaDeviceManager * manager)
 	{
         while((entry = readdir(dir))!=NULL)
 		{
-		    //if(strstr(entry->d_name,"ttyUSB")||strstr(entry->d_name,"ttyACM"))
-            if(strstr(entry->d_name,"ttyACM"))
-            {
+		    if(strstr(entry->d_name,"ttyUSB")) {
+                 // this is big range of devices
+                char buf[1024];
+                snprintf(buf, 1023, "/dev/%s", entry->d_name);
+                DiaDeviceManager_CheckOrAddDevice(manager, buf);
+            }
+            if(strstr(entry->d_name,"ttyACM")) {
+                // this is for NV9 only
                 char buf[1024];
                 snprintf(buf, 1023, "/dev/%s", entry->d_name);
                 DiaDeviceManager_CheckOrAddDevice(manager, buf);
@@ -118,4 +137,6 @@ void * DiaDeviceManager_WorkingThread(void * manager)
         DiaDeviceManager_ScanDevices(Manager);
         delay(100);
     }
+    pthread_exit(0);
+    return 0;
 }

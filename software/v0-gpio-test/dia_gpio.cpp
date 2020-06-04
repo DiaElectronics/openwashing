@@ -4,8 +4,6 @@
 #include "dia_gpio.h"
 #include "pthread.h"
 
-//#define BUTTON_ON_IS_3V3
-
 DiaGpio::~DiaGpio()
 {
 
@@ -13,12 +11,12 @@ DiaGpio::~DiaGpio()
 
 int DiaGpio_GetLastKey(DiaGpio * gpio)
 {
-    if(gpio->LastPressedKey>=0)
-    {
-	    int res = gpio->LastPressedKey;
-	    gpio->LastPressedKey = 0;
-	    return res;
+    if(gpio->LastPressedKey>=0) {
+        int res = gpio->LastPressedKey;
+        gpio->LastPressedKey = 0;
+        return res;
     }
+    return 0;
 }
 
 void DiaGpio_TurnLED(DiaGpio * gpio, int lightNumber, int value)
@@ -107,6 +105,17 @@ void DiaGpio_WriteRelay(DiaGpio * gpio, int relayNumber, int value)
     {
         if(relayNumber>=0 && relayNumber<PIN_COUNT && gpio->RelayPin[relayNumber]>=0)
         {
+            if (value == 1) {
+                gpio->RelayOnTime[relayNumber] = gpio->curTime;
+            } else {
+                if (gpio->RelayOnTime[relayNumber]>0) {
+                    long time_elapsed = gpio->curTime - gpio->RelayOnTime[relayNumber];
+                    gpio->Stat.relay_time[relayNumber] = gpio->Stat.relay_time[relayNumber] + time_elapsed;
+                    gpio->Stat.relay_switch[relayNumber] = gpio->Stat.relay_switch[relayNumber] + 1;
+                    gpio->RelayOnTime[relayNumber] = 0;
+                }
+            }
+
             digitalWrite(gpio->RelayPin[relayNumber], value);
             gpio->RelayPinStatus[relayNumber] = value;
         }
@@ -156,44 +165,44 @@ DiaGpio::DiaGpio()
     DiaGpio * gpio = this;
 
     //preliminary wash
-    gpio->Programs[1].Price = 18;
+    gpio->Programs[1].Price = 25;
     DiaGpio_SetProgram(gpio, 1, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 1, 3,  20, 450);
     DiaGpio_SetProgram(gpio, 1, 7,  1000, 0);
     DiaGpio_SetProgram(gpio, 1, 8,  1000, 0);
 
     //Soap
-    gpio->Programs[2].Price = 18;
+    gpio->Programs[2].Price = 25;
     DiaGpio_SetProgram(gpio, 2, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 2, 3,  135, 350);
     DiaGpio_SetProgram(gpio, 2, 7,  1000, 0);
     DiaGpio_SetProgram(gpio, 2, 8,  1000, 0);
 
     //Rinse
-    gpio->Programs[3].Price = 18;
+    gpio->Programs[3].Price = 20;
     DiaGpio_SetProgram(gpio, 3, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 3, 7,  1000, 0);
     DiaGpio_SetProgram(gpio, 3, 8,  1000, 0);
 
     //Wax
-    gpio->Programs[4].Price = 18;
+    gpio->Programs[4].Price = 20;
     DiaGpio_SetProgram(gpio, 4, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 4, 5,  135, 350);
     DiaGpio_SetProgram(gpio, 4, 7,  1000, 0);
     DiaGpio_SetProgram(gpio, 4, 8,  1000, 0);
 
     //Osmosian
-    gpio->Programs[5].Price = 18;
+    gpio->Programs[5].Price = 20;
     DiaGpio_SetProgram(gpio, 5, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 5, 7,  1000, 0);
     DiaGpio_SetProgram(gpio, 5, 8,  1000, 0);
 
     //Pause
-    gpio->Programs[6].Price = 18;
+    gpio->Programs[6].Price = 20;
     DiaGpio_SetProgram(gpio, 6, 8,  1000, 0);
 
     //Soap Premium
-    gpio->Programs[7].Price = 36;
+    gpio->Programs[7].Price = 50;
     DiaGpio_SetProgram(gpio, 7, 1,  1000, 0);
     DiaGpio_SetProgram(gpio, 7, 3,  250, 250);
     DiaGpio_SetProgram(gpio, 7, 7,  1000, 0);
@@ -219,6 +228,9 @@ DiaGpio::DiaGpio()
         ButtonLightMoveTo[i]=0;
         ButtonLightCurrentPosition[i]=0;
         ButtonLightTimeInCurrentPosition[i] = 0;
+        RelayOnTime[i] = 0;
+        Stat.relay_switch[i] = 0;
+        Stat.relay_time[i] = 0;
     }
 
     pthread_create(&WorkingThread, NULL, DiaGpio_WorkingThread, this);
@@ -258,7 +270,7 @@ void DiaGpio_CheckRelays(DiaGpio * gpio, int curTime)
 {
     if(gpio->CurrentProgram<0)
     {
-        if(!gpio->AllTurnedOff )
+        if(!gpio->AllTurnedOff)
         {
             gpio->AllTurnedOff = 1;
             DiaGpio_StopRelays(gpio);
@@ -307,11 +319,7 @@ int DiaGpio_ReadButton(DiaGpio * gpio, int ButtonNumber)
     {
         if(gpio->ButtonPin[ButtonNumber]>=0)
         {
-            #ifdef BUTTON_ON_IS_3V3
             return digitalRead( gpio->ButtonPin[ButtonNumber] );
-            #else
-            return !digitalRead( gpio->ButtonPin[ButtonNumber] );
-            #endif
         }
     }
     return 0;
@@ -435,16 +443,16 @@ void * DiaGpio_WorkingThread(void * gpio)
     }
     Gpio->CoinLoop = 0;
 
-    long curTime = 0;
+    Gpio->curTime = 0;
 
     while(Gpio->NeedWorking)
     {
         delay(1);//This code will run once per ms
-        curTime+=1;
-        DiaGpio_CheckRelays(Gpio, curTime);
+        Gpio->curTime=Gpio->curTime + 1;
+        DiaGpio_CheckRelays(Gpio, Gpio->curTime);
         DiaGpio_CheckCoin(Gpio);
-        DiaGpio_ButtonAnimation(Gpio, curTime);
-        if(curTime % 50 == 0)
+        DiaGpio_ButtonAnimation(Gpio, Gpio->curTime);
+        if(Gpio->curTime % 50 == 0)
         {
             for(int i=0;i<PIN_COUNT;i++)
             {
@@ -467,4 +475,6 @@ void * DiaGpio_WorkingThread(void * gpio)
             }
         }
     }
+    pthread_exit(0);
+    return 0;
 }

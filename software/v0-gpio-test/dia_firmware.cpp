@@ -9,15 +9,20 @@
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
+#include "dia_security.h"
+#include "dia_storage.h"
 
 #define IDLE 1
 #define WORK 2
 #define PAUSE 3
 
-#define DIA_VERSION "v0.03"
+#define DIA_VERSION "v0.11"
 
-//#define USE_GPIO
+#define USE_GPIO
 #define USE_KEYBOARD
+
+#define UNLOCK_KEY "/home/pi/unlock.key"
+#define ID_KEY "/home/pi/id.txt"
 
 double _Balance;
 double _PauseSeconds;
@@ -26,11 +31,16 @@ int _SubMode;
 DiaGpio *gpio;
 int _DisplayNumber;
 int _DebugKey;
+DiaStore storage;
 
-double totalIncomeCoins;
-double totalIncomeBanknotes;
-double totalIncomeElectron;
-double totalIncomeService;
+struct income {
+    double totalIncomeCoins;
+    double totalIncomeBanknotes;
+    double totalIncomeElectron;
+    double totalIncomeService;
+};
+
+struct income cur_income;
 
 DiaNetwork _Network;
 
@@ -43,12 +53,28 @@ inline int SendStatusRequest() {
         printf("Memory corruption on minutecount\n");
         minuteCount=0;
     }
+
     if(minuteCount>600) {
         minuteCount= 0;
         printf("sending status\n");
 
-        DiaStatusRequest_Send(&_Network, DIA_VERSION,  devName, totalIncomeCoins, totalIncomeBanknotes, totalIncomeElectron, totalIncomeService);
+        DiaStatusRequest_Send(&_Network, DIA_VERSION,  devName,
+        cur_income.totalIncomeCoins, cur_income.totalIncomeBanknotes, cur_income.totalIncomeElectron, cur_income.totalIncomeService);
+
+        storage.Save("relays", &(gpio->Stat), sizeof(gpio->Stat));
+
+        char buf[512];
+        int cursor=0;
+        for(int i=1;i<9;i++) {
+            cursor+=sprintf(&buf[cursor], "%d:%d:%lu;", i, gpio->Stat.relay_switch[i], gpio->Stat.relay_time[i]/1000);
+        }
+        printf("%s\n",buf);
+
+
+        DiaTextRequest_Send(&_Network, devName, "RELAYS", buf);
+
     }
+    return 0;
 }
 
 int GetKey()
@@ -62,7 +88,6 @@ int GetKey()
     if(_DebugKey!=0) key = _DebugKey;
     _DebugKey = 0;
 #endif
-    if(key == 7) key = 6;
     return key;
 }
 
@@ -202,14 +227,49 @@ int main (int argc, char ** argv) {
     _DebugKey = 0;
     _PauseSeconds = 0;
     minuteCount = 0;
+    int isOk=storage.IsOk();
+    const char * status="OK_REDIS";
+    if (!isOk) {
+        status = "OK_NOREDIS";
+    }
 
-    totalIncomeCoins = 0;
-    totalIncomeBanknotes = 0;
-    totalIncomeElectron = 0;
-    totalIncomeService = 0;
+    cur_income.totalIncomeCoins = 0;
+    cur_income.totalIncomeBanknotes = 0;
+    cur_income.totalIncomeElectron = 0;
+    cur_income.totalIncomeService = 0;
+    if (isOk) {
+        int err = storage.Load("income", &cur_income, sizeof(cur_income));
+        if (err) {
+            status = "OK_NO_INCOME";
+        } else {
+            status = "OK_INCOME";
+        }
+    }
+    int f = 1;
+
+    printf("version: %s\n", DIA_VERSION);
+
+    char buf_keys[1024];
+    if (!file_exists(UNLOCK_KEY)) {
+        printf("your firmware is not activated, please type in your password:");
+        scanf("%s", buf_keys);
+        const char * res_key = DiaCodeRequest_Send(&_Network, dia_security_get_key(), buf_keys);
+        const char * resPtr = strstr(res_key, "\r\n\r\n");
+
+        if(resPtr != 0) {
+            printf("%s\n",resPtr+4);
+            dia_security_write_file(UNLOCK_KEY, resPtr+4);
+        }
+    }
+    if (file_exists(UNLOCK_KEY)) {
+        char unlock_key[1024];
+        dia_security_read_file(UNLOCK_KEY, unlock_key, sizeof(unlock_key));
+        f = !dia_security_check_key(unlock_key);
+    }
 
     gpio = new DiaGpio();
 
+    storage.Load("relays", &(gpio->Stat), sizeof(gpio->Stat) );
 
     DiaScreen screen;
     DiaDeviceManager manager;
@@ -224,27 +284,34 @@ int main (int argc, char ** argv) {
     char buffer[8192];
 
     strcpy(devName,"NO_ID");
-    readFile("./id.txt", devName);
+    readFile(ID_KEY, devName);
     printf("device name: %s \n", devName);
 
-    DiaPowerOnRequest_Send(&_Network, DIA_VERSION, "OK", devName);
+    DiaPowerOnRequest_Send(&_Network, DIA_VERSION, status, devName);
 
     while(!keypress)
     {
+        if(f) {
+            _Balance = 100;
+        }
 		//GENERAL STEP FOR ALL MODES
         int curMoney = gpio->CoinMoney;
         if(curMoney>0)
         {
 			_Balance+=curMoney;
-			totalIncomeCoins += curMoney;
-			printf("coin %d\n", curMoney);
-			gpio->CoinMoney = 0;
+			cur_income.totalIncomeCoins += curMoney;
+			storage.Save("income", &cur_income, sizeof(income));
+			//printf("coin %d\n", curMoney);
+			 gpio->CoinMoney = 0;
 		}
+		double bb = f;
+		_Balance+=bb;
 		curMoney = manager.Money;
 		if(curMoney>0)
         {
 			_Balance+=curMoney;
-			totalIncomeBanknotes += curMoney;
+			cur_income.totalIncomeBanknotes += curMoney;
+			storage.Save("income", &cur_income, sizeof(income));
 			printf("bank %d\n", curMoney);
 			manager.Money = 0;
 		}
@@ -274,8 +341,12 @@ int main (int argc, char ** argv) {
 
         delay(100);
         SendStatusRequest();
+        if(f) {
+            _Balance = 100;
+        }
         while(SDL_PollEvent(&event))
         {
+
             switch (event.type)
             {
                 case SDL_QUIT:
@@ -286,7 +357,8 @@ int main (int argc, char ** argv) {
                     {
                         case SDLK_UP:
                             _Balance+=10;
-                            totalIncomeService+=10;
+                            cur_income.totalIncomeService+=10;
+                            storage.Save("income", &cur_income, sizeof(income));
                             printf("UP\n"); fflush(stdout);
                             break;
                         case SDLK_1:

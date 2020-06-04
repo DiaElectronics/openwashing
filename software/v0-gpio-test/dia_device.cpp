@@ -9,28 +9,23 @@
 #include <errno.h>
 
 
-DiaDevice::DiaDevice(char *portName)
-{
+DiaDevice::DiaDevice(char *portName) {
     _Buf[0] = 0;
     NeedWorking = 1;
     _PortName = strdup(portName);
     IncomingDataHandler = NULL;
     IncomingDataObject = NULL;
-    DiaDevice_StartDevice(this);
 }
 
 DiaDevice::~DiaDevice()
 {
-    if(_PortName!=NULL)
-    {
+    if(_PortName!=NULL) {
         free(_PortName);
     }
-    if(_DeviceDataEvent!=NULL)
-	{
+    if(_DeviceDataEvent!=NULL) {
 		event_free(_DeviceDataEvent);
 	}
-	if(_DeviceEventBase!=NULL)
-	{
+	if(_DeviceEventBase!=NULL) {
   		event_base_free(_DeviceEventBase);
 	}
 }
@@ -98,13 +93,6 @@ int DiaDevice_SetPortBlocking (int fd, int should_block)
 void * DiaDevice_CommunicationThread(void * devicePtr)
 {
     DiaDevice * device = (DiaDevice*) devicePtr;
-    int err = DiaDevice_OpenPort(device, B300);
-    if(err!=0)
-    {
-        device->ToBeDeleted = 1;
-        printf("port %s can't be opened", device->_PortName);
-        pthread_exit(NULL);
-    }
 
     while(device->NeedWorking)
     {
@@ -124,7 +112,17 @@ void * DiaDevice_CommunicationThread(void * devicePtr)
     pthread_exit(NULL);
 }
 
-int DiaDevice_StartDevice(DiaDevice * device)
+int DiaDevice::Open() {
+    int err = DiaDevice_OpenPort(this, B9600);
+    if(err!=0) {
+        this->ToBeDeleted = 1;
+        printf("can't open port:%s\n", this->_PortName);
+        return 1;
+    }
+    return 0;
+}
+
+int DiaDevice_StartDeviceThread(DiaDevice * device)
 {
     int err = pthread_create(&(device->DeviceCommunicationThread), NULL, &DiaDevice_CommunicationThread, (void *)device);
     if (err != 0)
@@ -148,12 +146,10 @@ int DiaDevice_ReadPortBytes(DiaDevice * device)
 {
     device->_Buf[0]=0;
     int n = read(device->_handler, device->_Buf, sizeof(device->_Buf)-1);
-    if(n <= 0)
-    {
+    if(n <= 0) {
         return -1;
     }
-    else
-    {
+    else {
         device->_Bytes_Read = n;
         device->_Buf[n] = 0;
         return n;

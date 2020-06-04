@@ -17,12 +17,19 @@
 #include <pthread.h>
 
 #include "dia_relayconfig.h"
+struct relay_stat {
+    long relay_time[PIN_COUNT];
+    int relay_switch[PIN_COUNT];
+};
+
 class DiaGpio
 {
 public:
 	int AnimationCode;
 	int AnimationSubCode;
+	relay_stat Stat;
 
+    long curTime;
     int LastPressedKey;
     int InitializedOk;
     int ButtonPin[PIN_COUNT];
@@ -33,6 +40,8 @@ public:
     int ButtonLightPinStatus[PIN_COUNT];
     int RelayPin[PIN_COUNT];
     int RelayPinStatus[PIN_COUNT];
+    long RelayOnTime[PIN_COUNT];
+
     int NeedWorking;
     int CoinMoney;
     int CoinStatus[COIN_TOTAL];

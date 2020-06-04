@@ -36,13 +36,11 @@ void * DiaNetwork_ThreadWorker(void * DiaNetworkObject) {
     DiaRequest **currentRequest;
     currentRequest = (DiaRequest **)malloc(sizeof(void *));
     while(!network->ToBeDestroyed) {
-        printf("ch.pop?\n");
         network->RequestsChannel->Pop(currentRequest, true);
-        printf("ch.pop!\n");
         DiaRequest * requestLink = *currentRequest;
         if (requestLink != NULL) {
-            DiaNetwork_SendRequest(network, requestLink);
-            printf("Request:%s\n", requestLink->RequestBuffer);
+            DiaNetwork_SendRequest(network, requestLink,0,0);
+            //printf("Request:%s\n", requestLink->RequestBuffer);
             delete requestLink;
         }
     }
@@ -51,7 +49,7 @@ void * DiaNetwork_ThreadWorker(void * DiaNetworkObject) {
     return NULL;
 }
 
-int DiaNetwork_SendRequest(DiaNetwork * network, DiaRequest * request) {
+int DiaNetwork_SendRequest(DiaNetwork * network, DiaRequest * request, char * response, int response_size) {
     if (request == NULL) {
         return DIA_ERR_NULL_REQUEST;
     };
@@ -119,7 +117,9 @@ int DiaNetwork_SendRequest(DiaNetwork * network, DiaRequest * request) {
     close(sockfd);
 
     /* process response */
-    printf("Response:\n%s\n",request->Response);
-
-
+    //printf("Response:\n%s\n",request->Response);
+    if(response!=0) {
+        strncpy(response, request->Response, response_size );
+    }
+    return 0;
 }
