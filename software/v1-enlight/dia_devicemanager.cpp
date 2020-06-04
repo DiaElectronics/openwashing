@@ -8,6 +8,7 @@
 #include "dia_nv9usb.h"
 #include "dia_microcoinsp.h"
 #include "dia_cardreader.h"
+#include "dia_ccnet.h"
 #include <wiringPi.h>
 #include <stdexcept>
 #include "money_types.h"
@@ -162,14 +163,21 @@ void DiaDeviceManager_CheckOrAddDevice(DiaDeviceManager *manager, char * PortNam
             dev->Open();
 
             int res = DiaMicroCoinSp_Detect(dev);
-            if (res)
-            {
+            if (res) {
                 printf("\nFound MicroCoinSp on port %s\n\n", PortName);
                 DiaMicroCoinSp * newMicroCoinSp = new DiaMicroCoinSp(dev, DiaDeviceManager_ReportMoney);
                 DiaMicroCoinSp_StartDriver(newMicroCoinSp);
                 manager->_Devices.push_back(dev);
             } else {
-                printf("MicroCoinSp check failed\n");
+                res = DiaCcnet_Detect(dev);
+                if (res) {
+                    printf("\nFound CCNET device on port %s\n\n", PortName);
+                    DiaCcnet * newCcnet = new DiaCcnet(dev, DiaDeviceManager_ReportMoney);
+                    DiaCcnet_StartDriver(newCcnet);
+                    manager->_Devices.push_back(dev);
+                } else {
+                    printf("\nNo devices found on port %s\n", PortName);
+                }
             }
         }
     }

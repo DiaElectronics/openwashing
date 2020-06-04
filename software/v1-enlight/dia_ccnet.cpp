@@ -30,32 +30,32 @@ DiaCcnet::DiaCcnet(DiaDevice * device, void (*incomingMoneyHandler)(void * nv9, 
     this->IncomingMoneyHandler = incomingMoneyHandler;
 }
 
-int DiaCcnet::SendCommand(uint8_t *command) {
+int DiaCcnet_SendCommand(DiaDevice * device, uint8_t *command) {
     uint8_t total_length = command[2];
-    return DiaDevice_WritePort(_Device, (const char *)command, total_length);
+    return DiaDevice_WritePort(device, (const char *)command, total_length);
 }
 
-int DiaCcnet::IsCcnet() {
+int DiaCcnet_Detect(DiaDevice * device) {
     printf("is_ccnet\n");
-    SendCommand(ccnet_poll);
+    DiaCcnet_SendCommand(device, ccnet_poll);
     usleep(100*1000);
-    int returned_bytes = DiaDevice_ReadPortBytes(_Device);
+    int returned_bytes = DiaDevice_ReadPortBytes(device);
     printf("ccnet returned %d bytes\n", returned_bytes);
     return returned_bytes > 3;
 }
 
-int DiaCcnet::GetCode(uint8_t * buffer, int bytes_read) {
+int DiaCcnet_GetCode(uint8_t * buffer, int bytes_read) {
     if (bytes_read<4) {
         return -1;
     }
     return buffer[3];
 }
-int DiaCcnet::SendCcnetAndReadAnswerCode(uint8_t* buffer) {
+int DiaCcnet_SendCcnetAndReadAnswerCode(DiaDevice * device, uint8_t* buffer) {
     assert(buffer);
-    SendCommand(buffer);
+    DiaCcnet_SendCommand(device, buffer);
     usleep(100000);
-    int bytes_read = DiaDevice_ReadPortBytes(_Device);
-    int code = GetCode((uint8_t*)_Device->_Buf, bytes_read);
+    int bytes_read = DiaDevice_ReadPortBytes(device);
+    int code = DiaCcnet_GetCode((uint8_t*)device->_Buf, bytes_read);
     printf("code=%d\n", code);
     return code;
 }
@@ -68,7 +68,7 @@ void * DiaCcnet_Thread(void * args) {
     assert(args);
     DiaCcnet * ccnet_device = (DiaCcnet *)args;
     while(ccnet_device->_Device->NeedWorking) {
-        int code = ccnet_device->SendCcnetAndReadAnswerCode(ccnet_poll);
+        int code = DiaCcnet_SendCcnetAndReadAnswerCode(ccnet_device->_Device, ccnet_poll);
         if (code<0) {
             printf("error sending to ccnet_device");
         }
@@ -106,7 +106,7 @@ void * DiaCcnet_Thread(void * args) {
             printf("unknown bancknote %d\n", banknote);
                 break;
             }
-            ccnet_device->SendCommand(ccnet_ack);
+            DiaCcnet_SendCommand(ccnet_device->_Device, ccnet_ack);
             if(new_money >0) {
                 if (ccnet_device->IncomingMoneyHandler){
                     ccnet_device->IncomingMoneyHandler(ccnet_device->_Device->Manager, 0, new_money);
@@ -121,9 +121,9 @@ void * DiaCcnet_Thread(void * args) {
     return 0;
 }
 
-int DiaCcnet::Run() {
-    StartDevice();
-    return pthread_create(&MainThread, NULL, DiaCcnet_Thread, this);
+int DiaCcnet_StartDriver(DiaCcnet * banknoteAcceptor) {
+    banknoteAcceptor->StartDevice();
+    return pthread_create(&banknoteAcceptor->MainThread, NULL, DiaCcnet_Thread, banknoteAcceptor);
 }
 
 DiaCcnet::~DiaCcnet() {
@@ -133,19 +133,19 @@ DiaCcnet::~DiaCcnet() {
 int DiaCcnet::StartDevice() {
     // RESET
     printf("reset>>\n");
-    if (SendCcnetAndReadAnswerCode(ccnet_reset)<0) return 10;
+    if (DiaCcnet_SendCcnetAndReadAnswerCode(this->_Device, ccnet_reset)<0) return 10;
 
     printf("poll>>\n");
-    if (SendCcnetAndReadAnswerCode(ccnet_poll)<0) return 20;
+    if (DiaCcnet_SendCcnetAndReadAnswerCode(this->_Device, ccnet_poll)<0) return 20;
 
     printf("identif>>\n");
-    if (SendCcnetAndReadAnswerCode(ccnet_identif)<0) return 30;
+    if (DiaCcnet_SendCcnetAndReadAnswerCode(this->_Device, ccnet_identif)<0) return 30;
 
     printf("poll>>\n");
-    if (SendCcnetAndReadAnswerCode(ccnet_poll)<0) return 40;
+    if (DiaCcnet_SendCcnetAndReadAnswerCode(this->_Device, ccnet_poll)<0) return 40;
 
     printf("enable>>\n");
-    if (SendCcnetAndReadAnswerCode(ccnet_enable)<0) return 50;
+    if (DiaCcnet_SendCcnetAndReadAnswerCode(this->_Device, ccnet_enable)<0) return 50;
 
     return 0;
 }

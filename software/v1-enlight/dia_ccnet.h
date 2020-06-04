@@ -20,13 +20,15 @@ class DiaCcnet
 
     DiaCcnet(DiaDevice * device, void (*incomingMoneyHandler)(void * nv9, int moneyType, int newMoney) );
     ~DiaCcnet();
-    int IsCcnet();
-    int SendCommand(uint8_t *command);
-    int SendCcnetAndReadAnswerCode(uint8_t* buffer);
+    
     int StartDevice();
-    int GetCode(uint8_t * buffer, int bytes_read);
     int GetBanknoteCode();
-    int Run();
 };
+
+int DiaCcnet_StartDriver(DiaCcnet * banknoteAcceptor);
+int DiaCcent_GetCode(uint8_t * buffer, int bytes_read);
+int DiaCcnet_SendCcnetAndReadAnswerCode(DiaDevice * device, uint8_t* buffer);
+int DiaCcnet_SendCommand(DiaDevice * device, uint8_t *command);
+int DiaCcnet_Detect(DiaDevice * device);
 
 #endif
