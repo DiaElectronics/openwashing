@@ -7,6 +7,14 @@
         "size":"1920;1080",
         "src":"pic/2/background_wait_card.png",
         "visible":"true"
+      },
+      {
+        "id":"logo",
+        "type":"image",
+        "position":"50;5",
+        "size":"144;60",
+        "src":"pic/logo.png",
+        "visible":"true"
       }
     ]
   }

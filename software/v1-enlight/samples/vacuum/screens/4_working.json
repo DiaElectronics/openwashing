@@ -9,6 +9,14 @@
         "visible":"true"
       },
       {
+        "id":"logo",
+        "type":"image",
+        "position":"50;5",
+        "size":"144;60",
+        "src":"pic/logo.png",
+        "visible":"true"
+      },
+      {
         "id":"balance_background",
         "type":"image",
         "position": "368;36",
