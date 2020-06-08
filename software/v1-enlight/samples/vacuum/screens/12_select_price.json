@@ -4,18 +4,17 @@
         "id":"background",
         "type":"image",
         "position": "0;0",
-        "size":"1920;1080",
-        "src":"pic/thanks.png",
-        "visible":"true",
-        "click_id":"1"
+        "size":"848;480",
+        "src":"pic/2/background_select_price.png",
+        "visible":"true"
       },
       {
-        "id":"delay_seconds",
+        "id":"balance",
         "type": "digits",
-        "position": "630;472",
+        "position": "383;73",
         "font": "standard_number",
-        "symbol_size":"75;108",
-        "padding": "2",
+        "symbol_size":"110;180",
+        "padding": "3",
         "length": "3",
         "visible":"true"
       }

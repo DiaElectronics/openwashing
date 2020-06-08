@@ -4,7 +4,7 @@
         "id":"background",
         "type":"image",
         "position": "0;0",
-        "size":"1920;1080",
+        "size":"848;480",
         "src":"pic/thanks.png",
         "visible":"true",
         "click_id":"1"
@@ -12,9 +12,9 @@
       {
         "id":"delay_seconds",
         "type": "digits",
-        "position": "630;472",
+        "position": "278;209",
         "font": "standard_number",
-        "symbol_size":"75;108",
+        "symbol_size":"33;48",
         "padding": "2",
         "length": "3",
         "visible":"true"

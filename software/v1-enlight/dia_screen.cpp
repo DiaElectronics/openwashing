@@ -16,7 +16,10 @@ DiaScreen::DiaScreen(int resX, int resY, int hideCursor, int fullScreen) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0 ) return;
     //printf("SDLInit finished properly, SDLShowCursor started\n"); fflush(stdout);
     if (hideCursor) {
-        SDL_ShowCursor(SDL_DISABLE); 
+        SDL_Cursor* cursor;
+        int32_t cursorData[2] = {0,0};
+        cursor = SDL_CreateCursor((uint8_t *)cursorData, (uint8_t *)cursorData, 8, 8, 4, 4);
+        SDL_SetCursor(cursor);
     }
     //printf("SDLShowCursor_2\n"); fflush(stdout);
 	//printf("trying to set a video mode \n"); fflush(stdout);
@@ -24,13 +27,15 @@ DiaScreen::DiaScreen(int resX, int resY, int hideCursor, int fullScreen) {
     //if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_HWSURFACE))) {  
     int additionalOption = 0;
     if (fullScreen) {
-        additionalOption = SDL_FULLSCREEN | SDL_NOFRAME;
-    } 
-	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, additionalOption|SDL_HWSURFACE))) {
-        printf("Cant set your videomode\n");
-        SDL_Quit();
-        InitializedOk = SDL_INIT_ERROR;
-        return;
+        additionalOption = SDL_FULLSCREEN;
+    }    
+	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, additionalOption|SDL_NOFRAME|SDL_HWSURFACE))) {
+        printf("Cant set your videomode, attempt #2, without fullscreen\n");
+    	if (!(Canvas = SDL_SetVideoMode(resX, resY, DEPTH, SDL_NOFRAME|SDL_HWSURFACE))) {
+            SDL_Quit();
+            InitializedOk = SDL_INIT_ERROR;
+            return;
+        }
     }
     printf("video mode is set properly \n"); fflush(stdout);
 	delay(100);

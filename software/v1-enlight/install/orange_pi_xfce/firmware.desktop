@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=firmware
+Comment=firmware to run
+Exec=/home/pi/run.sh
+Terminal=true
+Type=Application

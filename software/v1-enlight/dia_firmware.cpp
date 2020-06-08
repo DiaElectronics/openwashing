@@ -648,15 +648,15 @@ int main(int argc, char ** argv) {
         int y = 0;
         SDL_GetMouseState(&x, &y);
 
-        //printf("\n\n\n");
-        //printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
+        printf("\n\n\n");
+        printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
 
         // Process pressed button
         DiaScreen* screen = config->GetScreen();
         std::string last = screen->LastDisplayed;
 
-        //printf("LAST DISPLAYED: %s\n", last.c_str());
-        //printf("CLICKABLE OBJECTS: %s\n", last.c_str());
+        printf("LAST DISPLAYED: %s\n", last.c_str());
+        printf("CLICKABLE OBJECTS: %s\n", last.c_str());
 
         for (auto it = config->ScreenConfigs[last]->clickAreas.begin(); it != config->ScreenConfigs[last]->clickAreas.end(); ++it) {
             if (x >= (*it).X && x <= (*it).X + (*it).Width && y >= (*it).Y && y <= (*it).Y + (*it).Height && mousepress == 1) {
@@ -666,7 +666,7 @@ int main(int argc, char ** argv) {
                 printf("DEBUG KEY = %d\n", _DebugKey);    
             }
         }
-        //printf("\n\n\n");
+        printf("\n\n\n");
         
         while(SDL_PollEvent(&event))
         {
