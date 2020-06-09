@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "dia_device.h"
+#include "money_types.h"
 #include <assert.h>
 
 uint8_t ccnet_test_cmd[] = {0x02, 0x03, 0x06, 0x20, 0xDA, 0x81};
@@ -21,7 +22,7 @@ enum responseCode {PowerUp = 0x10, Initialize = 0x13, Idling = 0x14, Accepting =
 			JamInAcceptor = 0x43, JamInStacker = 0x44, Cheated = 0x45, Error = 0x47, Escrow = 0x80, Stacked = 0x81,
 			Returned = 0x82};
 
-enum bill {rub_10 = 2, rub_50 = 3, rub_100 = 4, rub_500 = 5, rub_1000 = 6, rub_5000 = 7, rub_200=12, rub_2000=13};
+enum bill {rub_10 = 2, rub_50 = 3, rub_100 = 4, rub_500 = 5, rub_1000 = 6, rub_5000 = 7, rub_1_m = 8, rub_2_m=9, rub_5_m=10,rub_10_m=11, rub_200=12, rub_2000=13};
 
 DiaCcnet::DiaCcnet(DiaDevice * device, void (*incomingMoneyHandler)(void * nv9, int moneyType, int newMoney) ){
     _Device = device;
@@ -73,10 +74,27 @@ void * DiaCcnet_Thread(void * args) {
             printf("error sending to ccnet_device");
         }
         if (code == Stacked) {
+            int curMoneyType = DIA_BANKNOTES;
             int banknote = ccnet_device->GetBanknoteCode();
             int new_money = 0;
             switch (banknote)
             {
+            case rub_1_m:
+                new_money = 1;
+                curMoneyType = DIA_COINS;
+                break;
+            case rub_2_m:
+                new_money = 2;
+                curMoneyType = DIA_COINS;
+                break;
+            case rub_5_m:
+                new_money = 5;
+                curMoneyType = DIA_COINS;
+                break;
+            case rub_10_m:
+                new_money = 10;
+                curMoneyType = DIA_COINS;
+                break;
             case rub_10:
                 new_money = 10;
                 break;
@@ -109,7 +127,7 @@ void * DiaCcnet_Thread(void * args) {
             DiaCcnet_SendCommand(ccnet_device->_Device, ccnet_ack);
             if(new_money >0) {
                 if (ccnet_device->IncomingMoneyHandler){
-                    ccnet_device->IncomingMoneyHandler(ccnet_device->_Device->Manager, 0, new_money);
+                    ccnet_device->IncomingMoneyHandler(ccnet_device->_Device->Manager, curMoneyType, new_money);
                 } else {
                     printf("Can't report money :( \n");
                 }
