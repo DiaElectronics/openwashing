@@ -5,6 +5,9 @@ setup = function()
     -- global variables
     balance = 0.0
 
+    -- program to turn on when user paid money but has not selected a program
+    default_paid_program = 6
+
     min_electron_balance = 50
     max_electron_balance = 900
     electron_amount_step = 25
@@ -234,13 +237,14 @@ end
 
 program_mode = function(working_mode)
   sub_mode = working_mode - mode_work
-  run_program(sub_mode)
   show_working(sub_mode, balance)
   
   if sub_mode == 0 then
+    run_program(default_paid_program)
     balance_seconds = free_pause_seconds
     turn_light(0, animation.intense)
   else
+    run_program(sub_mode)
     turn_light(sub_mode, animation.one_button)
   end
   
