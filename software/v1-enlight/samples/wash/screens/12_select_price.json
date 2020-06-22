@@ -9,6 +9,42 @@
         "visible":"true"
       },
       {
+        "id":"plus",
+        "type":"image",
+        "position": "0;660",
+        "size":"353;420",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"1"
+      },
+      {
+        "id":"minus",
+        "type":"image",
+        "position": "353;660",
+        "size":"307;420",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"2"
+      },
+      {
+        "id":"return",
+        "type":"image",
+        "position": "660;660",
+        "size":"353;420",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"3"
+      },
+      {
+        "id":"accept",
+        "type":"image",
+        "position": "1400;660",
+        "size":"520;420",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"6"
+      },
+      {
         "id":"balance",
         "type": "digits",
         "position": "867;165",

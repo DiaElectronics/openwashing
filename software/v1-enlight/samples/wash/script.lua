@@ -23,7 +23,7 @@ setup = function()
     free_pause_seconds = 120
     wait_card_mode_seconds = 40
     
-    hascardreader = false
+    hascardreader = true
     is_transaction_started = false
     is_waiting_receipt = false
 
@@ -54,7 +54,7 @@ setup = function()
     
     currentMode = mode_welcome
 
-    version = "2.1.0"
+    version = "2.2.0"
 
     printMessage("dia generic wash firmware v." .. version)
     return 0

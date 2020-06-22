@@ -431,10 +431,10 @@ public:
         money_report_data.cashless_total = cashless_total;
         money_report_data.service_total = service_total;
 
-	printf("Sending money report...\n");
+	    printf("Sending money report...\n");
         // Encode data to JSON
         std::string json_money_report_request = json_create_money_report(&money_report_data);
-	printf("JSON:\n%s\n", json_money_report_request.c_str());
+	    printf("JSON:\n%s\n", json_money_report_request.c_str());
         // Send a request
         CreateAndPushEntry(json_money_report_request, "/save-money");
         return 0;

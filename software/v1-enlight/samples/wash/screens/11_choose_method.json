@@ -7,6 +7,24 @@
         "size":"1920;1080",
         "src":"pic/2/background_choose_method.png",
         "visible":"true"
+      },
+      {
+        "id":"cash",
+        "type":"image",
+        "position": "0;0",
+        "size":"960;1080",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"2"
+      },
+      {
+        "id":"card",
+        "type":"image",
+        "position": "960;0",
+        "size":"960;1080",
+        "src":"pic/arrow.png",
+        "visible":"false",
+        "click_id":"5"
       }
     ]
   }
