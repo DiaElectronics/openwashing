@@ -6,7 +6,8 @@
       "position": "0;0",
       "size":"1920;1080",
       "src":"pic/2/background.png",
-      "visible":"true"
+      "visible":"true",
+      "click_id":"1"
     },
     {
       "id":"return_background",
@@ -14,7 +15,8 @@
       "position": "1245;720",
       "size":"543;112",
       "src":"pic/return_background.png",
-      "visible":"false"
+      "visible":"false",
+      "click_id":"2"
     }
   ]
 }
