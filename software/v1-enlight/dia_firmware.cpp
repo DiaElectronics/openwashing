@@ -30,8 +30,8 @@
 
 
 // TODO: must be set via API
-#define COIN_MULTIPLICATOR 1
-#define BANKNOTE_MULTIPLICATOR 10
+#define COIN_MULTIPLICATOR 10
+#define BANKNOTE_MULTIPLICATOR 100
 #define ALLOW_PULSE 1
 // END must be set via API
 

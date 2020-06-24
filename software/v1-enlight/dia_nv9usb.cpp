@@ -93,21 +93,19 @@ int DiaNv9Usb_ProcessCommand(DiaNv9Usb * driver, char currentCommand) {
         driver->CurrentMode = DIA_NV9_DRIVER__MONEY_ON_DEPOSITE;
         int sum=0;
         if(currentCommand == 1) {
-            sum=10;
-        } else if(currentCommand == 2) {
-            sum=50;
-        } else if(currentCommand == 3) {
-            sum=100;
-        } else if(currentCommand == 4) {
             sum=200;
-        } else if(currentCommand == 5) {
-            sum=500;
-        } else if(currentCommand == 6) {
+        } else if(currentCommand == 2) {
+            sum=500;// 50 RUR or 500 KZ
+        } else if(currentCommand == 3) {
             sum=1000;
-        } else if(currentCommand == 7) {
+        } else if(currentCommand == 4) {
             sum=2000;
-        } else if(currentCommand == 8) {
+        } else if(currentCommand == 5) {
             sum=5000;
+        } else if(currentCommand == 6) {
+            sum=10000;
+        } else if(currentCommand == 7) {
+            sum=20000;
         } else {
             sum = currentCommand;
         }

@@ -69,18 +69,18 @@ loop = function()
 end
 
 init_prices = function()
-    price_p[1] = 50
+    price_p[1] = 80
     
-    price_p[2] = 50
+    price_p[2] = 95
     
-    price_p[3] = 50
+    price_p[3] = 70
     
-    price_p[4] = 50
+    price_p[4] = 95
     
-    price_p[5] = 50
+    price_p[5] = 70
     
     price_p[6] = 50
-    price_p[7] = 50
+    price_p[7] = 130
     
     --price_p[7] = get_price("price7")
     --if price_p[7] == 0 then price_p[7] = 18 end
