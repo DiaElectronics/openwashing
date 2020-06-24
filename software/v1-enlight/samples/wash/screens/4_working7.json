@@ -19,7 +19,7 @@
       {
         "id":"p1_ico",
         "type":"image",
-        "position": "75;713",
+        "position": "22;713",
         "size":"249;249",
         "src":"programs/p1/ico.png",
         "visible":"true",
@@ -28,7 +28,7 @@
       {
         "id":"p2_ico",
         "type":"image",
-        "position": "383;713",
+        "position": "293;713",
         "size":"249;249",
         "src":"programs/p2/ico.png",
         "visible":"true", 
@@ -37,7 +37,7 @@
       {
         "id":"p3_ico",
         "type":"image",
-        "position": "688;713",
+        "position": "564;713",
         "size":"249;249",
         "src":"programs/p3/ico.png",
         "visible":"true", 
@@ -46,7 +46,7 @@
       {
         "id":"p4_ico",
         "type":"image",
-        "position": "998;713",
+        "position": "835;713",
         "size":"249;249",
         "src":"programs/p4/ico.png",
         "visible":"true", 
@@ -55,7 +55,7 @@
       {
         "id":"p5_ico",
         "type":"image",
-        "position": "1304;713",
+        "position": "1106;713",
         "size":"249;249",
         "src":"programs/p5/ico.png",
         "visible":"true",
@@ -64,7 +64,7 @@
       {
         "id":"p6_ico",
         "type":"image",
-        "position": "1610;713",
+        "position": "1377;713",
         "size":"249;249",
         "src":"programs/p6/ico.png",
         "visible":"true",
@@ -73,7 +73,7 @@
       {
         "id":"p7_ico",
         "type":"image",
-        "position": "1610;713",
+        "position": "1648;713",
         "size":"249;249",
         "src":"programs/p7/ico.png",
         "visible":"false",

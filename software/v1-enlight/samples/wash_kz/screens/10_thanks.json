@@ -1,0 +1,23 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"pic/thanks.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"delay_seconds",
+        "type": "digits",
+        "position": "630;472",
+        "font": "standard_number",
+        "symbol_size":"75;108",
+        "padding": "2",
+        "length": "3",
+        "visible":"true"
+      }
+    ]
+  }

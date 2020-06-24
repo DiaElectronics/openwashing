@@ -11,15 +11,15 @@
       {
         "id":"balance_background",
         "type":"image",
-        "position": "833;81",
-        "size":"955;524",
+        "position": "633;81",
+        "size":"1155;524",
         "src":"pic/balance.png",
         "visible":"true"
       },
       {
         "id":"p1_ico",
         "type":"image",
-        "position": "75;713",
+        "position": "22;713",
         "size":"249;249",
         "src":"programs/p1/ico.png",
         "visible":"true",
@@ -28,7 +28,7 @@
       {
         "id":"p2_ico",
         "type":"image",
-        "position": "383;713",
+        "position": "293;713",
         "size":"249;249",
         "src":"programs/p2/ico.png",
         "visible":"true", 
@@ -37,7 +37,7 @@
       {
         "id":"p3_ico",
         "type":"image",
-        "position": "688;713",
+        "position": "564;713",
         "size":"249;249",
         "src":"programs/p3/ico.png",
         "visible":"true", 
@@ -46,7 +46,7 @@
       {
         "id":"p4_ico",
         "type":"image",
-        "position": "998;713",
+        "position": "835;713",
         "size":"249;249",
         "src":"programs/p4/ico.png",
         "visible":"true", 
@@ -55,7 +55,7 @@
       {
         "id":"p5_ico",
         "type":"image",
-        "position": "1304;713",
+        "position": "1106;713",
         "size":"249;249",
         "src":"programs/p5/ico.png",
         "visible":"true",
@@ -64,7 +64,7 @@
       {
         "id":"p6_ico",
         "type":"image",
-        "position": "1610;713",
+        "position": "1377;713",
         "size":"249;249",
         "src":"programs/p6/ico.png",
         "visible":"true",
@@ -73,30 +73,30 @@
       {
         "id":"p7_ico",
         "type":"image",
-        "position": "1610;713",
+        "position": "1648;713",
         "size":"249;249",
         "src":"programs/p7/ico.png",
-        "visible":"false",
+        "visible":"true",
         "click_id":"7"
       },
       {
         "id":"balance",
         "type": "digits",
-        "position": "867;166",
+        "position": "655;166",
         "font": "standard_number",
-        "symbol_size":"251;405",
-        "padding": "3",
-        "length": "3",
+        "symbol_size":"240;405",
+        "padding": "1",
+        "length": "4",
         "visible":"true"
       },
       {
         "id":"cur_p",
         "type":"image_array",
-        "position": "158;137",
+        "position": "28;137",
         "size":"494;468",
         "visible":"true",
         "index":"0",
-        "length":"6",
+        "length":"7",
         "sources": [
           {
             "src":"programs/p1/ico.png"
@@ -124,7 +124,7 @@
       {
         "id":"pause_digits",
         "type": "digits",
-        "position": "251;247",
+        "position": "141;247",
         "font": "standard_number",
         "symbol_size":"86;157",
         "padding": "5",

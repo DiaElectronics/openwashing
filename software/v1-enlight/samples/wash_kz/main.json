@@ -62,7 +62,7 @@
     {
       "id": "p6relay",
       "src": "programs/p6/relay.json"
-    }
+    },
     {
       "id": "p7relay",
       "src": "programs/p6/relay.json"
