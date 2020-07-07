@@ -2,7 +2,7 @@
 #define dia_gpio_wiringpi
 
 //DO NOT CHANGE PIN COUNT
-#define PIN_COUNT 9
+#define PIN_COUNT 18
 
 #define COIN_TOTAL 6
 #define COIN_SWITCH 4
@@ -13,6 +13,7 @@
 #define ONE_BUTTON_ANIMATION 1
 #define IDLE_ANIMATION 2
 #define BALANCE_ANIMATION 3
+#define FREEZE_ANIMATION 4
 
 #define DEFAULT_LIGHTING_TIME_MS 500
 #define MAX_PROGRAMS_COUNT 100

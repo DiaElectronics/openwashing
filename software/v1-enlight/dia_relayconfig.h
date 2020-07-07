@@ -1,6 +1,6 @@
 #ifndef dia_relayconfig_wash
 #define dia_relayconfig_wash
-#define PIN_COUNT_CONFIG 9
+#define PIN_COUNT_CONFIG 18
 
 
 class DiaRelayConfig

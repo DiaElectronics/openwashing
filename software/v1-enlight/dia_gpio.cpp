@@ -67,6 +67,13 @@ void DiaGpio_WriteRelay(DiaGpio * gpio, int relayNumber, int value) {
     }
 }
 
+void cleanPins(int * arr, int N) {
+  assert(arr);
+  for (int i=0; i<N; i++) {
+      arr[i] = -1;
+  }
+}
+
 DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     InitializedOk = 0;
     MaxButtons = maxButtons;
@@ -94,7 +101,7 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     CoinsHandler = new PulseHandler(COIN_PIN);
     BanknotesHandler = new PulseHandler(BANKNOTE_PIN);
 
-    ButtonPin[0] = -1;
+    cleanPins(ButtonPin, PIN_COUNT);
     ButtonPin[1] = 13;
     ButtonPin[2] = 14;
     ButtonPin[3] = 21;
@@ -102,9 +109,8 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     ButtonPin[5] = 23;
     ButtonPin[6] = 24;
     ButtonPin[7] = 25;
-    ButtonPin[8] = -1;
 
-    ButtonLightPin[0] = -1;
+    cleanPins(ButtonLightPin, PIN_COUNT);
     ButtonLightPin[1] = 8;
     ButtonLightPin[2] = 9;
     ButtonLightPin[3] = 7;
@@ -112,17 +118,23 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     ButtonLightPin[5] = 2;
     ButtonLightPin[6] = 3;
     ButtonLightPin[7] = 12;
-    ButtonLightPin[8] = -1;
 
-    RelayPin[0] = -1;
+    cleanPins(RelayPin, PIN_COUNT);
     RelayPin[1] = 15; // HighPreasurePump
     RelayPin[2] = 16; // Not USED
     RelayPin[3] = 1; // Soap
     RelayPin[4] = 4; // Wax
     RelayPin[5] = 5; // Pump Station
     RelayPin[6] = 6; // Light
-    RelayPin[7] = -1;
-    RelayPin[8] = -1;
+ 
+    // these pins overwrite button lights
+    RelayPin[11] = 8; 
+    RelayPin[12] = 9; 
+    RelayPin[13] = 7; 
+    RelayPin[14] = 0; 
+    RelayPin[15] = 2; 
+    RelayPin[16] = 3;
+    RelayPin[17] = 12;
 
     for(int i=0;i<PIN_COUNT;i++) {
         if(RelayPin[i] >= 0) {
@@ -272,11 +284,14 @@ void DiaGpio_ButtonAnimation(DiaGpio * gpio, long curTime) {
             }
             DiaGpio_WriteLight(gpio, i, iShouldBeOn);
 		}
-	} else {
+	} else if (gpio->AnimationCode == FREEZE_ANIMATION) {
+    
+  }
+  else {
         for(int i=0;i<PIN_COUNT;i++) {
             DiaGpio_WriteLight(gpio, i, 0);
 		}
-    }
+  }
 }
 
 

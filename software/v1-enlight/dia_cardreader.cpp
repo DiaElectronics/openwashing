@@ -12,7 +12,7 @@
 
 #include "./dia_device.h"
 #include "./money_types.h"
-
+#include <assert.h>
 // Task thread
 // Reads requested money amount and tries to call an executable,
 // which works with card reader hardware
@@ -95,12 +95,16 @@ int DiaCardReader_StopDriver(void * specificDriver) {
     FILE* cmd = popen("pidof -s uic_payment_app", "r");
     int64_t pid = 0;
 
-    fgets(line, 10, cmd);
+    char * res = fgets(line, 10, cmd);
+    assert(res);
     pid = strtoul(line, NULL, 10);
 
     if (pid != 0) {
         std::string kill_line = std::string("kill -INT ") + std::to_string(pid);
-        system(kill_line.c_str());
+        int err = system(kill_line.c_str());
+        if (err) {
+            printf("can't kill cardreader thread %d\n", err);
+        }
     }
 
     pthread_join(driver->ExecuteDriverProgramThread, NULL);
