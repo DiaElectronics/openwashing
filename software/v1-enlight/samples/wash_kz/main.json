@@ -65,7 +65,7 @@
     },
     {
       "id": "p7relay",
-      "src": "programs/p6/relay.json"
+      "src": "programs/p7/relay.json"
     }
   ],
   "script": "script.lua"

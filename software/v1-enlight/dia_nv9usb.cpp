@@ -112,19 +112,21 @@ int sumByCodeKZ(int currentCommand) {
 int sumByCodeRU(int currentCommand) {
     int sum = 0;
     if(currentCommand == 1) {
-        sum=200;
+        sum=10;
     } else if(currentCommand == 2) {
-        sum=500;// 50 RUR or 500 KZ
+        sum=50;
     } else if(currentCommand == 3) {
-        sum=1000;
+        sum=100;
     } else if(currentCommand == 4) {
-        sum=2000;
+        sum=200;
     } else if(currentCommand == 5) {
-        sum=5000;
+        sum=500;
     } else if(currentCommand == 6) {
-        sum=10000;
+        sum=1000;
     } else if(currentCommand == 7) {
-        sum=20000;
+        sum=2000;
+    } else if(currentCommand == 8) {
+        sum=5000;
     } else {
         sum = currentCommand;
     }
@@ -133,27 +135,10 @@ int sumByCodeRU(int currentCommand) {
 
 int DiaNv9Usb_ProcessCommand(DiaNv9Usb * driver, char currentCommand) {
     printf("command: %d \n", (int)currentCommand);
-    if(currentCommand>=1&&currentCommand<=6)
+    if(currentCommand>=1&&currentCommand<=15)
     {
         driver->CurrentMode = DIA_NV9_DRIVER__MONEY_ON_DEPOSITE;
-        int sum=0;
-        if(currentCommand == 1) {
-            sum=200;
-        } else if(currentCommand == 2) {
-            sum=500;// 50 RUR or 500 KZ
-        } else if(currentCommand == 3) {
-            sum=1000;
-        } else if(currentCommand == 4) {
-            sum=2000;
-        } else if(currentCommand == 5) {
-            sum=5000;
-        } else if(currentCommand == 6) {
-            sum=10000;
-        } else if(currentCommand == 7) {
-            sum=20000;
-        } else {
-            sum = currentCommand;
-        }
+        int sum=sumByCodeRU(currentCommand);
         //DiaNv9Usb_SendByte(driver, (char)172);
 
         if(sum>0) {
