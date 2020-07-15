@@ -27,8 +27,8 @@
       "src": "screens/8_thanks.json"
     }
   ],
-  "buttons": 6,
-  "relays": 6,
+  "buttons": 7,
+  "relays": 17,
   "endpoint": "http://app.diae.ru/v0/gql/",
   "programs": [
     {
