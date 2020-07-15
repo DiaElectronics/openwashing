@@ -1,6 +1,7 @@
 -- Wash Firmware
 
 setup = function()
+    turn_light(0, animation.freeze)
     -- change this constant on every post
     post_position = 1     
 

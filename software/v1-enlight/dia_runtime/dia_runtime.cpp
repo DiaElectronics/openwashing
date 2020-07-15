@@ -139,6 +139,10 @@ int DiaRuntime::AddAnimations() {
     lua_pushinteger(Lua, 3);
     lua_settable(Lua, -3);
 
+    lua_pushliteral(Lua, "freeze");
+    lua_pushinteger(Lua, 4);
+    lua_settable(Lua, -3);
+
     lua_setglobal(Lua, "animation");
     return 0;
 }
