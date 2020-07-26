@@ -24,6 +24,7 @@ using namespace luabridge;
 class DiaRuntime {
 public:
     std::string src;
+    std::string incl;
     lua_State* Lua;
     int Setup();
     int Loop();
@@ -34,8 +35,8 @@ public:
     std::list<DiaRuntimeScreen *> all_screens;
     DiaRuntimeHardware * hardware;
     DiaRuntimeRegistry Registry;
-    int Init(std::string folder, json_t * src_json);
-    int Init(std::string folder, std::string src_str);
+    int Init(std::string folder, json_t * src_json, json_t * include_json);
+    int InitStr(std::string folder, std::string src_str, std::string incl_str);
     int AddScreen(DiaRuntimeScreen * screen);
     int AddHardware(DiaRuntimeHardware * hw);
     int AddRegistry(DiaRuntimeRegistry * hw);

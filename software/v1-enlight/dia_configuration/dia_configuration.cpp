@@ -247,7 +247,8 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
         this->_Programs[program->ID] = program;
     }
     json_t * script_json = json_object_get(configuration_json, "script");
-    return GetRuntime()->Init(_Folder, script_json);
+    json_t * include_json = json_object_get(configuration_json, "include");
+    return GetRuntime()->Init(_Folder, script_json, include_json);
 }
 
 DiaConfiguration::~DiaConfiguration() {
