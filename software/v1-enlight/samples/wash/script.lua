@@ -15,7 +15,7 @@ setup = function()
     
     balance_seconds = 0
     kasse_balance = 0.0
-    post_position = 1      
+    post_position = 1
 
     -- constants
     welcome_mode_seconds = 3
@@ -57,6 +57,9 @@ setup = function()
     version = "2.2.0"
 
     printMessage("dia generic wash firmware v." .. version)
+    -- external constants
+    init_constants();
+    welcome:Set("post_number.value", post_position)
     return 0
 end
 

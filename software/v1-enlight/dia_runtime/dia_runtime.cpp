@@ -1,7 +1,7 @@
 #include "dia_runtime.h"
 #include <string>
 
-int DiaRuntime::Init(std::string folder, json_t * src_json) {
+int DiaRuntime::Init(std::string folder, json_t * src_json, json_t * include_json) {
     hardware = 0;
     if(src_json == 0) {
         printf("error: script src is null\n");
@@ -14,18 +14,39 @@ int DiaRuntime::Init(std::string folder, json_t * src_json) {
     }
 
     std::string srcNew = json_string_value(src_json);
+    std::string includeNew = "";
 
-    return Init(folder, srcNew);
+    // Let's do the same with include file
+    if(include_json != 0) {
+        printf("include file is in use\n");
+        if(!json_is_string(include_json)) {
+            printf("error: include json is not string\n");
+            return 1;
+        }
+        includeNew = json_string_value(include_json);
+    }
+
+    
+
+    return InitStr(folder, srcNew, includeNew);
 }
 
 void printMessage(const std::string& s) {
     fprintf(stderr, "%s\n", s.c_str());
 }
 
-int DiaRuntime::Init(std::string folder, std::string src_str) {
+int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string incl_str) {
     src = src_str;
+    incl = incl_str;
     std::string script_body = dia_get_resource(folder.c_str(), src.c_str());
+    std::string include_body = "";
 
+    if (!incl_str.empty()) {
+        include_body = dia_get_resource(folder.c_str(), incl.c_str());
+    }
+
+    script_body += "\n\n";
+    script_body += include_body;
     Lua = luaL_newstate();
     luaL_openlibs(Lua);
 
