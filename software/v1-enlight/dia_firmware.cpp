@@ -650,6 +650,8 @@ int main(int argc, char ** argv) {
     if (configuration.UseLastButtonAsPulse()) {
         assert(configuration.GetGpio());
         DiaGpio_StartAdditionalHandler(configuration.GetGpio());
+    } else {
+        printf("no addtional handler\n");
     }
 
     while(!keypress)
