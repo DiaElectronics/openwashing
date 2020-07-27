@@ -163,7 +163,7 @@ int get_coins(void *object) {
 
   if (ALLOW_PULSE && config) {
     DiaGpio *g = config->GetGpio();
-    if (g) {
+    if (g && g->AdditionalHandler) {
       gpioCoinAdditional = COIN_MULTIPLICATOR * g->AdditionalHandler->Money;
       g->AdditionalHandler->Money = 0;
     }
@@ -645,6 +645,12 @@ int main(int argc, char ** argv) {
 
     // Call Lua setup function
     configuration.GetRuntime()->Setup();
+
+    // using button as pulse is a crap obviously
+    if (configuration.UseLastButtonAsPulse()) {
+        assert(configuration.GetGpio());
+        DiaGpio_StartAdditionalHandler(configuration.GetGpio());
+    }
 
     while(!keypress)
     {
