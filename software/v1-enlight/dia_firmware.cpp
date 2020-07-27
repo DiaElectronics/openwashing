@@ -648,10 +648,11 @@ int main(int argc, char ** argv) {
 
     // using button as pulse is a crap obviously
     if (configuration.UseLastButtonAsPulse()) {
+        printf("enabling additional coin handler\n");
         assert(configuration.GetGpio());
         DiaGpio_StartAdditionalHandler(configuration.GetGpio());
     } else {
-        printf("no addtional handler\n");
+        printf("no additional coin handler\n");
     }
 
     while(!keypress)
