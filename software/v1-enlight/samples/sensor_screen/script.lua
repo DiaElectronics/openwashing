@@ -98,7 +98,7 @@ init_prices = function()
     if price_p[6] == 0 then price_p[6] = 18 end
 end
 
-run_mode = function(new_mode)   
+run_mode = function(new_mode)
     if new_mode == mode_start then return start_mode() end
     if new_mode == mode_cash then return cash_mode() end
     if new_mode == mode_enter_price then return enter_price_mode() end
@@ -119,6 +119,11 @@ start_mode = function()
         animate_start_cash_button()
         return mode_cash
     end
+
+    if balance > 0.9 then 
+        return mode_cash
+    end
+
     --if pressed_key == 2 then
     --    animate_start_card_button()
     --    return mode_enter_price
@@ -615,7 +620,8 @@ run_pause = function()
 end
 
 run_stop = function()
-    run_program(program.stop)
+    if balance>0.9 then run_pause() end
+    if balance<=0.9 then run_program(program.stop) end
 end
 
 run_program = function(program_num)
