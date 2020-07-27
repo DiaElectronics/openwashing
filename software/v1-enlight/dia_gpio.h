@@ -70,8 +70,9 @@ public:
       if(curSwitchedOnPins<(COIN_TOTAL-COIN_SWITCH)) Status_ = 0;
     } else {
       if(curSwitchedOnPins>COIN_SWITCH) {
-          Money++;
-          Status_ = 1;
+        printf("coin handler worked on pin [%d]\n", PinNumber);
+        Money++;
+        Status_ = 1;
       }
     }
   }

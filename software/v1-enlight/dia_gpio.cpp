@@ -177,8 +177,9 @@ void DiaGpio_StartAdditionalHandler(DiaGpio *gpio) {
   for (int i = PIN_COUNT - 1;i>=0;i--) {
     if (gpio->ButtonPin[i]>=0) {
       foundPin = gpio->ButtonPin[i];
+      printf("starting additional handler on [%d] pin of index [%d]\n", foundPin, i);
       break;
-    }    
+    }
   }
   if(foundPin >=0 ) {
     gpio->AdditionalHandler = new PulseHandler(foundPin);
