@@ -199,7 +199,7 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
 
     _LastButtonPulse = 0;
     json_t *last_button_pulse_json = json_object_get(configuration_json, "last_button_pulse");
-    if (!last_button_pulse_json) {
+    if (last_button_pulse_json) {
         if(json_is_boolean(last_button_pulse_json)) {
             _LastButtonPulse = json_boolean_value(last_button_pulse_json);
         } else if (json_is_integer(last_button_pulse_json)) {
