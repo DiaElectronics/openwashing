@@ -207,7 +207,6 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
         }
     }
 
-
     // Let's unpack relays #
     json_t *relays_json = json_object_get(configuration_json, "relays");
     if(!json_is_integer(relays_json)) {

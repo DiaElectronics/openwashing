@@ -1,6 +1,11 @@
 {
   "relays": [
     {
+      "id":1,
+      "ontime":90,
+      "offtime":30
+    },
+    {
       "id":11
     },
     {

@@ -1,7 +1,12 @@
 {
   "relays": [
     {
-      "id":2
+      "id":1,
+      "ontime":60,
+      "offtime":30
+    },
+    {
+      "id":5
     },
     {
       "id":12
