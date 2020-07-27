@@ -78,6 +78,9 @@ public:
         return _Endpoint;
     }
     
+    int UseLastButtonAsPulse() {
+        return _LastButtonPulse;
+    }
     income_t _Income;
     
     private:
@@ -97,6 +100,7 @@ public:
     int _ButtonsNumber;
     int _RelaysNumber;
     
+    int _LastButtonPulse;
     int InitFromFile();
     int InitFromString(const char * configuration_json);// never ever is going to be virtual
     int InitFromJson(json_t * configuration_json); //never ever virtual

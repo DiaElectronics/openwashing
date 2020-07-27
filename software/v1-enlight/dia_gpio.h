@@ -70,8 +70,8 @@ public:
       if(curSwitchedOnPins<(COIN_TOTAL-COIN_SWITCH)) Status_ = 0;
     } else {
       if(curSwitchedOnPins>COIN_SWITCH) {
-          Money++;
-          Status_ = 1;
+        Money++;
+        Status_ = 1;
       }
     }
   }
@@ -110,6 +110,7 @@ public:
 
     PulseHandler * CoinsHandler;
     PulseHandler * BanknotesHandler;
+    PulseHandler * AdditionalHandler;
 
     int CurrentProgram;
     int AllTurnedOff;
@@ -137,6 +138,8 @@ void DiaGpio_WriteLight(DiaGpio * gpio, int relayNumber, int value);
 void DiaGpio_SetProgram(DiaGpio * gpio, int programNumber, int relayNumber,  int onTime, int offTime);
 void DiaGpio_StopRelays(DiaGpio * gpio);
 int DiaGpio_ReadButton(DiaGpio * gpio, int ButtonNumber);
+
+void DiaGpio_StartAdditionalHandler(DiaGpio *gpio);
 
 void DiaGpio_Test(DiaGpio * gpio);
 void * DiaGpio_WorkingThread(void * gpio);
