@@ -194,6 +194,20 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
 
     _ButtonsNumber = json_integer_value(buttons_json);
 
+
+    // Let's check if we can use the last button as a pulse coin
+
+    _LastButtonPulse = 0;
+    json_t *last_button_pulse_json = json_object_get(configuration_json, "last_button_pulse");
+    if (!last_button_pulse_json) {
+        if(json_is_boolean(last_button_pulse_json)) {
+            _LastButtonPulse = json_boolean_value(last_button_pulse_json);
+        } else if (json_is_integer(last_button_pulse_json)) {
+            _LastButtonPulse = json_integer_value(last_button_pulse_json);
+        }
+    }
+
+
     // Let's unpack relays #
     json_t *relays_json = json_object_get(configuration_json, "relays");
     if(!json_is_integer(relays_json)) {

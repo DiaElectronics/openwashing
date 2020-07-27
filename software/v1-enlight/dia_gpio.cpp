@@ -100,6 +100,7 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
 
     CoinsHandler = new PulseHandler(COIN_PIN);
     BanknotesHandler = new PulseHandler(BANKNOTE_PIN);
+    AdditionalHandler = 0;
 
     cleanPins(ButtonPin, PIN_COUNT);
     ButtonPin[1] = 13;
@@ -169,6 +170,19 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     pthread_create(&LedSwitchingThread, NULL, DiaGpio_LedSwitcher, this);
     pthread_setschedprio(WorkingThread, SCHED_FIFO);
     InitializedOk = 1;
+}
+
+void DiaGpio_StartAdditionalHandler(DiaGpio *gpio) {
+  int foundPin = -1;
+  for (int i = PIN_COUNT - 1;i>=0;i--) {
+    if (gpio->ButtonPin[i]>=0) {
+      foundPin = gpio->ButtonPin[i];
+      break;
+    }    
+  }
+  if(foundPin >=0 ) {
+    gpio->AdditionalHandler = new PulseHandler(foundPin);
+  }
 }
 
 void DiaGpio_StopRelays(DiaGpio * gpio) {
@@ -357,6 +371,9 @@ void * DiaGpio_WorkingThread(void * gpio) {
 
       Gpio->CoinsHandler->Tick();
       Gpio->BanknotesHandler->Tick();
+      if(Gpio->AdditionalHandler) {
+          Gpio->AdditionalHandler->Tick();
+      }
 
       DiaGpio_ButtonAnimation(Gpio, curTime);
 

@@ -146,30 +146,40 @@ int get_service() {
 }
 
 int get_coins(void *object) {
-    DiaDeviceManager * manager = (DiaDeviceManager *)object;
-    int curMoney = manager->CoinMoney;
-    manager->CoinMoney  = 0;        
-    
-    int gpioCoin = 0;
+  DiaDeviceManager * manager = (DiaDeviceManager *)object;
+  int curMoney = manager->CoinMoney;
+  manager->CoinMoney  = 0;  
+  int gpioCoin = 0;
 
-    if (ALLOW_PULSE && config) {
-      DiaGpio *g = config->GetGpio();
-      if (g) {
-        gpioCoin = COIN_MULTIPLICATOR * g->CoinsHandler->Money;
-        g->CoinsHandler->Money = 0;
-      }
+  if (ALLOW_PULSE && config) {
+    DiaGpio *g = config->GetGpio();
+    if (g) {
+      gpioCoin = COIN_MULTIPLICATOR * g->CoinsHandler->Money;
+      g->CoinsHandler->Money = 0;
     }
+  }
 
-    if (curMoney > 0) printf("coins from manager %d\n", curMoney);
-    if (gpioCoin > 0) printf("coins from gpio %d\n", gpioCoin);
+  int gpioCoinAdditional = 0;
 
-    int totalMoney = curMoney + gpioCoin;
-    if (totalMoney>0 && config) {
-        config->_Income.totalIncomeCoins += curMoney;
-        SaveIncome();
+  if (ALLOW_PULSE && config) {
+    DiaGpio *g = config->GetGpio();
+    if (g) {
+      gpioCoinAdditional = COIN_MULTIPLICATOR * g->AdditionalHandler->Money;
+      g->AdditionalHandler->Money = 0;
     }
+  }
 
-    return totalMoney;
+  if (curMoney > 0) printf("coins from manager %d\n", curMoney);
+  if (gpioCoin > 0) printf("coins from gpio %d\n", gpioCoin);
+  if (gpioCoinAdditional > 0) printf("coins from additional gpio %d\n", gpioCoinAdditional);
+
+  int totalMoney = curMoney + gpioCoin + gpioCoinAdditional;
+  if (totalMoney>0 && config) {
+      config->_Income.totalIncomeCoins += curMoney;
+      SaveIncome();
+  }
+
+  return totalMoney;
 }
 
 int get_banknotes(void *object) {

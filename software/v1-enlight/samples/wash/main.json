@@ -35,7 +35,8 @@
       "src": "screens/13_wait_for_card.json"
     }
   ],
-  "buttons": 7,
+  "buttons": 6,
+  "last_button_pulse": true,
   "relays": 6,
   "endpoint": "http://app.diae.ru/v0/gql/",
   "programs": [
