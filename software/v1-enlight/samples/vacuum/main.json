@@ -36,6 +36,7 @@
     }
   ],
   "buttons": 6,
+  "last_button_pulse": true,
   "relays": 6,
   "endpoint": "http://app.diae.ru/v0/gql/",
   "programs": [
