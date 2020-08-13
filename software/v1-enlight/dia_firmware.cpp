@@ -663,7 +663,7 @@ int main(int argc, char ** argv) {
                 printf("CLICK!!!\n");
                 mousepress = 0;
                 _DebugKey = std::stoi((*it).ID);
-                printf("DEBUG KEY = %d\n", _DebugKey);    
+                printf("DEBUG KEY = %d\n", _DebugKey);
             }
         }
         printf("\n\n\n");
