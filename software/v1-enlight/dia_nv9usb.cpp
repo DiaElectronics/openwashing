@@ -137,7 +137,7 @@ int DiaNv9Usb_ProcessCommand(DiaNv9Usb * driver, char currentCommand) {
     if(currentCommand>=1&&currentCommand<=15)
     {
         driver->CurrentMode = DIA_NV9_DRIVER__MONEY_ON_DEPOSITE;
-        int sum=sumByCodeKZ(currentCommand);
+        int sum=sumByCodeRU(currentCommand);
         //DiaNv9Usb_SendByte(driver, (char)172);
 
         if(sum>0) {
