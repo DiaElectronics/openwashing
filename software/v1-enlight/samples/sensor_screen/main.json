@@ -1,6 +1,7 @@
 {
   "name": "default configuration",
   "resolution": "1920x1080",
+  "touch_rotate": "+",
   "screens": [
     {
       "id": "start",

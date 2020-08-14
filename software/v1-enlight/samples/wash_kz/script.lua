@@ -105,6 +105,8 @@ welcome_mode = function()
     show_welcome()
     run_stop()
     turn_light(0, animation.idle)
+    rubbish = get_key()
+    pressed_key = -1
     smart_delay(1000 * welcome_mode_seconds)
     if hascardreader == true then
         return mode_choose_method

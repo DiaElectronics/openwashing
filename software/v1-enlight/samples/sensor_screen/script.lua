@@ -3,7 +3,7 @@
 setup = function()
     turn_light(0, animation.freeze)
     -- change this constant on every post
-    post_position = 1     
+    post_position = 1
 
     -- money variables
     balance = 0.0
@@ -110,6 +110,7 @@ run_mode = function(new_mode)
     if new_mode == mode_thanks then return thanks_mode() end
 end
 
+-- start_mode should show screen with all programs, their prices and text like "pay with cash/pay with bank card"
 start_mode = function()
     show_start()
     run_stop()
@@ -132,6 +133,7 @@ start_mode = function()
     return mode_start
 end
 
+-- enter_price_mode is the screen where user can enter an interesting amount of money to be charged from his card
 enter_price_mode = function()
     show_enter_price()
     run_stop()
@@ -149,6 +151,7 @@ enter_price_mode = function()
     return mode_enter_price
 end
 
+-- wait_for_card_mode is the screen saying you need to put your card to pay
 wait_for_card_mode = function()
     show_wait_for_card()
     run_stop()
@@ -192,6 +195,7 @@ wait_for_card_mode = function()
     return mode_wait_for_card
 end
 
+-- cash_mode this shows your balance and asks to put some money in the coin acceptor
 cash_mode = function()
     show_cash()
     run_stop()
@@ -216,7 +220,13 @@ end
 program_mode = function(working_mode)
   old_sub_mode = sub_mode
   sub_mode = working_mode - mode_work
-  run_program(sub_mode)
+  
+  if sub_mode == 0 then
+    run_pause()
+  else
+    run_program(sub_mode)
+  end
+
   show_working(sub_mode, balance)
   
   if sub_mode == 0 then

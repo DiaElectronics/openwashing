@@ -77,6 +77,10 @@ public:
     std::string GetEndpoint() {
         return _Endpoint;
     }
+
+    inline int NeedRotateTouch() {
+        return _NeedToRotateTouchScreen;
+    }
     
     int UseLastButtonAsPulse() {
         return _LastButtonPulse;
@@ -99,6 +103,7 @@ public:
     int _ResY;
     int _ButtonsNumber;
     int _RelaysNumber;
+    int _NeedToRotateTouchScreen;
     
     int _LastButtonPulse;
     int InitFromFile();

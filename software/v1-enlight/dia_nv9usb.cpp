@@ -23,14 +23,13 @@ void * DiaNv9Usb_CommandReadingThread(void * driverPtr) {
     printf("nv9 thread...\n");
     DiaNv9Usb * driver = (DiaNv9Usb *)driverPtr;
     while(!driver->ToBeDeleted) {
-        
         driver->_Device->ReadPortBytes();
         int size  = driver->_Device->_Bytes_Read;
-                
+
         for(int i=0;i<size;i++) {
             DiaNv9Usb_ProcessCommand(driver, driver->_Device->_Buf[i]);
         }
-        
+
         delay(100);
     }
     printf("NV9: Exit from thread\n");

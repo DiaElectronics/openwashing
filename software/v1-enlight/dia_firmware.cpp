@@ -666,6 +666,10 @@ int main(int argc, char ** argv) {
         int x = 0;
         int y = 0;
         SDL_GetMouseState(&x, &y);
+        if (configuration.NeedRotateTouch()) {
+            x = configuration.GetResX() - x;
+            y = configuration.GetResY() - y;
+        }
 
         printf("\n\n\n");
         printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
@@ -682,7 +686,7 @@ int main(int argc, char ** argv) {
                 printf("CLICK!!!\n");
                 mousepress = 0;
                 _DebugKey = std::stoi((*it).ID);
-                printf("DEBUG KEY = %d\n", _DebugKey);    
+                printf("DEBUG KEY = %d\n", _DebugKey);
             }
         }
         printf("\n\n\n");

@@ -185,6 +185,12 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
     }
     //printf("resolution:[%s], parsed ad [%d]*[%d]\n", _Resolution.c_str(), _ResX, _ResY);
 
+    _NeedToRotateTouchScreen = 0;
+    json_t *touch_rotate_json = json_object_get(configuration_json, "touch_rotate");
+    if(json_is_string(touch_rotate_json)) {
+        _NeedToRotateTouchScreen = 180;
+    }
+
     // Let's unpack buttons #
     json_t *buttons_json = json_object_get(configuration_json, "buttons");
     if(!json_is_integer(buttons_json)) {
