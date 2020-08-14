@@ -77,6 +77,10 @@ public:
     std::string GetEndpoint() {
         return _Endpoint;
     }
+
+    inline int NeedRotateTouch() {
+        return _NeedToRotateTouchScreen;
+    }
     
     income_t _Income;
     
@@ -96,6 +100,7 @@ public:
     int _ResY;
     int _ButtonsNumber;
     int _RelaysNumber;
+    int _NeedToRotateTouchScreen;
     
     int InitFromFile();
     int InitFromString(const char * configuration_json);// never ever is going to be virtual
