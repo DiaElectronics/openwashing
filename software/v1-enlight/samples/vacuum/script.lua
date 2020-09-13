@@ -1,4 +1,4 @@
--- Wash Firmware
+-- Vacuum Firmware
 
 -- setup is running at the start just once
 setup = function()
@@ -104,6 +104,7 @@ welcome_mode = function()
     run_stop()
     turn_light(0, animation.idle)
     smart_delay(1000 * welcome_mode_seconds)
+    forget_pressed_key()
     if hascardreader == true then
         return mode_choose_method
     end
@@ -215,6 +216,7 @@ end
 
 ask_for_money_mode = function()
     show_ask_for_money()
+    forget_pressed_key()
     run_stop()
     turn_light(0, animation.idle)
     
@@ -443,4 +445,8 @@ end
 is_working_mode = function(mode_to_check)
   if mode_to_check >= mode_work and mode_to_check<mode_work+10 then return true end
   return false
+end
+
+forget_pressed_key = function()
+    key = get_key()
 end
