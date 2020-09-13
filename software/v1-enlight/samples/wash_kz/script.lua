@@ -108,9 +108,10 @@ welcome_mode = function()
     rubbish = get_key()
     pressed_key = -1
     smart_delay(1000 * welcome_mode_seconds)
+    forget_pressed_key()
     if hascardreader == true then
         return mode_choose_method
-    end
+    end    
     return mode_ask_for_money
 end
 
@@ -227,6 +228,8 @@ ask_for_money_mode = function()
         if pressed_key > 0 and pressed_key < 7 then
             return mode_choose_method
         end
+    else
+        forget_pressed_key()
     end
 
     update_balance()
@@ -457,4 +460,8 @@ end
 is_working_mode = function(mode_to_check)
   if mode_to_check >= mode_work and mode_to_check<mode_work+10 then return true end
   return false
+end
+
+forget_pressed_key = function()
+    key = get_key()
 end

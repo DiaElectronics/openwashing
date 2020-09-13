@@ -647,19 +647,16 @@ int main(int argc, char ** argv) {
     configuration.GetRuntime()->Setup();
 
     // using button as pulse is a crap obviously
-    if (configuration.UseLastButtonAsPulse()) {
+    if (configuration.UseLastButtonAsPulse() && configuration.GetGpio()) {
         printf("enabling additional coin handler\n");
-        assert(configuration.GetGpio());
         DiaGpio_StartAdditionalHandler(configuration.GetGpio());
     } else {
         printf("no additional coin handler\n");
     }
 
-    while(!keypress)
-    {
+    while(!keypress) {
         // Call Lua loop function
         configuration.GetRuntime()->Loop();
-
         // Ping server every 2 sec and probably get service money from it
         CentralServerDialog();
 
@@ -691,10 +688,8 @@ int main(int argc, char ** argv) {
         }
         printf("\n\n\n");
         
-        while(SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
+        while(SDL_PollEvent(&event)) {
+            switch (event.type) {
                 case SDL_QUIT:
                     keypress = 1;
                     printf("Quitting by sdl_quit\n");
@@ -703,9 +698,7 @@ int main(int argc, char ** argv) {
                     mousepress = 1;
                 break;
                 case SDL_KEYDOWN:
-                    switch(event.key.keysym.sym)
-                    {
-                        
+                    switch(event.key.keysym.sym) {
                         case SDLK_UP:
                             // Debug service money addition
                             _Balance += 10;
