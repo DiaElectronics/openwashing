@@ -1,0 +1,18 @@
+------------------------------------------------------------------------------------------
+Gerber File Extension Report For: CONTROL_485.GBR   28.06.2020  13:06:16
+------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------
+Layer Extension     Layer Description                      
+------------------------------------------------------------------------------------------
+.GTL                Top Layer, Top                          
+.GBL                Bottom Layer, Bottom                    
+.GTO                Top Overlay, Top Silk                   
+.GTP                Top Paste, Top Paste                    
+.GTS                Top Solder, Top Mask                    
+.GBS                Bottom Solder, Bot Mask                 
+.GBP                Bottom Paste, Bot Paste                 
+.GBO                Bottom Overlay, Bot Silk                
+.GM4                Mechanical 4                            
+------------------------------------------------------------------------------------------

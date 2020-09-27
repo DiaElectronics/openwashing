@@ -1,0 +1,281 @@
+*************************************************************
+FileName = CONTROL_485.GBR
+AutoAperture = True
+*************************************************************
+Generating : Top Layer, Top
+      File : CONTROL_485.GTL
+
+    Adding Layer      : Top Layer, Top
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D11
+    D12
+    D13
+    D14
+    D15
+    D16
+    D17
+    D18
+    D19
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+*************************************************************
+
+*************************************************************
+Generating : Bottom Layer, Bottom
+      File : CONTROL_485.GBL
+
+    Adding Layer      : Bottom Layer, Bottom
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D10
+    D14
+    D15
+    D16
+    D17
+    D18
+    D20
+    D21
+    D22
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D54
+    D55
+    D56
+    D57
+    D58
+    D59
+    D60
+    D61
+    D62
+    D63
+    D64
+    D65
+*************************************************************
+
+*************************************************************
+Generating : Top Overlay, Top Silk
+      File : CONTROL_485.GTO
+
+    Adding Layer      : Top Overlay, Top Silk
+
+
+Used DCodes :
+    D16
+    D17
+    D66
+    D67
+    D68
+*************************************************************
+
+*************************************************************
+Generating : Top Paste, Top Paste
+      File : CONTROL_485.GTP
+
+    Adding Layer      : Top Paste, Top Paste
+
+    Adding Layer      : Top Layer, Top
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D11
+    D12
+    D13
+    D14
+    D15
+*************************************************************
+
+*************************************************************
+Generating : Top Solder, Top Mask
+      File : CONTROL_485.GTS
+
+    Adding Layer      : Top Solder, Top Mask
+
+    Adding Layer      : Top Layer, Top
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D69
+    D70
+    D71
+    D72
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+    D79
+    D80
+    D81
+*************************************************************
+
+*************************************************************
+Generating : Bottom Solder, Bot Mask
+      File : CONTROL_485.GBS
+
+    Adding Layer      : Bottom Solder, Bot Mask
+
+    Adding Layer      : Bottom Layer, Bottom
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D37
+    D38
+    D39
+    D69
+    D73
+    D74
+    D75
+    D76
+    D77
+    D78
+    D79
+    D80
+    D81
+    D82
+    D83
+    D84
+    D85
+    D86
+    D87
+    D88
+    D89
+    D90
+    D91
+    D92
+    D93
+    D94
+    D95
+    D96
+    D97
+    D98
+    D99
+    D100
+    D101
+    D102
+    D103
+    D104
+    D105
+*************************************************************
+
+*************************************************************
+Generating : Bottom Paste, Bot Paste
+      File : CONTROL_485.GBP
+
+    Adding Layer      : Bottom Paste, Bot Paste
+
+    Adding Layer      : Bottom Layer, Bottom
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D14
+    D15
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+    D36
+    D37
+    D38
+    D39
+    D40
+    D41
+    D42
+    D43
+    D44
+    D45
+    D46
+    D47
+    D48
+    D49
+    D50
+    D51
+    D52
+    D53
+    D106
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay, Bot Silk
+      File : CONTROL_485.GBO
+
+    Adding Layer      : Bottom Overlay, Bot Silk
+
+
+Used DCodes :
+    D16
+    D66
+    D67
+    D68
+    D107
+    D108
+    D109
+    D110
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 4
+      File : CONTROL_485.GM4
+
+    Adding Layer      : Mechanical 4
+
+
+Used DCodes :
+    D18
+*************************************************************
+
