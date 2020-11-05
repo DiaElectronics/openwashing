@@ -37,7 +37,7 @@ public:
         if(!container.empty()) {
             T *result = container.front();
             container.pop_front();
-            free(result);
+            delete result;
         } else {
             err = 1;
         }

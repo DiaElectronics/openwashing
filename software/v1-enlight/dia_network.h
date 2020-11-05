@@ -15,6 +15,7 @@
 #include <jansson.h>
 #include <iomanip>
 #include <iostream>
+#include <queue>
 
 #include <sstream>
 #include <sys/types.h>
@@ -42,6 +43,18 @@ class NetworkMessage {
     uint64_t stime;
 };
 
+class ReceiptToSend {
+public:
+    int PostPosition;
+    int IsCard;
+    int Amount;
+    ReceiptToSend(int postPosition, int isCard, int amount) {
+        PostPosition = postPosition;
+        IsCard = isCard;
+        Amount = amount;
+    }
+};
+
 typedef struct curl_answer {
     char * data;
     size_t length;
@@ -65,26 +78,40 @@ typedef struct relay_report {
 } relay_report_t;
 
 class DiaNetwork {
-public:    
+private:
+// For receipts
+
+
+public:
+    DiaChannel<ReceiptToSend> * receipts_channel;
+
     DiaNetwork() {
         _Host = "";
-	_Port = ":8020";
+	    _Port = ":8020";
 
         _OnlineCashRegister = "";
         _PublicKey = "";
+        receipts_channel = new DiaChannel<ReceiptToSend>();
 
         pthread_create(&entry_processing_thread, NULL, DiaNetwork::process_extract, this);
+        pthread_create(&receipts_processing_thread, NULL, DiaNetwork::process_receipts, this);
     }
 
     ~DiaNetwork() {
         printf("Destroying DiaNetwork\n");
+        delete receipts_channel;
         StopTheWorld();
         int status = pthread_join(entry_processing_thread, NULL);
         if (status != 0) {
-            printf("Main error: can't join thread, status = %d\n", status);
+            printf("Main error: can't join reports thread, status = %d\n", status);
+        }
+        status = pthread_join(receipts_processing_thread, NULL);
+        if (status != 0) {
+            printf("Main error: can't join receipts thread, status = %d\n", status);
         }
     }
 
+    
     // Base function for sending a GET request.
     // Parameters: gets pre-created HTTP body, modifies answer from server, gets address of host (URL).
     int SendRequestGet(std::string *answer, std::string host_addr) {
@@ -372,16 +399,11 @@ public:
         return err;
     }
 
-    // Sends receipt report directly to Online Cash Register.
+
+    // Adds a receipt to a queue.
     int ReceiptRequest(int postPosition, int isCard, int amount) {
-        int res = 0;
-        
-        res = SendReceiptRequest(postPosition, isCard, amount);
-        
-        if (res > 0) {
-            printf("No connection to server\n");
-            return 1;
-        }
+        ReceiptToSend * incomingReceipt = new ReceiptToSend(postPosition, isCard, amount);
+        receipts_channel->Push(incomingReceipt);
         return 0;
     }
 
@@ -657,6 +679,7 @@ private:
 
     DiaChannel<NetworkMessage> channel;
     pthread_t entry_processing_thread;
+    pthread_t receipts_processing_thread;
     pthread_mutex_t nfct_entries_mutex = PTHREAD_MUTEX_INITIALIZER;
 
     // Thread, which tries to send reports to Central Server.
@@ -666,11 +689,49 @@ private:
         while(!Dia->interrupted) {
             int res = Dia->PopAndSend();
             if (res == SERVER_UNAVAILABLE) {
-                usleep(5000000); //let's sleep for 5 second before the next attempt
+                sleep(5);
+                printf("Server's unavailable ... \n");
             }
         }
         pthread_exit(NULL);
         return NULL;
+    }
+
+    // Thread, which tries to send reports to Central Server.
+    static void *process_receipts(void *arg) {
+        DiaNetwork *Dia = (DiaNetwork*) arg;
+
+        while(!Dia->interrupted) {
+            int res = Dia->PopAndSendReceipt();
+            if (res == SERVER_UNAVAILABLE) {
+                sleep(5);
+                printf("Kasses's server unavailable... \n");
+            }
+        }
+        pthread_exit(NULL);
+        return NULL;
+    }
+
+    int PopAndSendReceipt() {
+        ReceiptToSend * extractedReceipt;
+        int err = receipts_channel->Peek(&extractedReceipt);        
+
+        if (err) {
+            //CHANNEL_BUFFER_EMPTY IS THE ONLY ERR
+            sleep(1);
+            return err;
+        }
+
+        int res = SendReceiptRequest(extractedReceipt->PostPosition, extractedReceipt->IsCard, extractedReceipt->Amount);
+
+        if (res > 0) {
+            printf("No connection to server\n");
+            return SERVER_UNAVAILABLE;
+        } else {
+            receipts_channel->DropOne();
+        }
+
+        return 0;
     }
 
     // Interrupt the report processing thread. 
@@ -686,18 +747,19 @@ private:
 
         if (!err) {
             if(message && message->json_request != "") {
-		printf("New message popped\n");
+		        printf("New message popped\n");
                 std::string answer;
-		std::string url = _Host + _Port + message->route;
+		        std::string url = _Host + _Port + message->route;
                 int res = SendRequest(&(message->json_request), &answer, url);
+                delete message;
 
-		printf("Answer from server: %s\n", answer.c_str());
+		        printf("Answer from server: %s\n", answer.c_str());
                 //let's ignore the answer for now;
                 if (res == SERVER_UNAVAILABLE) {
                     printf("ERR: SERVER IS NOT AVAILABLE\n");
                     return SERVER_UNAVAILABLE;
                 }
-                free(message);
+                
                 return res;
             } else {
                 printf("ERROR: something is wrong with the channel\n");
