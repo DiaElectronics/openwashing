@@ -3,6 +3,8 @@
 
 #include "dia_functions.h"
 
+#include <ctime>
+
 extern "C" {
 #include "lua.h"
 #include "lauxlib.h"
@@ -44,12 +46,13 @@ public:
     }
 
     int (*send_receipt_function)(int postPosition, int isCard, int amount);
+    
     int SendReceipt(int postPosition, int isCard, int amount) {
-	if(send_receipt_function) {
-	    send_receipt_function(postPosition, isCard, amount);
-	} else {
-	    printf("error: NIL function SendReceipt\n");
-	}
+        if(send_receipt_function) {
+            send_receipt_function(postPosition, isCard, amount);
+        } else {
+            printf("error: NIL function SendReceipt\n");
+        }
 	    return 0;
     }
 
@@ -116,6 +119,18 @@ public:
             printf("error: NIL object or function RequestTransaction\n");
         }
         return 0;
+    }
+
+    int GetHours() {
+        std::time_t t = std::time(0);   // get time now
+        std::tm* now = std::localtime(&t);
+        return now->tm_hour;
+    }
+
+    int GetMinutes() {
+        std::time_t t = std::time(0);   // get time now
+        std::tm* now = std::localtime(&t);
+        return now->tm_min;
     }
 
     int (*get_transaction_status_function)(void * object);

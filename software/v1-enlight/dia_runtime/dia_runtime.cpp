@@ -97,6 +97,8 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("IncrementCars", &DiaRuntimeHardware::IncrementCars)
     .addFunction("GetElectronical", &DiaRuntimeHardware::GetElectronical)
     .addFunction("RequestTransaction", &DiaRuntimeHardware::RequestTransaction)
+    .addFunction("GetHours", &DiaRuntimeHardware::GetHours)
+    .addFunction("GetMinutes", &DiaRuntimeHardware::GetMinutes)
     .addFunction("GetTransactionStatus", &DiaRuntimeHardware::GetTransactionStatus)
     .addFunction("AbortTransaction", &DiaRuntimeHardware::AbortTransaction)
     .endClass();
