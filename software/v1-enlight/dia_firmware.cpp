@@ -302,10 +302,15 @@ int CentralServerDialog() {
         printf("Sending another PING request to server...\n");
 
         int serviceMoney = 0;
-        network.SendPingRequest(network.GetHostName(), serviceMoney);
+        bool openStation = false;
+        network.SendPingRequest(network.GetHostName(), serviceMoney, openStation);
         
         if (serviceMoney > 0) {
 	        _Balance += serviceMoney;
+        }
+        if (openStation) {
+            printf("Open station...\n");
+            // TODO: add the function of turning on the relay, which will open the lock.
         }
     }
 
@@ -316,7 +321,6 @@ int CentralServerDialog() {
         printf("Sending relay report to server...\n");
         
         RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
-
         DiaGpio * gpio = config->GetGpio();
 
         for (int i = 0; i < MAX_RELAY_NUM; i++) {
@@ -325,9 +329,7 @@ int CentralServerDialog() {
         }
         
         network.SendRelayReport(relays);
-
         delete relays;
-        
     }
     return 0;
 }
@@ -436,7 +438,8 @@ int RecoverRegistry() {
     std::string value = "";
 
     int tmp = 0;
-    int err = network.SendPingRequest(network.GetHostName(), tmp);
+    bool openStation = false;
+    int err = network.SendPingRequest(network.GetHostName(), tmp, openStation);
     std::string default_price = "15";
 
     if (!err) {
@@ -760,3 +763,7 @@ int main(int argc, char ** argv) {
     delay(2000);
     return 0;
 }
+
+std::string SetRegistryValueByKeyIfNotExists(std::string key, std::string value) {
+    return network.SetRegistryValueByKeyIfNotExists(key, value);
+    }

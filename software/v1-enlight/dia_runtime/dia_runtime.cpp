@@ -106,6 +106,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addConstructor<void(*)()>()
     .addFunction("Value", &DiaRuntimeRegistry::Value)
     .addFunction("ValueInt", &DiaRuntimeRegistry::Value)
+    .addFunction("SetValueByKeyIfNotExists", &DiaRuntimeRegistry::SetValueByKeyIfNotExists)
     .endClass();
 
     return 0;

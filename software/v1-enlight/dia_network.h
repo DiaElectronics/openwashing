@@ -329,7 +329,7 @@ public:
     // PING request to specified URL with method POST. 
     // Returns 0, if request was OK, other value - in case of failure.
     // Modifies service money, if server returned that kind of data.
-    int SendPingRequest(std::string url, int& service_money) {
+    int SendPingRequest(std::string url, int& service_money, bool& open_station) {
         std::string answer;
 	url += _Port + "/ping";
 
@@ -366,6 +366,10 @@ public:
             json_t *obj_service_amount;
             obj_service_amount = json_object_get(object, "serviceAmount");
             service_money = (int)json_integer_value(obj_service_amount);
+
+            json_t *obj_open_station;
+            obj_open_station = json_object_get(object, "openStation");
+            open_station = (bool)json_boolean_value(obj_open_station);
             
         } while (0);
         json_decref(object);

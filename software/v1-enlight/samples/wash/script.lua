@@ -403,6 +403,10 @@ get_price = function(key)
     return registry:ValueInt(key)
 end
 
+set_value_if_not_exists = function(key, value)
+    return registry:SetValueByKeyIfNotExists(key, value)
+end
+
 turn_light = function(rel_num, animation_code)
     hardware:TurnLight(rel_num, animation_code)
 end

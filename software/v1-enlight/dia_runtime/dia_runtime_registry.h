@@ -2,6 +2,7 @@
 #define dia_runtime_registry_h
 
 #include "dia_functions.h"
+#include "dia_firmware.h"
 
 extern "C" {
 #include "lua.h"
@@ -16,6 +17,9 @@ extern "C" {
 #include <stdexcept>
 
 using namespace luabridge;
+
+// Main object for Client-Server communication.
+
 
 class DiaRuntimeRegistry {
 public:
@@ -40,6 +44,10 @@ public:
     int SetValue(std::string key,std::string value) {
         values[key]= value;
         return 0;
+    }
+
+    std::string SetValueByKeyIfNotExists(std::string key, std::string value) {
+        return SetRegistryValueByKeyIfNotExists(key, value);
     }
 
 private:
