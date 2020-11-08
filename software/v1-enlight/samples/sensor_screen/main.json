@@ -61,5 +61,6 @@
       "src": "programs/openlid/relay.json"
     }
   ],
-  "script": "script.lua"
+  "script": "script.lua",
+  "include": "constants.lua"
 }

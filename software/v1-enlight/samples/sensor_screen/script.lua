@@ -27,8 +27,9 @@ setup = function()
     wait_card_mode_seconds = 40
     show_pistol_seconds = 5
     
-    frame_delay = 50
-    frames_per_second = 1000 / 50
+    frame_delay = 100
+
+    frames_per_second = 1000 / frame_delay
     balance_reduce_rate = 1 / (frames_per_second * 60)
 
     -- flags
@@ -67,16 +68,31 @@ setup = function()
 
     version = "3.0.0"
 
-    printMessage("dia generic wash firmware v." .. version)
     if need_to_open_lid then printMessage("OPEN LID AGAIN!!!") end
+
+    init_constants();
+
+    forget_pressed_key();
+
+    printMessage("dia proprietary QUARTZ wash firmware v." .. version)
 
     return 0
 end
 
+forget_pressed_key = function()
+    key = get_key()
+end
+
 loop = function()
+    update_time()
     currentMode = run_mode(currentMode)
     smart_delay(frame_delay)
     return 0
+end
+
+update_time = function()
+    time_minutes = hardware:GetMinutes()
+    time_hours = hardware:GetHours()
 end
 
 init_prices = function()
