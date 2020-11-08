@@ -90,6 +90,16 @@
         "visible":"true"
       },
       {
+        "id":"price",
+        "type": "digits",
+        "position": "1694;156",
+        "font": "round_number",
+        "symbol_size":"25;40",
+        "padding": "0",
+        "length": "3",
+        "visible":"true"
+      },
+      {
         "id":"cur_p",
         "type":"image_array",
         "position": "158;137",
@@ -124,9 +134,9 @@
       {
         "id":"pause_digits",
         "type": "digits",
-        "position": "251;247",
+        "position": "269;247",
         "font": "round_number",
-        "symbol_size":"86;157",
+        "symbol_size":"87;157",
         "padding": "5",
         "length": "3",
         "visible":"true"
