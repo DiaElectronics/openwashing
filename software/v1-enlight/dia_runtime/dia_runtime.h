@@ -28,13 +28,13 @@ public:
     lua_State* Lua;
     int Setup();
     int Loop();
-    DiaRuntime();
+    DiaRuntime(DiaRuntimeRegistry *newDiaRuntimeRegistry);
     ~DiaRuntime();
     LuaRef * SetupFunction;
     LuaRef * LoopFunction;
     std::list<DiaRuntimeScreen *> all_screens;
     DiaRuntimeHardware * hardware;
-    DiaRuntimeRegistry Registry;
+    DiaRuntimeRegistry * Registry;
     int Init(std::string folder, json_t * src_json, json_t * include_json);
     int InitStr(std::string folder, std::string src_str, std::string incl_str);
     int AddScreen(DiaRuntimeScreen * screen);

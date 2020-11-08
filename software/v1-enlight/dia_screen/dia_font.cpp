@@ -47,17 +47,18 @@ int DiaFont::InitSymbols(int is_vertical) {
             SymbolRect[i]-> w = SymbolSize.x;
             SymbolRect[i]-> h = SymbolSize.y;
         }
-
-    // This code is for legacy horizontal screen
     } else {
-        SymbolSize.x = 235;
-        SymbolSize.y = 405;
+        // This code is for legacy horizontal screen
+        int symbolWidth = FontImage->w / 10;
+        int symbolHeight = FontImage->h;
+        SymbolSize.x = symbolWidth;
+        SymbolSize.y = symbolHeight;
         for(int i=0;i<10;i++) {
             SymbolRect[i] = (SDL_Rect *) malloc(sizeof(SDL_Rect));
-            SymbolRect[i]->x = i * 265;
+            SymbolRect[i]->x = i * symbolWidth;
             SymbolRect[i]->y = 0;
-            SymbolRect[i]->w = 235; //All symbols have about 30 pixels of wide space on the right side
-            SymbolRect[i]->h = 405;
+            SymbolRect[i]->w = symbolWidth;
+            SymbolRect[i]->h = symbolHeight;
         }
     }
     
@@ -89,18 +90,16 @@ int DiaFont::Scale(double xScale, double yScale, int is_vertical) {
 
     // This code is for legacy horizontal screen
     } else {
-        int newWidth = (int)(2650.0 * xScale);
-        int newHeight = (int)(405.0 * yScale);
+        int newWidth = (int)(FontImage->w * xScale);
+        int newHeight = (int)(FontImage->h * yScale);
         ScaledFontImage = dia_ScaleSurface(FontImage, newWidth, newHeight);
 
-        //here is a code for scaling the surface
-
-        int newSymbolWidth = (int)(235.0 * xScale);
+        int newSymbolWidth = (int)(SymbolSize.x * xScale);
         for(int i=0;i<10;i++) {
-            double xOffset = (double)(i * 265);
+            double xOffset = (double)(i * SymbolSize.x);
             SymbolRect[i]->x = (int)(xOffset * xScale);
-            SymbolRect[i]->w = newSymbolWidth; //All symbols have about 30 pixels of wide space on the right side
-            SymbolRect[i]->h = 405;
+            SymbolRect[i]->w = newSymbolWidth;
+            SymbolRect[i]->h = newHeight;
         }
     }
 

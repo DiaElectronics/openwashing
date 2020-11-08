@@ -103,14 +103,17 @@ int DiaConfiguration::Init() {
     return err;
 }
 
-DiaConfiguration::DiaConfiguration(std::string folder) {
+DiaConfiguration::DiaConfiguration(std::string folder, DiaNetwork *newNet) {
     _Name = "";
     _Folder = folder;
     _ResX = 0;
     _ResY = 0;
     _ButtonsNumber = 0;
     _RelaysNumber = 0;
-    _Runtime = new DiaRuntime();
+
+    // Must be rearranged
+    registry = new DiaRuntimeRegistry(newNet);
+    _Runtime = new DiaRuntime(registry);
     _Gpio = 0;
     _Screen = 0; // use Init();
 
@@ -272,6 +275,7 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
 
 DiaConfiguration::~DiaConfiguration() {
     printf("Destroying configuration ... \n");
+
     std::map<std::string, DiaScreenConfig *>::iterator it;
     for (it=ScreenConfigs.begin(); it!=ScreenConfigs.end(); it++) {
         DiaScreenConfig * curConfig = it->second;
@@ -285,5 +289,8 @@ DiaConfiguration::~DiaConfiguration() {
     }
     if(_Gpio) {
         delete _Gpio;
+    }
+    if(registry) {
+        delete registry;
     }
 }

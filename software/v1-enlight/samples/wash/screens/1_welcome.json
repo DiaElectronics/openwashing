@@ -11,9 +11,9 @@
     {
       "id":"post_number",
       "type": "digits",
-      "position": "1347;839",
-      "font": "standard_number",
-      "symbol_size":"57;90",
+      "position": "1347;842",
+      "font": "round_number",
+      "symbol_size":"56;88",
       "padding": "1",
       "length": "1",
       "visible":"true"

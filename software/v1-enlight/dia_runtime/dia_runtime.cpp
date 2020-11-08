@@ -103,9 +103,8 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
 
     getGlobalNamespace(Lua)
     .beginClass<DiaRuntimeRegistry>("DiaRuntimeRegistry")
-    .addConstructor<void(*)()>()
     .addFunction("Value", &DiaRuntimeRegistry::Value)
-    .addFunction("ValueInt", &DiaRuntimeRegistry::Value)
+    .addFunction("ValueInt", &DiaRuntimeRegistry::ValueInt)
     .addFunction("SetValueByKeyIfNotExists", &DiaRuntimeRegistry::SetValueByKeyIfNotExists)
     .endClass();
 
@@ -193,10 +192,11 @@ int DiaRuntime::Loop() {
     return result;
 }
 
-DiaRuntime::DiaRuntime() {
+DiaRuntime::DiaRuntime(DiaRuntimeRegistry *newDiaRuntimeRegistry) {
     Lua = 0;
     SetupFunction = 0;
     LoopFunction = 0;
+    Registry = newDiaRuntimeRegistry;
 }
 
 DiaRuntime::~DiaRuntime() {
