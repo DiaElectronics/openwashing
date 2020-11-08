@@ -68,7 +68,6 @@ setup = function()
     version = "3.0.0"
 
     printMessage("dia generic wash firmware v." .. version)
-
     if need_to_open_lid then printMessage("OPEN LID AGAIN!!!") end
 
     return 0
