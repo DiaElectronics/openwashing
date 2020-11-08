@@ -100,6 +100,16 @@ public:
         return 0;
     }
 
+    int (*get_openlid_function)();
+    int GetOpenLid() {
+        if (get_openlid_function) {
+            return get_openlid_function();
+        } else {
+            printf("error: NIL object or function GetOpenLid");
+        }
+        return 0;
+    }
+
     void * electronical_object;
     int (*get_electronical_function)(void * object);
     int GetElectronical() {
@@ -195,6 +205,7 @@ public:
         get_banknotes_function = 0;
 
         get_service_function = 0;
+        get_openlid_function = 0;
 
         electronical_object = 0;
         get_electronical_function = 0;

@@ -51,6 +51,7 @@ int _DebugKey = 0;
 // Variable for storing an additional money.
 // For instance, service money from Central Server can be transfered inside.
 int _Balance = 0;
+int _OpenLid = 0;
 
 int GetKey(DiaGpio * _gpio) {
     int key = 0;
@@ -73,7 +74,7 @@ int GetKey(DiaGpio * _gpio) {
 }
 
 // Main object for Client-Server communication.
-DiaNetwork network;
+DiaNetwork * network = new DiaNetwork();
 
 // Saves new income money and creates money report to Central Server.
 void SaveIncome() {
@@ -81,7 +82,7 @@ void SaveIncome() {
         storage_interface_t * storage = config->GetStorage();
         storage->save(storage->object, "income", &(config->_Income), sizeof(income));
 
-        network.SendMoneyReport((int)config->_Income.carsTotal,
+        network->SendMoneyReport((int)config->_Income.carsTotal,
         (int)config->_Income.totalIncomeCoins,
         (int)config->_Income.totalIncomeBanknotes,
         (int)config->_Income.totalIncomeElectron,
@@ -105,7 +106,7 @@ int turn_light(void *object, int pin, int animation_id) {
 
 // Creates receipt request to Online Cash Register.
 int send_receipt(int postPosition, int isCard, int amount) {
-    return network.ReceiptRequest(postPosition, isCard, amount);
+    return network->ReceiptRequest(postPosition, isCard, amount);
 }
 
 // Increases car counter in config
@@ -143,6 +144,13 @@ int get_service() {
         }
     }
     return curMoney;
+}
+
+int get_openlid() {
+    int curOpenLid = _OpenLid;
+    _OpenLid = 0;
+   
+    return curOpenLid;
 }
 
 int get_coins(void *object) {
@@ -302,10 +310,16 @@ int CentralServerDialog() {
         printf("Sending another PING request to server...\n");
 
         int serviceMoney = 0;
-        network.SendPingRequest(network.GetHostName(), serviceMoney);
+        bool openStation = false;
+        network->SendPingRequest(network->GetHostName(), serviceMoney, openStation);
         
         if (serviceMoney > 0) {
 	        _Balance += serviceMoney;
+        }
+        if (openStation) {
+            _OpenLid = _OpenLid + 1;
+            printf("Door is going to be opened... \n");
+            // TODO: add the function of turning on the relay, which will open the lock.
         }
     }
 
@@ -316,7 +330,6 @@ int CentralServerDialog() {
         printf("Sending relay report to server...\n");
         
         RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
-
         DiaGpio * gpio = config->GetGpio();
 
         for (int i = 0; i < MAX_RELAY_NUM; i++) {
@@ -324,10 +337,8 @@ int CentralServerDialog() {
             relays[i].total_time_on = gpio->Stat.relay_time[i+1];
         }
         
-        network.SendRelayReport(relays);
-
+        network->SendRelayReport(relays);
         delete relays;
-        
     }
     return 0;
 }
@@ -335,7 +346,7 @@ int CentralServerDialog() {
 int RecoverMoney() {
     money_report_t* last_money_report = new money_report_t;
 
-    int err = network.GetLastMoneyReport(last_money_report);
+    int err = network->GetLastMoneyReport(last_money_report);
 
     if (err == 0) 
     {
@@ -374,7 +385,7 @@ int RecoverMoney() {
 int RecoverRelay() {
     relay_report_t* last_relay_report = new relay_report_t;
 
-    int err = network.GetLastRelayReport(last_relay_report);
+    int err = network->GetLastRelayReport(last_relay_report);
 
     if (err == 0) {
         DiaGpio * gpio = config->GetGpio();
@@ -431,12 +442,13 @@ void SetLocalData(std::string key, std::string value) {
 int RecoverRegistry() {
     printf("Recovering registries...\n");
 
-    DiaRuntimeRegistry* registry = &(config->GetRuntime()->Registry);
+    DiaRuntimeRegistry* registry = config->GetRuntime()->Registry;
 
     std::string value = "";
 
     int tmp = 0;
-    int err = network.SendPingRequest(network.GetHostName(), tmp);
+    bool openStation = false;
+    int err = network->SendPingRequest(network->GetHostName(), tmp, openStation);
     std::string default_price = "15";
 
     if (!err) {
@@ -445,14 +457,14 @@ int RecoverRegistry() {
 
         for (int i = 1; i < 7; i++) {
             std::string key = "price" + std::to_string(i);
-            std::string value = network.GetRegistryValueByKey(key);
+            std::string value = network->GetRegistryValueByKey(key);
 
             if (value != "") {
                 fprintf(stderr, "Key-value read online => %s:%s; \n", key.c_str(), value.c_str());
             } else {
 		fprintf(stderr, "Server returned empty value, setting default...\n");
 		value = default_price;
-		network.SetRegistryValueByKey(key, value);
+		network->SetRegistryValueByKey(key, value);
 	    }
 	    registry->SetValue(key.c_str(), value.c_str());
 
@@ -535,9 +547,9 @@ int main(int argc, char ** argv) {
     
     printf("Looking for firmware in [%s]\n", folder.c_str());
     printf("Version: %s\n", DIA_VERSION);
-
-    centralKey = network.GetMacAddress(centralKeySize);
-    network.SetPublicKey(std::string(centralKey));
+ 
+    centralKey = network->GetMacAddress(centralKeySize);
+    network->SetPublicKey(std::string(centralKey));
 
     printf("MAC address or KEY: %s\n", centralKey.c_str());
     
@@ -545,24 +557,22 @@ int main(int argc, char ** argv) {
     std::string serverIP = "";
 
     while (need_to_find) {
-    	serverIP = network.GetCentralServerAddress();
+    	serverIP = network->GetCentralServerAddress();
     	if (serverIP == "") {
         	printf("Error: Center Server is unavailable. Next try...\n");
     	} else
 	    need_to_find = 0;
     }
-    network.SetHostAddress(serverIP);
+    network->SetHostAddress(serverIP);
 
     // Runtime and firmware initialization
     DiaDeviceManager *manager = new DiaDeviceManager;
     DiaDeviceManager_AddCardReader(manager);
 
     SDL_Event event;
-    
-    
-    DiaConfiguration configuration(folder);
-    config = &configuration;
-    int err = configuration.Init();
+
+    config = new DiaConfiguration(folder, network);
+    int err = config->Init();
     if (err != 0) {
         printf("Can't run due to the configuration error\n");
         return 1;
@@ -576,21 +586,21 @@ int main(int argc, char ** argv) {
     // Screen load
     
     std::map<std::string, DiaScreenConfig *>::iterator it;
-    for (it = configuration.ScreenConfigs.begin(); it != configuration.ScreenConfigs.end(); it++) {
+    for (it = config->ScreenConfigs.begin(); it != config->ScreenConfigs.end(); it++) {
         std::string currentID = it->second->id;
         DiaRuntimeScreen * screen = new DiaRuntimeScreen();
         screen->Name = currentID;
         screen->object = (void *)it->second;
         screen->set_value_function = dia_screen_config_set_value_function;
-        screen->screen_object = configuration.GetScreen();
+        screen->screen_object = config->GetScreen();
         screen->display_screen = dia_screen_display_screen;
-        configuration.GetRuntime()->AddScreen(screen);
+        config->GetRuntime()->AddScreen(screen);
     }
     
     // Program load
     
     #ifdef USE_GPIO
-    configuration.GetRuntime()->AddPrograms(&configuration.GetGpio()->_ProgramMapping);
+    config->GetRuntime()->AddPrograms(&config->GetGpio()->_ProgramMapping);
     #else
     printf("NOT USING GPIO - adding FAKE programs...\n");
     std::map<std::string, int> *fake_programs = new std::map<std::string, int>();
@@ -600,19 +610,20 @@ int main(int argc, char ** argv) {
     fake_programs->insert( std::pair<std::string, int>("p4relay", 4) );
     fake_programs->insert( std::pair<std::string, int>("p5relay", 5) );
     fake_programs->insert( std::pair<std::string, int>("p6relay", 6) );
-    configuration.GetRuntime()->AddPrograms(fake_programs);
+    fake_programs->insert( std::pair<std::string, int>("openlid", 7) );
+    config->GetRuntime()->AddPrograms(fake_programs);
     #endif
 
-    configuration.GetRuntime()->AddAnimations();
+    config->GetRuntime()->AddAnimations();
   
     DiaRuntimeHardware * hardware = new DiaRuntimeHardware();
-    hardware->keys_object = configuration.GetGpio();
+    hardware->keys_object = config->GetGpio();
     hardware->get_keys_function = get_key;
 
-    hardware->light_object = configuration.GetGpio();
+    hardware->light_object = config->GetGpio();
     hardware->turn_light_function = turn_light;
 
-    hardware->program_object = configuration.GetGpio();
+    hardware->program_object = config->GetGpio();
     hardware->turn_program_function = turn_program;
 
     hardware->send_receipt_function = send_receipt;
@@ -625,7 +636,8 @@ int main(int argc, char ** argv) {
     hardware->get_banknotes_function = get_banknotes;
 
     hardware->electronical_object = manager;
-    hardware->get_service_function = get_service; 
+    hardware->get_service_function = get_service;
+    hardware->get_openlid_function = get_openlid;
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
@@ -634,8 +646,8 @@ int main(int argc, char ** argv) {
     hardware->delay_object = &stored_time;
     hardware->smart_delay_function = smart_delay_function;
 
-    configuration.GetRuntime()->AddHardware(hardware);
-    configuration.GetRuntime()->AddRegistry(&(config->GetRuntime()->Registry));
+    config->GetRuntime()->AddHardware(hardware);
+    config->GetRuntime()->AddRegistry(config->GetRuntime()->Registry);
     
     //InitSensorButtons();
 
@@ -644,39 +656,34 @@ int main(int argc, char ** argv) {
     int mousepress = 0;
 
     // Call Lua setup function
-    configuration.GetRuntime()->Setup();
+    config->GetRuntime()->Setup();
 
     // using button as pulse is a crap obviously
-    if (configuration.UseLastButtonAsPulse() && configuration.GetGpio()) {
+    if (config->UseLastButtonAsPulse() && config->GetGpio()) {
         printf("enabling additional coin handler\n");
-        DiaGpio_StartAdditionalHandler(configuration.GetGpio());
+        DiaGpio_StartAdditionalHandler(config->GetGpio());
     } else {
         printf("no additional coin handler\n");
     }
 
     while(!keypress) {
         // Call Lua loop function
-        configuration.GetRuntime()->Loop();
+        config->GetRuntime()->Loop();
         // Ping server every 2 sec and probably get service money from it
         CentralServerDialog();
 
         int x = 0;
         int y = 0;
         SDL_GetMouseState(&x, &y);
-        if (configuration.NeedRotateTouch()) {
-            x = configuration.GetResX() - x;
-            y = configuration.GetResY() - y;
+        if (config->NeedRotateTouch()) {
+            x = config->GetResX() - x;
+            y = config->GetResY() - y;
         }
 
-        printf("\n\n\n");
-        printf("MOUSE STATE: X - %d, Y - %d\n", x, y);
-
+        
         // Process pressed button
         DiaScreen* screen = config->GetScreen();
         std::string last = screen->LastDisplayed;
-
-        printf("LAST DISPLAYED: %s\n", last.c_str());
-        printf("CLICKABLE OBJECTS: %s\n", last.c_str());
 
         for (auto it = config->ScreenConfigs[last]->clickAreas.begin(); it != config->ScreenConfigs[last]->clickAreas.end(); ++it) {
             if (x >= (*it).X && x <= (*it).X + (*it).Width && y >= (*it).Y && y <= (*it).Y + (*it).Height && mousepress == 1) {
@@ -686,7 +693,6 @@ int main(int argc, char ** argv) {
                 printf("DEBUG KEY = %d\n", _DebugKey);
             }
         }
-        printf("\n\n\n");
         
         while(SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -760,3 +766,7 @@ int main(int argc, char ** argv) {
     delay(2000);
     return 0;
 }
+
+std::string SetRegistryValueByKeyIfNotExists(std::string key, std::string value) {
+    return network->SetRegistryValueByKeyIfNotExists(key, value);
+    }

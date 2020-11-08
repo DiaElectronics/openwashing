@@ -11,10 +11,6 @@
       "src": "screens/2_ask_for_money.json"
     },
     {
-      "id": "start",
-      "src": "screens/3_start.json"
-    },
-    {
       "id": "working",
       "src": "screens/4_working.json"
     },

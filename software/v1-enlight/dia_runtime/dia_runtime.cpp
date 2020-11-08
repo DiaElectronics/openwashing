@@ -91,6 +91,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("GetCoins", &DiaRuntimeHardware::GetCoins)
     .addFunction("GetBanknotes", &DiaRuntimeHardware::GetBanknotes)
     .addFunction("GetService", &DiaRuntimeHardware::GetService)
+    .addFunction("GetOpenLid", &DiaRuntimeHardware::GetOpenLid)
     .addFunction("SmartDelay", &DiaRuntimeHardware::SmartDelay)
     .addFunction("GetKey", &DiaRuntimeHardware::GetKey)
     .addFunction("SendReceipt", &DiaRuntimeHardware::SendReceipt)
@@ -105,9 +106,9 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
 
     getGlobalNamespace(Lua)
     .beginClass<DiaRuntimeRegistry>("DiaRuntimeRegistry")
-    .addConstructor<void(*)()>()
     .addFunction("Value", &DiaRuntimeRegistry::Value)
-    .addFunction("ValueInt", &DiaRuntimeRegistry::Value)
+    .addFunction("ValueInt", &DiaRuntimeRegistry::ValueInt)
+    .addFunction("SetValueByKeyIfNotExists", &DiaRuntimeRegistry::SetValueByKeyIfNotExists)
     .endClass();
 
     return 0;
@@ -194,10 +195,11 @@ int DiaRuntime::Loop() {
     return result;
 }
 
-DiaRuntime::DiaRuntime() {
+DiaRuntime::DiaRuntime(DiaRuntimeRegistry *newDiaRuntimeRegistry) {
     Lua = 0;
     SetupFunction = 0;
     LoopFunction = 0;
+    Registry = newDiaRuntimeRegistry;
 }
 
 DiaRuntime::~DiaRuntime() {

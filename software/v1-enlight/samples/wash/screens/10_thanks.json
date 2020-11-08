@@ -12,10 +12,10 @@
       {
         "id":"delay_seconds",
         "type": "digits",
-        "position": "630;472",
-        "font": "standard_number",
-        "symbol_size":"75;108",
-        "padding": "2",
+        "position": "729;490",
+        "font": "round_number",
+        "symbol_size":"50;66",
+        "padding": "1",
         "length": "3",
         "visible":"true"
       }

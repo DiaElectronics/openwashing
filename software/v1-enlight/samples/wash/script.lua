@@ -245,7 +245,8 @@ end
 
 program_mode = function(working_mode)
   sub_mode = working_mode - mode_work
-  show_working(sub_mode, balance)
+  cur_price = price_p[sub_mode]
+  show_working(sub_mode, balance, cur_price)
   
   if sub_mode == 0 then
     run_program(default_paid_program)
@@ -267,16 +268,20 @@ program_mode = function(working_mode)
 end
 
 pause_mode = function()
-    show_pause(balance, balance_seconds)
+    
     run_pause()
     turn_light(6, animation.one_button)
     update_balance()
+    cur_price = 0
     if balance_seconds > 0 then
         balance_seconds = balance_seconds - 0.1
     else
         balance_seconds = 0
         charge_balance(price_p[6])
+        cur_price = price_p[6]
     end
+
+    show_pause(balance, balance_seconds, cur_price)
     
     if balance <= 0.01 then return mode_thanks end
     
@@ -355,21 +360,23 @@ show_start = function(balance_rur)
     start:Display()
 end
 
-show_working = function(sub_mode, balance_rur)
+show_working = function(sub_mode, balance_rur, price_rur)
     balance_int = math.ceil(balance_rur)
     working:Set("pause_digits.visible", "false")
     working:Set("balance.value", balance_int)
+    working:Set("price.value", price_rur)
     
     switch_submodes(sub_mode)
     working:Display()
 end
 
-show_pause = function(balance_rur, balance_sec)
+show_pause = function(balance_rur, balance_sec, price_rur)
     balance_int = math.ceil(balance_rur)
     sec_int = math.ceil(balance_sec)
     working:Set("pause_digits.visible", "true")
     working:Set("pause_digits.value", sec_int)
     working:Set("balance.value", balance_int)
+    working:Set("price.value", price_rur)
     switch_submodes(6)
     working:Display()
 end
@@ -401,6 +408,10 @@ end
 
 get_price = function(key)
     return registry:ValueInt(key)
+end
+
+set_value_if_not_exists = function(key, value)
+    return registry:SetValueByKeyIfNotExists(key, value)
 end
 
 turn_light = function(rel_num, animation_code)

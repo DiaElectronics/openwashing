@@ -20,10 +20,12 @@ typedef struct income {
 } income_t;
 
 class DiaConfiguration {
+private:
+    DiaRuntimeRegistry * registry;
 public:
     std::map<std::string, DiaScreenConfig *> ScreenConfigs;
 
-    DiaConfiguration(std::string folder);
+    DiaConfiguration(std::string folder, DiaNetwork * newNet);
     ~DiaConfiguration();
 
     int Init();

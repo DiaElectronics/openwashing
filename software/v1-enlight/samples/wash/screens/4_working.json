@@ -83,9 +83,19 @@
         "id":"balance",
         "type": "digits",
         "position": "867;166",
-        "font": "standard_number",
+        "font": "round_number",
         "symbol_size":"251;405",
         "padding": "3",
+        "length": "3",
+        "visible":"true"
+      },
+      {
+        "id":"price",
+        "type": "digits",
+        "position": "1694;156",
+        "font": "round_number",
+        "symbol_size":"25;40",
+        "padding": "0",
         "length": "3",
         "visible":"true"
       },
@@ -124,9 +134,9 @@
       {
         "id":"pause_digits",
         "type": "digits",
-        "position": "251;247",
-        "font": "standard_number",
-        "symbol_size":"86;157",
+        "position": "269;247",
+        "font": "round_number",
+        "symbol_size":"87;157",
         "padding": "5",
         "length": "3",
         "visible":"true"

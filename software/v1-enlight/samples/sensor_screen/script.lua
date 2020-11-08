@@ -68,6 +68,8 @@ setup = function()
 
     version = "3.0.0"
 
+    if need_to_open_lid then printMessage("OPEN LID AGAIN!!!") end
+
     init_constants();
 
     forget_pressed_key();
@@ -129,6 +131,10 @@ end
 start_mode = function()
     show_start()
     run_stop()
+
+    if need_to_open_lid() then
+        open_lid()
+    end
 
     pressed_key = get_key()
     if pressed_key == 1 then
@@ -689,4 +695,20 @@ end
 is_working_mode = function(mode_to_check)
   if mode_to_check >= mode_work and mode_to_check<mode_work+10 then return true end
   return false
+end
+
+need_to_open_lid = function()
+    val = hardware:GetOpenLid()
+    if val>0 then return true end
+    return false
+end
+
+open_lid = function()
+    printMessage("LID OPENED !!!")
+    open_lid_program = program.openlid
+    printMessage("LID OPENED ...")
+    run_program(open_lid_program)
+    printMessage("LID OPENED :(")
+    smart_delay(20000)
+    printMessage("LID CLOSED :)")
 end
