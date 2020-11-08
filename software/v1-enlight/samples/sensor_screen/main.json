@@ -55,6 +55,10 @@
     {
       "id": "p6relay",
       "src": "programs/p6/relay.json"
+    },
+    {
+      "id": "openlid",
+      "src": "programs/openlid/relay.json"
     }
   ],
   "script": "script.lua"

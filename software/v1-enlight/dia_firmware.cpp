@@ -51,6 +51,7 @@ int _DebugKey = 0;
 // Variable for storing an additional money.
 // For instance, service money from Central Server can be transfered inside.
 int _Balance = 0;
+int _OpenLid = 0;
 
 int GetKey(DiaGpio * _gpio) {
     int key = 0;
@@ -143,6 +144,13 @@ int get_service() {
         }
     }
     return curMoney;
+}
+
+int get_openlid() {
+    int curOpenLid = _OpenLid;
+    _OpenLid = 0;
+   
+    return curOpenLid;
 }
 
 int get_coins(void *object) {
@@ -309,7 +317,8 @@ int CentralServerDialog() {
 	        _Balance += serviceMoney;
         }
         if (openStation) {
-            printf("Open station...\n");
+            _OpenLid = _OpenLid + 1;
+            printf("Door is going to be opened... \n");
             // TODO: add the function of turning on the relay, which will open the lock.
         }
     }
@@ -601,6 +610,7 @@ int main(int argc, char ** argv) {
     fake_programs->insert( std::pair<std::string, int>("p4relay", 4) );
     fake_programs->insert( std::pair<std::string, int>("p5relay", 5) );
     fake_programs->insert( std::pair<std::string, int>("p6relay", 6) );
+    fake_programs->insert( std::pair<std::string, int>("openlid", 7) );
     config->GetRuntime()->AddPrograms(fake_programs);
     #endif
 
@@ -626,7 +636,8 @@ int main(int argc, char ** argv) {
     hardware->get_banknotes_function = get_banknotes;
 
     hardware->electronical_object = manager;
-    hardware->get_service_function = get_service; 
+    hardware->get_service_function = get_service;
+    hardware->get_openlid_function = get_openlid;
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
