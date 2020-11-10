@@ -848,6 +848,7 @@ private:
         std::string res = str;
 
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -866,6 +867,7 @@ private:
         char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -890,6 +892,7 @@ private:
         char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -908,6 +911,7 @@ private:
         std::string res = str;
 
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -923,6 +927,7 @@ private:
         std::string res = str;
 
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -937,6 +942,7 @@ private:
         std::string res = str;
 
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -955,6 +961,7 @@ private:
         char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
@@ -979,6 +986,7 @@ private:
         char *str = json_dumps(object, 0);
         std::string res = str;
         free(str);
+        str = 0;
         json_decref(object);
         return res;
     }
