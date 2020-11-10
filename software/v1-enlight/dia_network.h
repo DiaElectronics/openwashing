@@ -702,20 +702,19 @@ public:
         std::string result = "";
 
         std::string get_public_key = json_get_public_key();
-	printf("GetStationID JSON:\n%s\n", get_public_key.c_str());
+	    printf("GetStationID JSON:\n%s\n", get_public_key.c_str());
 
         // Send request to Central Server
-	std::string url = _Host + _Port + "/station-by-hash";
-        int res = SendRequest(&get_public_key, &answer, url);
+	    std::string url = _Host + _Port + "/station-by-hash";
+            int res = SendRequest(&get_public_key, &answer, url);
         
-	printf("Server answer: %s\n", answer.c_str());
+	    printf("Server answer: %s\n", answer.c_str());
 
         if (res > 0) {
             printf("No connection to server\n");
         } else {
-	    if (answer != "")
-	    	result = answer;
-	}
+	        if (answer != "") result = answer;
+	    }
         return result;
     }
 private:

@@ -79,12 +79,17 @@ setup = function()
     return 0
 end
 
+update_post = function() 
+    post_position = registry:GetPostID();
+end
+
 forget_pressed_key = function()
     key = get_key()
 end
 
 loop = function()
     update_time()
+    update_post()
     currentMode = run_mode(currentMode)
     smart_delay(frame_delay)
     return 0

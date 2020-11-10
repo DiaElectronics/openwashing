@@ -25,7 +25,9 @@ class DiaRuntimeRegistry {
 private:
     DiaNetwork * network;
 public:
+    int curPostID;
     DiaRuntimeRegistry(DiaNetwork * newNetwork) {
+        curPostID = 0;
         network = newNetwork;
     }
     
@@ -43,6 +45,15 @@ public:
             return 0;
         }
         return result;
+    }
+
+    int SetPostID(int newPostID) {
+        curPostID = newPostID;
+        return 0;
+    }
+
+    int GetPostID() {
+        return curPostID;
     }
 
     int SetValue(std::string key,std::string value) {

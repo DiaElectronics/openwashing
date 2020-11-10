@@ -59,6 +59,7 @@ setup = function()
     printMessage("dia generic wash firmware v." .. version)
     -- external constants
     init_constants();
+    update_post();
     welcome:Set("post_number.value", post_position)
     forget_pressed_key();
     return 0
@@ -66,9 +67,14 @@ end
 
 -- loop is being executed
 loop = function()
+    update_post()
     currentMode = run_mode(currentMode)
     smart_delay(100)
     return 0
+end
+
+update_post = function() 
+    post_position = registry:GetPostID();
 end
 
 init_prices = function()

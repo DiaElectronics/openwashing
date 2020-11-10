@@ -109,6 +109,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("Value", &DiaRuntimeRegistry::Value)
     .addFunction("ValueInt", &DiaRuntimeRegistry::ValueInt)
     .addFunction("SetValueByKeyIfNotExists", &DiaRuntimeRegistry::SetValueByKeyIfNotExists)
+    .addFunction("GetPostID", &DiaRuntimeRegistry::GetPostID)
     .endClass();
 
     return 0;

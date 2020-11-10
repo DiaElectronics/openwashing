@@ -42,6 +42,7 @@ public:
     int AddRegistry(DiaRuntimeRegistry * hw);
     int AddAnimations();
     int AddPrograms(std::map<std::string, int> *programs);
+    int SetPostID(int newPostID);
 };
 
 void printMessage(const std::string& s);
