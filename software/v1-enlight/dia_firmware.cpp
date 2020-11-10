@@ -422,7 +422,7 @@ std::string GetLocalData(std::string key) {
     std::string filename = "registry_" + key + ".reg";
     if (file_exists(filename.c_str())) {
         char value[6];
-        dia_security_read_file(filename.c_str(), value, sizeof(6));
+        dia_security_read_file(filename.c_str(), value, 5);
 
         return std::string(value, 6);
     }
