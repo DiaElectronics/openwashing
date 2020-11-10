@@ -421,10 +421,10 @@ int RecoverRelay() {
 std::string GetLocalData(std::string key) {
     std::string filename = "registry_" + key + ".reg";
     if (file_exists(filename.c_str())) {
-        char value[2];
-        dia_security_read_file(filename.c_str(), value, sizeof(2));
-        
-        return std::string(value, 2);
+        char value[6];
+        dia_security_read_file(filename.c_str(), value, 5);
+
+        return std::string(value, 6);
     }
     else {
         return "0";
@@ -464,7 +464,7 @@ int RecoverRegistry() {
             } else {
 		fprintf(stderr, "Server returned empty value, setting default...\n");
 		value = default_price;
-		network->SetRegistryValueByKey(key, value);
+		network->SetRegistryValueByKeyIfNotExists(key, value);
 	    }
 	    registry->SetValue(key.c_str(), value.c_str());
 
@@ -588,7 +588,7 @@ int main(int argc, char ** argv) {
     
     // Get working data from server: money, relays, prices
     RecoverData();
-
+ 
     printf("Configuration is loaded...\n");
 
     // Screen load

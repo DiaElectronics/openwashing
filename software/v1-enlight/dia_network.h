@@ -627,28 +627,6 @@ public:
         return err;
     }
 
-    // Sends SAVE request to Central Server and decodes JSON result to value string.
-    // Gets key and value strings.
-    std::string SetRegistryValueByKey(std::string key, std::string value) {
-        std::string answer;
-        std::string result = "";
-
-        // Encode SAVE request to JSON with key string
-        std::string set_registry_value = json_set_registry_value(key, value);
-        printf("JSON:\n%s\n", set_registry_value.c_str());
-
-        // Send request to Central Server
-        std::string url = _Host + _Port + "/save";
-        int res = SendRequest(&set_registry_value, &answer, url);
-
-        printf("Server answer: \n%s\n", answer.c_str());
-
-        if (res > 0) {
-            printf("No connection to server\n");
-        }
-        return result;
-    }
-
     // Sends SAVE IF NOT EXISTS request to Central Server and decodes JSON result to value string.
     // Gets key and value strings.
     std::string SetRegistryValueByKeyIfNotExists(std::string key, std::string value) {
@@ -690,8 +668,7 @@ public:
         if (res > 0) {
             printf("No connection to server\n");
         } else {
-	    if (answer != "")
-	    	result = answer.substr(1, 2);
+	    if (answer.length() > 3) result = answer.substr(1, answer.length()-3);
 	}
         return result;
     }
