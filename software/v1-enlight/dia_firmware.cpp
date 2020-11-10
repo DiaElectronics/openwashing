@@ -22,7 +22,7 @@
 #include "dia_screen_item_image.h"
 
 
-#define DIA_VERSION "v1.7-enlight"
+#define DIA_VERSION "v1.8-enlight"
 
 
 //#define USE_GPIO
@@ -564,6 +564,14 @@ int main(int argc, char ** argv) {
 	    need_to_find = 0;
     }
     network->SetHostAddress(serverIP);
+    std::string stationIDasString = network->GetStationID();
+    int stationID = 0;
+    try { 
+        stationID = std::stoi(stationIDasString);
+    }
+    catch(...) {
+        printf("Wrong post number received [%s]\n", stationIDasString.c_str() );
+    }
 
     // Runtime and firmware initialization
     DiaDeviceManager *manager = new DiaDeviceManager;
@@ -648,6 +656,7 @@ int main(int argc, char ** argv) {
 
     config->GetRuntime()->AddHardware(hardware);
     config->GetRuntime()->AddRegistry(config->GetRuntime()->Registry);
+    config->GetRuntime()->Registry->SetPostID(stationID);
     
     //InitSensorButtons();
 
