@@ -696,6 +696,28 @@ public:
         return result;
     }
 
+// Sends request to Central Server and return station id.
+    std::string GetStationID() {
+        std::string answer;
+        std::string result = "";
+
+        std::string get_public_key = json_get_public_key();
+	printf("GetStationID JSON:\n%s\n", get_public_key.c_str());
+
+        // Send request to Central Server
+	std::string url = _Host + _Port + "/station-by-hash";
+        int res = SendRequest(&get_public_key, &answer, url);
+        
+	printf("Server answer: %s\n", answer.c_str());
+
+        if (res > 0) {
+            printf("No connection to server\n");
+        } else {
+	    if (answer != "")
+	    	result = answer;
+	}
+        return result;
+    }
 private:
     int interrupted = 0;
     std::string _PublicKey;
@@ -896,6 +918,20 @@ private:
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
         json_object_set_new(object, "Key", json_string(key.c_str()));
+
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        json_decref(object);
+        return res;
+    }
+
+    // Encode PublicKey to JSON string.
+    std::string json_get_public_key() {
+        json_t *object = json_object();
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
 
         char *str = json_dumps(object, 0);
         std::string res = str;
