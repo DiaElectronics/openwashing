@@ -448,10 +448,16 @@ int RecoverRegistry() {
 
     int tmp = 0;
     bool openStation = false;
-    int err = network->SendPingRequest(network->GetHostName(), tmp, openStation);
+    
     std::string default_price = "15";
-
-    if (!err) {
+    int err = 1;
+    while (err) {
+        err = network->SendPingRequest(network->GetHostName(), tmp, openStation);
+        if (err) {
+            printf("waiting for server proper answer \n");
+            sleep(5);
+            continue;
+        }
         // Load all prices in online mode
         fprintf(stderr, "Online mode, registry got from Central Server...\n");
 
@@ -462,33 +468,13 @@ int RecoverRegistry() {
             if (value != "") {
                 fprintf(stderr, "Key-value read online => %s:%s; \n", key.c_str(), value.c_str());
             } else {
-		fprintf(stderr, "Server returned empty value, setting default...\n");
-		value = default_price;
-		network->SetRegistryValueByKeyIfNotExists(key, value);
-	    }
-	    registry->SetValue(key.c_str(), value.c_str());
-
-	    std::string localData = GetLocalData(key);
-	    if (localData != value) {
-		SetLocalData(key, value);
-	    }
+		        fprintf(stderr, "Server returned empty value, setting default...\n");
+		        value = default_price;
+		        network->SetRegistryValueByKeyIfNotExists(key, value);
+	        }
+	        registry->SetValue(key.c_str(), value.c_str());
         }
-    } else {
-        fprintf(stderr, "Offline mode, checking local registries...\n");
-
-        // 6 washing modes ~ 6 prices
-        for (int i = 1; i < 7; i++) {
-            std::string current_key = "price" + std::to_string(i);
-            
-            std::string value = GetLocalData(current_key);
-            if (value == "0") {
-                value = default_price;
-            } 
-            
-            registry->SetValue(current_key.c_str(), value.c_str());
-            fprintf(stderr, "Key-value read locally => %s:%s; \n", current_key.c_str(), value.c_str());
-        }
-    }  
+    }
     return err;
 }
 //////////////////////////////////////////////
