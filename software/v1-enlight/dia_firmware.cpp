@@ -53,6 +53,8 @@ int _DebugKey = 0;
 int _Balance = 0;
 int _OpenLid = 0;
 
+int _to_be_destroyed = 0;
+
 int GetKey(DiaGpio * _gpio) {
     int key = 0;
 
@@ -103,6 +105,8 @@ int turn_light(void *object, int pin, int animation_id) {
     #endif
     return 0;
 }
+
+pthread_t pinging_thread;
 
 // Creates receipt request to Online Cash Register.
 int send_receipt(int postPosition, int isCard, int amount) {
@@ -290,6 +294,7 @@ int smart_delay_function(void * arg, int ms) {
 // Sends PING request to Central Server every 2 seconds.
 // May get service money from server.
 int CentralServerDialog() {
+    printf("PING CENTRAL SERVER\n");
     
     _IntervalsCount++;
     if(_IntervalsCount < 0) {
@@ -314,6 +319,7 @@ int CentralServerDialog() {
         network->SendPingRequest(network->GetHostName(), serviceMoney, openStation);
         
         if (serviceMoney > 0) {
+            // TODO protect with mutex
 	        _Balance += serviceMoney;
         }
         if (openStation) {
@@ -340,6 +346,15 @@ int CentralServerDialog() {
         network->SendRelayReport(relays);
         delete relays;
     }
+    return 0;
+}
+
+void * pinging_func(void * ptr) {
+    while(!_to_be_destroyed) {
+        CentralServerDialog();
+        sleep(2);
+    }
+    pthread_exit(0);
     return 0;
 }
 
@@ -661,11 +676,10 @@ int main(int argc, char ** argv) {
         printf("no additional coin handler\n");
     }
 
+    pthread_create(&pinging_thread, NULL, pinging_func, NULL);
     while(!keypress) {
         // Call Lua loop function
         config->GetRuntime()->Loop();
-        // Ping server every 2 sec and probably get service money from it
-        CentralServerDialog();
 
         int x = 0;
         int y = 0;
@@ -757,6 +771,7 @@ int main(int argc, char ** argv) {
             }
         }
     }
+    _to_be_destroyed = 1;
 
     delay(2000);
     return 0;
