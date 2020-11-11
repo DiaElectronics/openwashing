@@ -340,6 +340,7 @@ show_welcome = function()
 end
 
 show_ask_for_money = function()
+    ask_for_money:Set("post_number.value", post_position)
     if hascardreader == true then
         ask_for_money:Set("return_background.visible", "true")
     end
@@ -347,6 +348,7 @@ show_ask_for_money = function()
 end
 
 show_choose_method = function()
+    choose_method:Set("post_number.value", post_position)
     choose_method:Display()
 end
 

@@ -25,6 +25,16 @@
         "src":"pic/arrow.png",
         "visible":"false",
         "click_id":"5"
+      },
+      {
+        "id":"post_number",
+        "type": "digits",
+        "position": "1880;10",
+        "font": "round_number",
+        "symbol_size":"14;22",
+        "padding": "1",
+        "length": "2",
+        "visible":"true"
       }
     ]
   }
