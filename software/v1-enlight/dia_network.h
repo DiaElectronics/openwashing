@@ -114,7 +114,7 @@ public:
     
     // Base function for sending a GET request.
     // Parameters: gets pre-created HTTP body, modifies answer from server, gets address of host (URL).
-    int SendRequestGet(std::string *answer, std::string host_addr) {
+    int SendRequestGet(std::string *answer, std::string host_addr, int timeout) {
         assert(answer);
 
         CURL *curl;
@@ -137,7 +137,7 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
+	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeout);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -170,6 +170,7 @@ public:
         if (curl == NULL) {
             DestructCurlAnswer(&raw_answer);
             curl_global_cleanup();
+            printf("curl is NULL :( \n");
             return 1;
         }
 
@@ -185,10 +186,11 @@ public:
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, this->_Writefunc);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &raw_answer);
-	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 75);
+	    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
+            printf("CURL code is wrong %d\n", res);
             DestructCurlAnswer(&raw_answer);
             curl_easy_cleanup(curl);
             curl_global_cleanup();
@@ -349,8 +351,8 @@ public:
     int SendPingRequestGet(std::string url) {
         std::string answer;
 	    url += _Port + "/ping";
-
-        return SendRequestGet(&answer, url);
+        printf("trying %s ...\n", url.c_str());
+        return SendRequestGet(&answer, url, 200);
     }
 
     // PING request to specified URL with method POST. 
@@ -358,8 +360,8 @@ public:
     // Modifies service money, if server returned that kind of data.
     int SendPingRequest(std::string url, int& service_money, bool& open_station) {
         std::string answer;
-	url += _Port + "/ping";
-
+	    url += _Port + "/ping";
+        
         int result;
         std::string json_ping_request = json_create_ping_report();
         result = SendRequest(&json_ping_request, &answer, url);
