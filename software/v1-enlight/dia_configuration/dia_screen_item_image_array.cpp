@@ -79,20 +79,29 @@ DiaScreenItemImageArray::~DiaScreenItemImageArray() {
 
 
 int dia_screen_item_image_array_display(DiaScreenItem * base_item, void * image_array_ptr, DiaScreen * screen) {
-    if (base_item == 0) {
+    printf("image array display function engaged\n");
+    if (!base_item) {
         printf("error: nil base item\n");
         return 1;
     }
 
-    if (image_array_ptr == 0) {
+    if (!image_array_ptr) {
         printf("error: nil image_ptr\n");
         return 1;
     }
 
     DiaScreenItemImageArray * image_array = (DiaScreenItemImageArray *)image_array_ptr;
 
+    printf("trying to display %d index, must be from 0 to %d\n", image_array->index.value, image_array->length.value - 1);
     int picture_to_show = image_array->index.value;
-
+    if (picture_to_show < 0) {
+        picture_to_show = 0;
+    }
+    int high_boundary = image_array->length.value - 1;
+    if (picture_to_show > high_boundary) {
+        picture_to_show = high_boundary;
+    }
+   
     SDL_Surface * currentPicture = image_array->Pictures[picture_to_show];
 
     SDL_BlitSurface(currentPicture,
