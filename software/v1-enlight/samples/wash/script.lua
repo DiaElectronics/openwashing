@@ -259,10 +259,9 @@ program_mode = function(working_mode)
     balance_seconds = free_pause_seconds
     turn_light(0, animation.intense)
   else
-    run_program(sub_mode)
+    run_sub_program(sub_mode)
     turn_light(sub_mode, animation.one_button)
   end
-  
   charge_balance(price_p[sub_mode])
   if balance <= 0.01 then 
     return mode_thanks 
@@ -271,6 +270,17 @@ program_mode = function(working_mode)
   suggested_mode = get_mode_by_pressed_key()
   if suggested_mode >=0 then return suggested_mode end
   return working_mode
+end
+
+run_sub_program = function(program_index) 
+    if program_index == 1 then return run_program(program.p1relay) end
+    if program_index == 2 then return run_program(program.p2relay) end
+    if program_index == 3 then return run_program(program.p3relay) end
+    if program_index == 4 then return run_program(program.p4relay) end
+    if program_index == 5 then return run_program(program.p5relay) end
+    if program_index == 6 then return run_program(program.p6relay) end
+    printMessage("WARNING WRONG PROGRAM PASSED") 
+    printMessage(program_index)
 end
 
 pause_mode = function()
