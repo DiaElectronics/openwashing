@@ -266,6 +266,7 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
             printf("Something's wrong with the program");
             return 1;
         }
+        // TODO: an error here... programs must be alphabetically sorted with this code
         this->_Programs[program->ID] = program;
     }
     json_t * script_json = json_object_get(configuration_json, "script");

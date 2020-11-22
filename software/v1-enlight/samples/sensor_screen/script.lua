@@ -710,7 +710,7 @@ end
 
 open_lid = function()
     printMessage("LID OPENED !!!")
-    open_lid_program = program.openlid
+    open_lid_program = program.p7openlid
     printMessage("LID OPENED ...")
     run_program(open_lid_program)
     printMessage("LID OPENED :(")

@@ -57,7 +57,7 @@
       "src": "programs/p6/relay.json"
     },
     {
-      "id": "openlid",
+      "id": "p7openlid",
       "src": "programs/openlid/relay.json"
     }
   ],
