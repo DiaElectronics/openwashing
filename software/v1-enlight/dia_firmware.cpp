@@ -131,7 +131,6 @@ int turn_program(void *object, int program) {
         return 1;
     }
     gpio->CurrentProgram = program;
-    printf("gpio program turned ON: %d\n, program");
     #endif
     return 0;
 }
