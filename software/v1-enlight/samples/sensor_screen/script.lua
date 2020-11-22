@@ -147,6 +147,8 @@ start_mode = function()
         return mode_cash
     end
 
+    update_balance()
+    
     if balance > 0.9 then 
         return mode_cash
     end
