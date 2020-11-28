@@ -224,15 +224,6 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
     }
     _RelaysNumber = json_integer_value(relays_json);
 
-    // Let's unpack the endpoint
-    json_t *endpoint_json = json_object_get(configuration_json, "endpoint");
-    if(!json_is_string(endpoint_json)) {
-        fprintf(stderr, "error: endpoint is not a string\n");
-        return 1;
-    }
-
-    _Endpoint = json_string_value(endpoint_json);
-
     for(unsigned int i = 0; i < json_array_size(screens_json); i++) {
         //printf("screen loop \n");
         json_t * screen_json = json_array_get(screens_json, i);

@@ -308,29 +308,26 @@ int CentralServerDialog() {
         _IntervalsCountRelay = 0;
     }
 
-    // Every 2 seconds we go inside this
-    if (_IntervalsCount > 20) {
-        _IntervalsCount = 0;
-        
-        printf("Sending another PING request to server...\n");
+    
+    printf("Sending another PING request to server...\n");
 
-        int serviceMoney = 0;
-        bool openStation = false;
-        network->SendPingRequest(network->GetHostName(), serviceMoney, openStation);
-        
-        if (serviceMoney > 0) {
-            // TODO protect with mutex
-	        _Balance += serviceMoney;
-        }
-        if (openStation) {
-            _OpenLid = _OpenLid + 1;
-            printf("Door is going to be opened... \n");
-            // TODO: add the function of turning on the relay, which will open the lock.
-        }
+    int serviceMoney = 0;
+    bool openStation = false;
+    network->SendPingRequest(network->GetHostName(), serviceMoney, openStation);
+    
+    if (serviceMoney > 0) {
+        // TODO protect with mutex
+        _Balance += serviceMoney;
     }
+    if (openStation) {
+        _OpenLid = _OpenLid + 1;
+        printf("Door is going to be opened... \n");
+        // TODO: add the function of turning on the relay, which will open the lock.
+    }
+    
 
     // Every 5 min (300 sec) we go inside this
-    if (_IntervalsCountRelay > 3000) {
+    if (_IntervalsCountRelay > 300) {
         _IntervalsCountRelay = 0;
         
         printf("Sending relay report to server...\n");
@@ -352,7 +349,7 @@ int CentralServerDialog() {
 void * pinging_func(void * ptr) {
     while(!_to_be_destroyed) {
         CentralServerDialog();
-        sleep(2);
+        sleep(1);
     }
     pthread_exit(0);
     return 0;
