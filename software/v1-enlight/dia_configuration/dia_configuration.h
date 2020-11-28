@@ -75,10 +75,6 @@ public:
     int GetRelaysNumber() {
         return _RelaysNumber;
     }
-    
-    std::string GetEndpoint() {
-        return _Endpoint;
-    }
 
     inline int NeedRotateTouch() {
         return _NeedToRotateTouchScreen;
@@ -92,7 +88,6 @@ public:
     private:
     std::string _Name;
     std::string _Folder;
-    std::string _Endpoint;
     std::map<std::string, DiaProgram*> _Programs;
     
     DiaScreen * _Screen;
