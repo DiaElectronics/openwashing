@@ -685,7 +685,7 @@ animate_enter_price_all_number_buttons = function(pressed_key_var)
 
         enter_price:Display()
     end
-    if pressed_key_var == 3 then
+    if pressed_key_var == 21 then
         enter_price:Set("button_delete_on.visible", "true")
         enter_price:Display()
         smart_delay(500)
@@ -776,7 +776,7 @@ change_enter_price_selected_button_value = function(pressed_key_var)
     if pressed_key_var == 20 then
         balance_for_enter = balance_for_enter*10 + 0
     end
-    if pressed_key_var == 3 then 
+    if pressed_key_var == 21 then 
         balance_for_enter = balance_for_enter/10 --delete number
     end
     return mode_enter_price
