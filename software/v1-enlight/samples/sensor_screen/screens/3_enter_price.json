@@ -257,7 +257,95 @@
 		"size":"115;115",
 		"src":"pic/buttons/button_delete.png",
 		"visible":"true",
-		"click_id":"21"
+		"click_id":"3"
+	  },
+	  {
+		"id":"button_1_on",
+		"type":"image",
+		"position": "821;721",
+		"size":"115;115",
+		"src":"pic/buttons/button_1_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_2_on",
+		"type":"image",
+		"position": "821;561",
+		"size":"115;115",
+		"src":"pic/buttons/button_2_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_3_on",
+		"type":"image",
+		"position": "821;401",
+		"size":"115;115",
+		"src":"pic/buttons/button_3_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_4_on",
+		"type":"image",
+		"position": "821;241",
+		"size":"115;115",
+		"src":"pic/buttons/button_4_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_5_on",
+		"type":"image",
+		"position": "981;721",
+		"size":"115;115",
+		"src":"pic/buttons/button_5_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_6_on",
+		"type":"image",
+		"position": "981;561",
+		"size":"115;115",
+		"src":"pic/buttons/button_6_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_7_on",
+		"type":"image",
+		"position": "981;401",
+		"size":"115;115",
+		"src":"pic/buttons/button_7_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_8_on",
+		"type":"image",
+		"position": "981;241",
+		"size":"115;115",
+		"src":"pic/buttons/button_8_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_9_on",
+		"type":"image",
+		"position": "1141;721",
+		"size":"115;115",
+		"src":"pic/buttons/button_9_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_0_on",
+		"type":"image",
+		"position": "1141;401",
+		"size":"115;275",
+		"src":"pic/buttons/button_on.png",
+		"visible":"false"
+	  },
+	  {
+		"id":"button_delete_on",
+		"type":"image",
+		"position": "1141;241",
+		"size":"115;115",
+		"src":"pic/buttons/button_delete_on.png",
+		"visible":"false"
 	  }
     ]
   }

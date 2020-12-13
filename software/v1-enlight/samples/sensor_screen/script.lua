@@ -7,7 +7,8 @@ setup = function()
 
     -- money variables
     balance = 0.0
-    electron_balance = 0
+    balance_for_enter = 0
+   
     balance_seconds = 0
     kasse_balance = 0.0
 
@@ -36,6 +37,7 @@ setup = function()
     is_transaction_started = false
     is_waiting_receipt = false
     is_showing_pistol = false
+    is_sum_ready = false
 
     price_p = {}
     
@@ -153,28 +155,48 @@ start_mode = function()
         return mode_cash
     end
 
-    --if pressed_key == 2 then
-    --    animate_start_card_button()
-    --    return mode_enter_price
-    --end
+    if pressed_key == 2 then
+       animate_start_card_button()
+       return mode_enter_price
+    end
 
     return mode_start
 end
 
 -- enter_price_mode is the screen where user can enter an interesting amount of money to be charged from his card
 enter_price_mode = function()
+    
     show_enter_price()
     run_stop()
 
     pressed_key = get_key()
-    if pressed_key == 1 then
+    if balance_for_enter > 900 or 
+        (balance_for_enter < 50 and balance_for_enter > 0) then
+            is_sum_ready = false end
+    if pressed_key == 1 and is_sum_ready then
         animate_enter_price_begin_wash_button()
+        balance_int = 0
+        balance_for_enter = 0
+        enter_price:Set("balance.value", balance_int)
         return mode_wait_for_card
     end
     if pressed_key == 2 then
         animate_enter_price_cancel_button()
+        balance_int = 0
+        balance = 0
+        balance_for_enter = 0
+        enter_price:Set("balance.value", balance_int)
+        is_sum_ready = false
         return mode_start
     end
+    if pressed_key >=11 and pressed_key <=21 or pressed_key == 3 then
+        animate_enter_price_all_number_buttons(pressed_key)
+        change_enter_price_selected_button_value(pressed_key)
+        balance_int = math.floor(balance_for_enter)
+        enter_price:Set("balance.value", balance_int)
+        is_sum_ready = true
+        return mode_enter_price
+    end    
     
     return mode_enter_price
 end
@@ -187,8 +209,8 @@ wait_for_card_mode = function()
     if is_transaction_started == false then
         waiting_loops = wait_card_mode_seconds * frames_per_second;
 
-        request_transaction(electron_balance)
-        electron_balance = min_electron_balance
+        request_transaction(balance_for_enter)
+        
         is_transaction_started = true
     end
 
@@ -382,8 +404,6 @@ show_enter_price = function()
     enter_price:Set("temp_degrees.value", temp_degrees)
 
     enter_price:Set("post_numbers.index", post_position-1)
-    balance_int = math.ceil(balance)
-    enter_price:Set("balance.value", balance_int)
     enter_price:Display()
 end
 
@@ -414,7 +434,7 @@ show_working = function(sub_mode, balance_rur)
     index = math.ceil((balance_to_show / diagram_balance)*15 - 1)
     working:Set("diagrams.index", index)
 
-    balance_int = math.ceil(balance_rur)
+    balance_int = math.floor(balance_rur)
     working:Set("balance.value", balance_int)
     
     working:Set("time_min.value", time_minutes)
@@ -550,6 +570,16 @@ animate_cash_cancel_button = function()
     cash:Display()
 end
 
+animate_enter_price_numbers_buttons = function(pressedkey) -- non working method
+    if pressedkey == 3 then 
+        enter_price:Set("button_button_1_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_button_1_on.visible", "false")
+        enter_price:Display()
+    end
+end
+
 animate_enter_price_begin_wash_button = function()
     enter_price:Set("button_begin_washing_on.visible", "true")
     enter_price:Display()
@@ -572,6 +602,99 @@ animate_wait_for_card_cancel_button = function()
     smart_delay(500)
     card:Set("button_cancel_on.visible", "false")
     card:Display()
+end
+
+animate_enter_price_all_number_buttons = function(pressed_key_var)
+    if pressed_key_var == 11 then
+        enter_price:Set("button_1_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_1_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 12 then
+        enter_price:Set("button_2_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_2_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 13 then
+        enter_price:Set("button_3_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_3_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 14 then
+        enter_price:Set("button_4_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_4_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 15 then
+        enter_price:Set("button_5_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_5_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 16 then
+        enter_price:Set("button_6_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_6_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 17 then
+        enter_price:Set("button_7_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_7_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 18 then
+        enter_price:Set("button_8_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_8_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 19 then
+        enter_price:Set("button_9_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_9_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 20 then
+        enter_price:Set("button_0_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_0_on.visible", "false")
+
+        enter_price:Display()
+    end
+    if pressed_key_var == 21 then
+        enter_price:Set("button_delete_on.visible", "true")
+        enter_price:Display()
+        smart_delay(500)
+        enter_price:Set("button_delete_on.visible", "false")
+
+        enter_price:Display()
+    end
+
+
 end
 
 animate_p1_button = function()
@@ -620,6 +743,43 @@ animate_p6_button = function()
     smart_delay(700)
     working:Set("button_p6_on.visible", "false")
     working:Display()
+end
+
+change_enter_price_selected_button_value = function(pressed_key_var)
+    if pressed_key_var == 11 then
+        balance_for_enter = balance_for_enter*10 + 1
+    end
+    if pressed_key_var == 12 then
+        balance_for_enter = balance_for_enter*10 + 2
+    end
+    if pressed_key_var == 13 then
+        balance_for_enter = balance_for_enter*10 + 3
+    end
+    if pressed_key_var == 14 then
+        balance_for_enter = balance_for_enter*10 + 4
+    end
+    if pressed_key_var == 15 then
+        balance_for_enter = balance_for_enter*10 + 5
+    end
+    if pressed_key_var == 16 then
+        balance_for_enter = balance_for_enter*10 + 6
+    end
+    if pressed_key_var == 17 then
+        balance_for_enter = balance_for_enter*10 + 7
+    end
+    if pressed_key_var == 18 then
+        balance_for_enter = balance_for_enter*10 + 8
+    end
+    if pressed_key_var == 19 then
+        balance_for_enter = balance_for_enter*10 + 9
+    end
+    if pressed_key_var == 20 then
+        balance_for_enter = balance_for_enter*10 + 0
+    end
+    if pressed_key_var == 21 then 
+        balance_for_enter = balance_for_enter/10 --delete number
+    end
+    return mode_enter_price
 end
 
 get_mode_by_pressed_key = function()
