@@ -617,6 +617,8 @@ int main(int argc, char ** argv) {
     fake_programs->insert( std::pair<std::string, int>("p5relay", 5) );
     fake_programs->insert( std::pair<std::string, int>("p6relay", 6) );
     fake_programs->insert( std::pair<std::string, int>("openlid", 7) );
+    fake_programs->insert( std::pair<std::string, int>("p7relay", 7) );
+    fake_programs->insert( std::pair<std::string, int>("p8relay", 8) );
     config->GetRuntime()->AddPrograms(fake_programs);
     #endif
 
