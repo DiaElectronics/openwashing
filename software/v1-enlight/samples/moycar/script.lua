@@ -299,145 +299,90 @@ washing_started_mode = function()
   return mode_finish
 end
 
+set_button_state = function(choose_program,name_buttons,is_on)
+  off_visible = "true"
+  on_visible = "false"
+  if is_on then 
+     off_visible = "false"
+     on_visible = "true"
+  end
+  choose_program:Set("button_" .. name_buttons .. "_off.visible", off_visible)
+  choose_program:Set("button_" .. name_buttons .. "_on.visible", on_visible)
+end
+
 cash = function()
-  choose_payment_method:Set("button_cash_off.visible", "false")
-  choose_payment_method:Set("button_cash_on.visible", "true")
-  choose_payment_method:Set("button_bank_card_off.visible", "true")
-  choose_payment_method:Set("button_bank_card_on.visible", "false")
+  set_button_state(choose_payment_method,"cash",true)
+  set_button_state(choose_payment_method,"bank_card",false)
   payment_method_var = "cash"
 end
 
 bank_card = function()
-  choose_payment_method:Set("button_cash_off.visible", "true")
-  choose_payment_method:Set("button_cash_on.visible", "false")
-  choose_payment_method:Set("button_bank_card_off.visible", "false")
-  choose_payment_method:Set("button_bank_card_on.visible", "true")
+  set_button_state(choose_payment_method,"cash",false)
+  set_button_state(choose_payment_method,"bank_card",true)
   payment_method_var = "bank_card"
 end
 
 express = function()
-  choose_program:Set("button_express_off.visible", "false")
-  choose_program:Set("button_express_on.visible", "true")
-  choose_program:Set("button_daily_off.visible", "true")
-  choose_program:Set("button_daily_on.visible", "false")
-  choose_program:Set("button_premium_off.visible", "true")
-  choose_program:Set("button_premium_on.visible", "false")
+  set_button_state(choose_program,"express",true)
+  set_button_state(choose_program,"daily",false)
+  set_button_state(choose_program,"premium",false)
   main_chosen_program = "express"
 end 
 
 daily = function()
-  choose_program:Set("button_express_off.visible", "true")
-  choose_program:Set("button_express_on.visible", "false")
-  choose_program:Set("button_daily_off.visible", "false")
-  choose_program:Set("button_daily_on.visible", "true")
-  choose_program:Set("button_premium_off.visible", "true")
-  choose_program:Set("button_premium_on.visible", "false")
+  set_button_state(choose_program,"express",false)
+  set_button_state(choose_program,"daily",true)
+  set_button_state(choose_program,"premium",false)
   main_chosen_program = "daily"
 end
 
 premium = function()
-  choose_program:Set("button_express_off.visible", "true")
-  choose_program:Set("button_express_on.visible", "false")
-  choose_program:Set("button_daily_off.visible", "true")
-  choose_program:Set("button_daily_on.visible", "false")
-  choose_program:Set("button_premium_off.visible", "false")
-  choose_program:Set("button_premium_on.visible", "true")
+  set_button_state(choose_program,"express",false)
+  set_button_state(choose_program,"daily",false)
+  set_button_state(choose_program,"premium",true)
   main_chosen_program = "premium"
 end
 
-vacuum_cleaner_and_mats = function()
-  if compare_vacuum_cleaner_and_mats == "true" then 
-    compare_vacuum_cleaner_and_mats = "false"
-    choose_add_services:Set("button_vacuum_cleaner_and_mats_on.visible", "false") 
-    choose_add_services:Set("button_vacuum_cleaner_and_mats_off.visible", "true") 
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost2.visible", "false")
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost.visible", "true")
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost_rub.src", "rub_red.png")
-    vacuum_cleaner_and_mats_var = "nothing"
+set_service = function(compare_service,name_service)
+  if compare_service == "true" then 
+    compare_service_new = "false"
+    choose_add_services:Set("button_"..name_service.."_on.visible", "false") 
+    choose_add_services:Set("button_"..name_service.."_off.visible", "true") 
+    choose_add_services:Set(name_service.."_cost2.visible", "false")
+    choose_add_services:Set(name_service.."_cost.visible", "true")
+    choose_add_services:Set(name_service.."_cost_rub.src", "rub_red.png")
+    service_var = "nothing"
+    return compare_service_new,service_var
   else
-    compare_vacuum_cleaner_and_mats = "true" 
-    choose_add_services:Set("button_vacuum_cleaner_and_mats_on.visible", "true") 
-    choose_add_services:Set("button_vacuum_cleaner_and_mats_off.visible", "false")
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost.visible", "false") 
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost2.visible", "true")
-    choose_add_services:Set("vacuum_cleaner_and_mats_cost_rub.src", "rub.png")
-    vacuum_cleaner_and_mats_var = "vacuum_cleaner_and_mats" end
+    compare_service_new = "true" 
+    choose_add_services:Set("button_"..name_service.."_on.visible", "true") 
+    choose_add_services:Set("button_"..name_service.."_off.visible", "false")
+    choose_add_services:Set(name_service.."_cost.visible", "false") 
+    choose_add_services:Set(name_service.."_cost2.visible", "true")
+    choose_add_services:Set(name_service.."_cost_rub.src", "rub.png")
+    service_var = "vacuum_cleaner_and_mats"
+    return compare_service_new,service_var
+  end
+end
+
+vacuum_cleaner_and_mats = function()
+  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = set_service(compare_vacuum_cleaner_and_mats,"vacuum_cleaner_and_mats")
 end
 
 interior_and_wheels = function()
-  if compare_interior_and_wheels == "true" then 
-    compare_interior_and_wheels = "false"
-    choose_add_services:Set("button_interior_and_wheels_on.visible", "false") 
-    choose_add_services:Set("button_interior_and_wheels_off.visible", "true") 
-    choose_add_services:Set("interior_and_wheels_cost2.visible", "false")
-    choose_add_services:Set("interior_and_wheels_cost.visible", "true")
-    choose_add_services:Set("interior_and_wheels_cost_rub.src", "rub_red.png")
-    interior_and_wheels_var = "nothing" 
-  else
-    compare_interior_and_wheels = "true" 
-    choose_add_services:Set("button_interior_and_wheels_on.visible", "true") 
-    choose_add_services:Set("button_interior_and_wheels_off.visible", "false")
-    choose_add_services:Set("interior_and_wheels_cost.visible", "false") 
-    choose_add_services:Set("interior_and_wheels_cost2.visible", "true")
-    choose_add_services:Set("interior_and_wheels_cost_rub.src", "rub.png")
-    interior_and_wheels_var = "interior_and_wheels" end
+  compare_interior_and_wheels,interior_and_wheels_var = set_service(compare_interior_and_wheels,"interior_and_wheels")
 end
 
 tire = function()
-  if compare_tire == "true" then 
-    compare_tire = "false"
-    choose_add_services:Set("button_tire_on.visible", "false") 
-    choose_add_services:Set("button_tire_off.visible", "true")
-    choose_add_services:Set("tire_cost2.visible", "false")
-    choose_add_services:Set("tire_cost.visible", "true")
-    choose_add_services:Set("tire_cost_rub.src", "rub_red.png") 
-    tire_var = "nothing"  
-  else
-    compare_tire = "true" 
-    choose_add_services:Set("button_tire_on.visible", "true") 
-    choose_add_services:Set("button_tire_off.visible", "false") 
-    choose_add_services:Set("tire_cost.visible", "false") 
-    choose_add_services:Set("tire_cost2.visible", "true")
-    choose_add_services:Set("tire_cost_rub.src", "rub.png")
-    tire_var = "tire"  end
+  compare_tire,tire_var = set_service(compare_tire,"tire")
 end
 
 disks = function()
-  if compare_disks == "true" then 
-    compare_disks = "false"
-    choose_add_services:Set("button_disks_on.visible", "false") 
-    choose_add_services:Set("button_disks_off.visible", "true") 
-    choose_add_services:Set("disks_cost2.visible", "false")
-    choose_add_services:Set("disks_cost.visible", "true")
-    choose_add_services:Set("disks_cost_rub.src", "rub_red.png")
-    disks_var = "nothing"  
-  else
-    compare_disks = "true" 
-    choose_add_services:Set("button_disks_on.visible", "true") 
-    choose_add_services:Set("button_disks_off.visible", "false")
-    choose_add_services:Set("disks_cost.visible", "false") 
-    choose_add_services:Set("disks_cost2.visible", "true")
-    choose_add_services:Set("disks_cost_rub.src", "rub.png")
-    disks_var = "disks"   end
+  compare_disks,disks_var = set_service(compare_disks,"disks")
 end
 
 drying = function()
-  if compare_drying == "true" then 
-    compare_drying = "false"
-    choose_add_services:Set("button_drying_on.visible", "false") 
-    choose_add_services:Set("button_drying_off.visible", "true") 
-    choose_add_services:Set("drying_cost2.visible", "false")
-    choose_add_services:Set("drying_cost.visible", "true")
-    choose_add_services:Set("drying_cost_rub.src", "rub_red.png") 
-    drying_var = "nothing"  
-  else 
-    compare_drying = "true" 
-    choose_add_services:Set("button_drying_on.visible", "true") 
-    choose_add_services:Set("button_drying_off.visible", "false") 
-    choose_add_services:Set("drying_cost.visible", "false") 
-    choose_add_services:Set("drying_cost2.visible", "true")
-    choose_add_services:Set("drying_cost_rub.src", "rub.png")
-    drying_var = "drying"  end
+  compare_drying,drying_var = set_service(compare_drying,"drying")
 end
 
 show_payment_cash = function()
