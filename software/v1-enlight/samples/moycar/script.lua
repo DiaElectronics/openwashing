@@ -94,8 +94,7 @@ run_need_program = function(main_program, vacuum_cleaner_and_mats_program,interi
   	debug_message("RAB3")
     end
     smart_delay(short_delay_var)
-    run_stop()
-    
+    run_stop()    
     if vacuum_cleaner_and_mats_program == "vacuum_cleaner_and_mats" then 
 	run_program(program.p4relay)
 	debug_message("RAB4")
@@ -360,7 +359,7 @@ set_service = function(compare_service,name_service)
     choose_add_services:Set(name_service.."_cost.visible", "false") 
     choose_add_services:Set(name_service.."_cost2.visible", "true")
     choose_add_services:Set(name_service.."_cost_rub.src", "rub.png")
-    service_var = "vacuum_cleaner_and_mats"
+    service_var = name_service
     return compare_service_new,service_var
   end
 end
@@ -611,54 +610,26 @@ set_defaults = function()
 
   mode_finish = mode_contact1
 
+  set_button_state(choose_program,"express",false)
+  set_button_state(choose_program,"daily",false)
+  set_button_state(choose_program,"premium",false)
 
-  choose_program:Set("button_express_off.visible", "true")
-  choose_program:Set("button_express_on.visible", "false")
-  choose_program:Set("button_daily_off.visible", "true")
-  choose_program:Set("button_daily_on.visible", "false")
-  choose_program:Set("button_premium_off.visible", "true")
-  choose_program:Set("button_premium_on.visible", "false")
+  set_button_state(choose_add_services,"drying",false)
+  set_button_state(choose_add_services,"disks",false)
+  set_button_state(choose_add_services,"tire",false)
+  set_button_state(choose_add_services,"interior_and_wheels",false)
+  set_button_state(choose_add_services,"vacuum_cleaner_and_mats_on",false)
 
-  choose_add_services:Set("button_drying_on.visible", "false") 
-  choose_add_services:Set("button_drying_off.visible", "true") 
-  choose_add_services:Set("button_disks_on.visible", "false") 
-  choose_add_services:Set("button_disks_off.visible", "true") 
-  choose_add_services:Set("button_disks_on.visible", "false") 
-  choose_add_services:Set("button_disks_off.visible", "true") 
-  choose_add_services:Set("button_tire_on.visible", "false") 
-  choose_add_services:Set("button_tire_off.visible", "true")
-  choose_add_services:Set("button_interior_and_wheels_on.visible", "false") 
-  choose_add_services:Set("button_interior_and_wheels_off.visible", "true") 
-  choose_add_services:Set("button_vacuum_cleaner_and_mats_on.visible", "false") 
-  choose_add_services:Set("button_vacuum_cleaner_and_mats_off.visible", "true") 
-  
   --icon color of the ruble and digits
-  choose_add_services:Set("drying_cost2.visible", "false")
-  choose_add_services:Set("drying_cost.visible", "true")
-  choose_add_services:Set("drying_cost_rub.src", "rub_red.png") 
+  compare_drying,drying_var = set_service("true","drying")
+  compare_disks,disks_var = set_service("true","disks")
+  compare_tire,tire_var = set_service("true","tire")
+  compare_interior_and_wheels,interior_and_wheels_var = set_service("true","interior_and_wheels")
+  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = set_service("true","vacuum_cleaner_and_mats")
 
-  choose_add_services:Set("disks_cost2.visible", "false")
-  choose_add_services:Set("disks_cost.visible", "true")
-  choose_add_services:Set("disks_cost_rub.src", "rub_red.png") 
-
-  choose_add_services:Set("tire_cost2.visible", "false")
-  choose_add_services:Set("tire_cost.visible", "true")
-  choose_add_services:Set("tire_cost_rub.src", "rub_red.png") 
-
-  choose_add_services:Set("interior_and_wheels_cost2.visible", "false")
-  choose_add_services:Set("interior_and_wheels_cost.visible", "true")
-  choose_add_services:Set("interior_and_wheels_cost_rub.src", "rub_red.png") 
-
-  choose_add_services:Set("vacuum_cleaner_and_mats_cost2.visible", "false")
-  choose_add_services:Set("vacuum_cleaner_and_mats_cost.visible", "true")
-  choose_add_services:Set("vacuum_cleaner_and_mats_cost_rub.src", "rub_red.png") 
-
-  --cash or bank card buttons 
-  choose_payment_method:Set("button_cash_off.visible", "true")
-  choose_payment_method:Set("button_cash_on.visible", "false")
-  choose_payment_method:Set("button_bank_card_off.visible", "true")
-  choose_payment_method:Set("button_bank_card_on.visible", "false")
-
+  --cash or bank card buttons
+  set_button_state(choose_payment_method,"cash",false)
+  set_button_state(choose_payment_method,"bank_card",false) 
 
   --button to pay(grey)
   payment:Set("button_to_pay_off.visible", "true")
