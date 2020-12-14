@@ -563,20 +563,6 @@ set_defaults = function()
   --END MAIN PROGRAMS SCREEN6
   
   --SERVICE SCREEN7
-  --add service program state variables
-  vacuum_cleaner_and_mats_var = "nothing"
-  interior_and_wheels_var = "nothing"
-  tire_var = "nothing"
-  disks_var = "nothing"
-  drying_var = "nothing"
-
-  --service variables for a swap white and red images
-  compare_vacuum_cleaner_and_mats = "false"
-  compare_interior_and_wheels = "false"
-  compare_tire = "false"
-  compare_disks = "false"
-  compare_drying = "false"
-  
   --variables for a choosing add service
   function_vacuum_cleaner_and_mats = 300
   function_interior_and_wheels = 310
