@@ -200,7 +200,7 @@ choose_add_services_mode = function()
 	if vacuum_cleaner_and_mats_var == "vacuum_cleaner_and_mats" then summ_cost_var = summ_cost_var + vacuum_cleaner_and_mats_cost end
 	if interior_and_wheels_var == "interior_and_wheels" then summ_cost_var = summ_cost_var + interior_and_wheels_cost end
 	if tire_var == "tire" then summ_cost_var = summ_cost_var + tire_cost  end
-        if disks_var == "disks" then summ_cost_var = summ_cost_var + disks_cost  end
+  if disks_var == "disks" then summ_cost_var = summ_cost_var + disks_cost  end
 	if drying_var == "drying" then summ_cost_var = summ_cost_var + drying_cost end
 	return mode_choose_payment_method 
   end
