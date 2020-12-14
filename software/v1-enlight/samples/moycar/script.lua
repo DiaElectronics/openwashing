@@ -75,7 +75,10 @@ run_mode = function(new_mode)
   if new_mode == mode_choose_payment_method then return choose_payment_method_mode() end
   if new_mode == mode_payment_cash then return payment_cash_mode() end
   if new_mode == mode_payment_bank_card then return payment_bank_card_mode() end
-  if new_mode == mode_finish then return contract1_mode() end
+  if new_mode == mode_finish then
+    set_defaults()
+    return contract1_mode()
+  end
   if new_mode == mode_washing_started then return washing_started_mode() end
 end
 
@@ -130,7 +133,6 @@ run_need_program = function(main_program, vacuum_cleaner_and_mats_program,interi
 end
 
 contract1_mode = function()
-  set_defaults()
   show_contract1()
   pressed_key = get_key()
   if pressed_key == 1 then return mode_contract2 end
@@ -532,6 +534,8 @@ set_defaults = function()
   mode_payment_bank_card = 110
   mode_washing_started = 120
 
+  mode_finish = 999
+
   --MAIN PROGRAMS SCREEN6
   function_express = 200
   function_daily = 210
@@ -578,7 +582,7 @@ set_defaults = function()
   cash_balance = 0
   electronical_balance = 0
 
-  mode_finish = mode_contact1
+  
 
   set_button_state(choose_program,"express",false)
   set_button_state(choose_program,"daily",false)
