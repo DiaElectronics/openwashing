@@ -3,7 +3,6 @@
 setup = function()
 
     -- program to turn on when user paid money but has not selected a program
-    default_paid_program = 8
 
     min_electron_balance = 50
     max_electron_balance = 900
@@ -246,12 +245,8 @@ wait_for_card = function()
 	if status ~= 0 then
 	    abort_transaction()
 	end
-
 end
-
-    smart_delay(100)
     waiting_loops = waiting_loops - 1
-   
     return mode_payment_bank_card 
 end
 
@@ -342,7 +337,7 @@ premium = function()
   main_chosen_program = "premium"
 end
 
-set_service = function(compare_service,name_service)
+switch_additional_program_state = function(compare_service,name_service)
   if compare_service == "true" then 
     compare_service_new = "false"
     choose_add_services:Set("button_"..name_service.."_on.visible", "false") 
@@ -365,44 +360,41 @@ set_service = function(compare_service,name_service)
 end
 
 vacuum_cleaner_and_mats = function()
-  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = set_service(compare_vacuum_cleaner_and_mats,"vacuum_cleaner_and_mats")
+  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = switch_additional_program_state(compare_vacuum_cleaner_and_mats,"vacuum_cleaner_and_mats")
 end
 
 interior_and_wheels = function()
-  compare_interior_and_wheels,interior_and_wheels_var = set_service(compare_interior_and_wheels,"interior_and_wheels")
+  compare_interior_and_wheels,interior_and_wheels_var = switch_additional_program_state(compare_interior_and_wheels,"interior_and_wheels")
 end
 
 tire = function()
-  compare_tire,tire_var = set_service(compare_tire,"tire")
+  compare_tire,tire_var = switch_additional_program_state(compare_tire,"tire")
 end
 
 disks = function()
-  compare_disks,disks_var = set_service(compare_disks,"disks")
+  compare_disks,disks_var = switch_additional_program_state(compare_disks,"disks")
 end
 
 drying = function()
-  compare_drying,drying_var = set_service(compare_drying,"drying")
+  compare_drying,drying_var = switch_additional_program_state(compare_drying,"drying")
 end
 
 show_payment_cash = function()
   payment:Set("payed_cost.value", cash_balance)
   payment:Set("to_pay_cost.value", summ_cost_var)
   payment:Display()
-  smart_delay(100)
 end
 
 show_payment_electronical = function()
   payment:Set("payed_cost.value", electronical_balance)
   payment:Set("to_pay_cost.value", summ_cost_var)
   payment:Display()
-  smart_delay(100)
 end
 
 show_choose_payment_method = function()
   debug_message("show_choose_payment_method")
   choose_payment_method:Set("to_pay_cost.value", summ_cost_var)
   choose_payment_method:Display()
-  smart_delay(100)
 end
 
 show_choose_add_services = function()
@@ -417,7 +409,6 @@ show_choose_add_services = function()
   choose_add_services:Set("drying_cost.value", drying_cost)
   choose_add_services:Set("drying_cost2.value", drying_cost)  
   choose_add_services:Display()
-  smart_delay(100)
 end
 
 show_choose_program = function()
@@ -425,37 +416,30 @@ show_choose_program = function()
   choose_program:Set("daily_cost.value", daily_cost)
   choose_program:Set("premium_cost.value", premium_cost)
   choose_program:Display()
-  smart_delay(100)
 end
 
 show_contract1 = function()
   contract1:Display()
-  smart_delay(100)
 end
 
 show_contract2 = function()
   contract2:Display()
-  smart_delay(100)
 end
 
 show_contract3 = function()
   contract3:Display()
-  smart_delay(100)
 end
 
 show_contract4 = function()
   contract4:Display()
-  smart_delay(100)
 end
 
 show_contract5 = function()
   contract5:Display()
-  smart_delay(100)
 end
 
 show_washing_started = function()
   washing_started:Display()
-  smart_delay(100)
 end
 
 smart_delay = function(ms)
@@ -607,11 +591,11 @@ set_defaults = function()
   set_button_state(choose_add_services,"vacuum_cleaner_and_mats_on",false)
 
   --icon color of the ruble and digits
-  compare_drying,drying_var = set_service("true","drying")
-  compare_disks,disks_var = set_service("true","disks")
-  compare_tire,tire_var = set_service("true","tire")
-  compare_interior_and_wheels,interior_and_wheels_var = set_service("true","interior_and_wheels")
-  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = set_service("true","vacuum_cleaner_and_mats")
+  compare_drying,drying_var = switch_additional_program_state("true","drying")
+  compare_disks,disks_var = switch_additional_program_state("true","disks")
+  compare_tire,tire_var = switch_additional_program_state("true","tire")
+  compare_interior_and_wheels,interior_and_wheels_var = switch_additional_program_state("true","interior_and_wheels")
+  compare_vacuum_cleaner_and_mats,vacuum_cleaner_and_mats_var = switch_additional_program_state("true","vacuum_cleaner_and_mats")
 
   --cash or bank card buttons
   set_button_state(choose_payment_method,"cash",false)
