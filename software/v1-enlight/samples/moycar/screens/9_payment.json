@@ -42,7 +42,7 @@
         "size":"350;100",
         "src":"button/to_pay.png",
         "visible":"false",
-        "click_id":"2" 
+        "click_id":"10" 
       },
       {
         "id":"button_to_pay_off",
