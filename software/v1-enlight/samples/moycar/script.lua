@@ -76,6 +76,7 @@ run_mode = function(new_mode)
   if new_mode == mode_payment_cash then return payment_cash_mode() end
   if new_mode == mode_payment_bank_card then return payment_bank_card_mode() end
   if new_mode == mode_finish then
+    update_balance()
     set_defaults()
     return contract1_mode()
   end
@@ -222,46 +223,16 @@ choose_payment_method_mode = function()
   return mode_choose_payment_method
 end
 
-wait_for_card = function()
-  debug_message("{{{{{{{{{{{{{{ start wait for card")
-    run_stop()
-
-    if is_transaction_started == false then
-        waiting_loops = wait_card_mode_seconds * 10;
-
-        request_transaction(summ_cost_var)
-        is_transaction_started = true
-    end
-    update_balance()
-    if balance > 0.99 then
-        status = get_transaction_status()
-        if status ~= 0 then 
-            abort_transaction()
-        end
-        is_transaction_started = false
-        electronical_balance = balance
-    end
-    if waiting_loops <= 0 then
-        is_transaction_started = false
-	status = get_transaction_status()
-	if status ~= 0 then
-	    abort_transaction()
-	end
-end
-    waiting_loops = waiting_loops - 1
-    return mode_payment_bank_card 
-end
-
 payment_cash_mode = function()
   update_balance()
-  if cash_balance >= summ_cost_var then
+  if balance >= summ_cost_var then
     payment:Set("button_to_pay_off.visible", "false")
     payment:Set("button_to_pay.visible", "true")
   end
   show_payment_cash()
   pressed_key = get_key()
   if pressed_key == 1 then return mode_choose_payment_method end
-  if pressed_key == 2 and cash_balance >= summ_cost_var then 
+  if pressed_key == 2 and balance >= summ_cost_var then 
     run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
     return mode_washing_started
   end
@@ -269,25 +240,59 @@ payment_cash_mode = function()
 end
 
 payment_bank_card_mode = function()
-  update_balance()
-  if cash_balance >= summ_cost_var then
+  need_pay=summ_cost_var-balance
+  if need_pay<=0 then
     payment:Set("button_to_pay_off.visible", "false")
     payment:Set("button_to_pay.visible", "true")
   end
   show_payment_electronical()
-  wait_for_card()
   pressed_key = get_key()
-  if pressed_key == 1 then
-    debug_message("return mode_choose_payment_method") 
+  if pressed_key > 0 and pressed_key < 7 then
+    close_transaction()
+    debug_message("return mode_choose_payment_method")
     return mode_choose_payment_method
   end
-  if pressed_key == 2 and electronical_balance >= summ_cost_var then
+  if pressed_key == 10 and need_pay<=0 then
     debug_message("run_need_program")  
-    run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
+    run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)
+    close_transaction()
     return mode_washing_started
   end
-  return mode_payment_bank_card 
+  if need_pay>0 then
+    debug_message("{{{{{{{{{{{{{{ start wait for card")
+    run_stop()
+
+    if is_transaction_started == false  then
+        waiting_loops = wait_card_mode_seconds * 10;
+        debug_message("////////////////////need_pay="..tostring(need_pay))
+        request_transaction(need_pay)
+        is_transaction_started = true
+    end
+    update_balance()
+    if balance >= summ_cost_var-0.01 then
+        close_transaction()
+        return mode_payment_bank_card        
+    end
+    if waiting_loops <= 0 then
+        close_transaction()
+        return mode_choose_payment_method
+    end
+    waiting_loops = waiting_loops - 1
+  end  
+  return mode_payment_bank_card
 end
+
+close_transaction = function()
+  if is_transaction_started then
+    status = get_transaction_status()
+    if status ~= 0 then
+        debug_message("////////////////////abort_balance="..tostring(balance))
+        abort_transaction()
+    end
+    debug_message("////////////////////close_trans="..tostring(balance))
+    is_transaction_started = false
+  end
+end  
 
 washing_started_mode = function()
   show_washing_started()
@@ -382,13 +387,13 @@ drying = function()
 end
 
 show_payment_cash = function()
-  payment:Set("payed_cost.value", cash_balance)
+  payment:Set("payed_cost.value", balance)
   payment:Set("to_pay_cost.value", summ_cost_var)
   payment:Display()
 end
 
 show_payment_electronical = function()
-  payment:Set("payed_cost.value", electronical_balance)
+  payment:Set("payed_cost.value", balance)
   payment:Set("to_pay_cost.value", summ_cost_var)
   payment:Display()
 end
@@ -491,11 +496,6 @@ update_balance = function()
   new_electronical = hardware:GetElectronical()
   new_service = hardware:GetService()
 
-  cash_balance = cash_balance + new_coins
-  cash_balance = cash_balance + new_banknotes
-  cash_balance = cash_balance + new_electronical
-  cash_balance = cash_balance + new_service
-
   balance = balance + new_coins
   balance = balance + new_banknotes
   balance = balance + new_electronical
@@ -503,7 +503,6 @@ update_balance = function()
 end 
 
 set_defaults = function()
-
 
   balance = 0
   balance_seconds = 0
@@ -518,7 +517,7 @@ set_defaults = function()
   
   --help variables
   short_delay_var = 1000 
-  is_debug = false
+  is_debug = true
   
 
   --WORKING SCREEN MODES
@@ -578,11 +577,7 @@ set_defaults = function()
   mode_bank_card = 410
   --END PAYMENT METHOD SCREEN8
    
-  --PAYMENT SCREEN9
-  cash_balance = 0
-  electronical_balance = 0
 
-  
 
   set_button_state(choose_program,"express",false)
   set_button_state(choose_program,"daily",false)
