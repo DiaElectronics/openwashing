@@ -232,7 +232,7 @@ payment_cash_mode = function()
   show_payment_cash()
   pressed_key = get_key()
   if pressed_key == 1 then return mode_choose_payment_method end
-  if pressed_key == 2 and balance >= summ_cost_var then 
+  if pressed_key == 10 and balance >= summ_cost_var then 
     run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
     return mode_washing_started
   end
@@ -240,6 +240,7 @@ payment_cash_mode = function()
 end
 
 payment_bank_card_mode = function()
+  update_balance()
   need_pay=summ_cost_var-balance
   if need_pay<=0 then
     payment:Set("button_to_pay_off.visible", "false")
