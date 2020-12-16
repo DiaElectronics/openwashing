@@ -232,7 +232,8 @@ payment_cash_mode = function()
   show_payment_cash()
   pressed_key = get_key()
   if pressed_key == 1 then return mode_choose_payment_method end
-  if pressed_key == 10 and balance >= summ_cost_var then 
+  if pressed_key == 10 and balance >= summ_cost_var then
+    if balance > summ_cost_var then return_cash(balance-summ_cost_var) end  
     run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
     return mode_washing_started
   end
@@ -254,7 +255,8 @@ payment_bank_card_mode = function()
     return mode_choose_payment_method
   end
   if pressed_key == 10 and need_pay<=0 then
-    debug_message("run_need_program")  
+    debug_message("run_need_program")
+    if need_pay<0 then return_cash(balance-summ_cost_var) end  
     run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)
     close_transaction()
     return mode_washing_started
@@ -282,6 +284,10 @@ payment_bank_card_mode = function()
   end  
   return mode_payment_bank_card
 end
+
+return_cash = function(how_much)
+  printMessage("returned "..tostring(how_much).."RUB")
+end  
 
 close_transaction = function()
   if is_transaction_started then
@@ -518,7 +524,7 @@ set_defaults = function()
   
   --help variables
   short_delay_var = 1000 
-  is_debug = true
+  is_debug = false
   
 
   --WORKING SCREEN MODES
