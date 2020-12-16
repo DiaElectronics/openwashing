@@ -232,8 +232,7 @@ payment_cash_mode = function()
   pressed_key = get_key()
   if pressed_key == 1 then return mode_choose_payment_method end
   if pressed_key == 10 and balance >= summ_cost_var then
-    if balance > summ_cost_var then return_cash(balance-summ_cost_var) end  
-    run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
+    if balance > summ_cost_var then return_cash(balance-summ_cost_var) end    
     return mode_washing_started
   end
   return mode_payment_cash 
@@ -255,8 +254,7 @@ payment_bank_card_mode = function()
   end
   if pressed_key == 10 and need_pay<=0 then
     debug_message("run_need_program")
-    if need_pay<0 then return_cash(balance-summ_cost_var) end  
-    run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)
+    if need_pay<0 then return_cash(balance-summ_cost_var) end
     close_transaction()
     return mode_washing_started
   end
@@ -302,6 +300,7 @@ end
 
 washing_started_mode = function()
   show_washing_started()
+  run_need_program(main_chosen_program, vacuum_cleaner_and_mats_var,interior_and_wheels_var,tire_var,disks_var,drying_var)  
   smart_delay(10000)
   return mode_finish
 end
