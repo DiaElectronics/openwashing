@@ -26,8 +26,7 @@ setup = function()
 currentMode = mode_contract1
     
     -- external constants
-    init_constants();
-    forget_pressed_key();
+    init_constants();    
     return 0
 end
 
@@ -510,7 +509,7 @@ update_balance = function()
 end 
 
 set_defaults = function()
-
+  forget_pressed_key();
   balance = 0
   balance_seconds = 0
   kasse_balance = 0.0
