@@ -1,0 +1,30 @@
+{
+  "items": [
+    {
+      "id":"background",
+      "type":"image",
+      "position": "0;0",
+      "size":"1920;1080",
+      "src":"button/background/1_0_contract.png",
+      "visible":"true"
+    },
+    {
+      "id":"button_contract",
+      "type":"image",
+      "position": "200;931",
+      "size":"560;100",
+      "src":"button/contract/button_contract.png",
+      "visible":"true",
+      "click_id":"1"
+    },
+    {
+      "id":"button_washing",
+      "type":"image",
+      "position": "1164;931",
+      "size":"560;100",
+      "src":"button/contract/button_washing.png",
+      "visible":"true",
+      "click_id":"2"
+    }
+  ]
+}

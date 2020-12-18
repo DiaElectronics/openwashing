@@ -1,0 +1,135 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/2_program_selection.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position":"200;931",
+        "size":"350;100",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_next_white",
+        "type":"image",
+        "position":"1373;931",
+        "size":"350;100",
+        "src":"button/button_next_white.png",
+        "visible":"true",
+        "click_id":"2"
+      },
+      {
+        "id":"button_express_off",
+        "type":"image",
+        "position":"200;301",
+        "size":"480;560",
+        "src":"button/program/button_express_program_off.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"button_express_on",
+        "type":"image",
+        "position":"200;301",
+        "size":"480;560",
+        "src":"button/program/button_express_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_daily_off",
+        "type":"image",
+        "position":"722;301",
+        "size":"480;560",
+        "src":"button/program/button_daily_program_off.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"button_daily_on",
+        "type":"image",
+        "position":"722;301",
+        "size":"480;560",
+        "src":"button/program/button_daily_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_premium_off",
+        "type":"image",
+        "position":"1243;301",
+        "size":"480;560",
+        "src":"button/program/button_premium_program_off.png",
+        "visible":"true",
+        "click_id":"5"
+      },
+      {
+        "id":"button_premium_on",
+        "type":"image",
+        "position":"1243;301",
+        "size":"480;560",
+        "src":"button/program/button_premium_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"express_cost",
+        "type": "digits",
+        "position": "383;791",
+        "font": "numbers_white",
+        "symbol_size":"24;30",
+        "length": "3",
+        "padding": "3",
+        "visible":"true"
+      },
+      {
+        "id":"express_cost_rub",
+        "type": "image",
+        "position": "465;791",
+        "size":"26;30",
+        "src":"rub.png",
+        "visible":"true"
+      },
+      {
+        "id":"daily_cost",
+        "type": "digits",
+        "position": "905;791",
+        "font": "numbers_white",
+        "symbol_size":"24;30",
+        "length": "3",
+        "padding": "3",
+        "visible":"true"
+      },
+      {
+        "id":"daily_cost_rub",
+        "type": "image",
+        "position": "987;791",
+        "size":"26;30",
+        "src":"rub.png",
+        "visible":"true"
+      },
+      {
+        "id":"premium_cost",
+        "type": "digits",
+        "position": "1426;791",
+        "font": "numbers_white",
+        "symbol_size":"24;30",
+        "length": "3",
+        "padding": "3",
+        "visible":"true"
+      },
+      {
+        "id":"premium_cost_rub",
+        "type": "image",
+        "position": "1508;791",
+        "size":"26;30",
+        "src":"rub.png",
+        "visible":"true"
+      }
+    ]
+  }

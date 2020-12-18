@@ -1,0 +1,82 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/4_1_pay.png",
+        "visible":"true"
+      }, 
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position":"200;931",
+        "size":"350;100",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_next_white",
+        "type":"image",
+        "position":"1373;931",
+        "size":"350;100",
+        "src":"button/button_next_white.png",
+        "visible":"true",
+        "click_id":"2"
+      },    
+      {
+        "id":"button_cash_off",
+        "type":"image",
+        "position":"1023;401",
+        "size":"700;160",
+        "src":"button/pay/button_cash_off.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"button_cash_on",
+        "type":"image",
+        "position":"1023;401",
+        "size":"700;160",
+        "src":"button/pay/button_cash_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_bank_card_off",
+        "type":"image",
+        "position":"1023;600",
+        "size":"700;160",
+        "src":"button/pay/button_bank_card_off.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"button_bank_card_on",
+        "type":"image",
+        "position":"1023;600",
+        "size":"700;160",
+        "src":"button/pay/button_bank_card_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"to_pay_cost",
+        "type": "digits",
+        "position": "633;455",
+        "font": "numbers_white",
+        "symbol_size":"40;50",
+        "length": "3",
+        "padding": "6",
+        "visible":"true"
+      }, 
+      {
+        "id":"to_pay_cost_rub",
+        "type": "image",
+        "position": "783;455",
+        "size":"43;50",
+        "src":"rub.png",
+        "visible":"true"
+      }
+    ]
+  }

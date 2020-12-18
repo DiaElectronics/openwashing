@@ -1,0 +1,74 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/4_2_pay.png",
+        "visible":"true"
+      }, 
+      {
+        "id":"payed_cost",
+        "type": "digits",
+        "position": "780;554",
+        "font": "numbers_white",
+        "symbol_size":"72;90",
+        "length": "3",
+        "padding":"10",
+        "visible":"true"
+      },
+      {
+        "id":"payed_cost_rub",
+        "type": "image",
+        "position": "1038;554",
+        "size":"77;90",
+        "src":"rub.png",
+        "visible":"true"
+      },      
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position":"200;931",
+        "size":"350;100",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_to_pay",
+        "type":"image",
+        "position":"1373;931",
+        "size":"350;100",
+        "src":"button/to_pay.png",
+        "visible":"false",
+        "click_id":"10" 
+      },
+      {
+        "id":"button_to_pay_off",
+        "type":"image",
+        "position":"1373;931",
+        "size":"350;100",
+        "src":"button/to_pay_off.png",
+        "visible":"true"
+      },
+      {
+        "id":"to_pay_cost",
+        "type": "digits",
+        "position": "548;301",
+        "font": "numbers_white",
+        "symbol_size":"40;50",
+        "length": "3",
+        "padding": "6",
+        "visible":"true"
+      }, 
+      {
+        "id":"to_pay_cost_rub",
+        "type": "image",
+        "position": "698;301",
+        "size":"43;50",
+        "src":"rub.png",
+        "visible":"true"
+      }
+    ]
+  }
