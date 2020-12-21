@@ -1,0 +1,12 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/5_start.png",
+        "visible":"true"
+      }
+    ]
+  }

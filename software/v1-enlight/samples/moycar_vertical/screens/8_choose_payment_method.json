@@ -1,0 +1,83 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/4_1_pay.png",
+        "visible":"true"
+      }, 
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position": "1741;685",
+        "size":"100;350",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_next_white",
+        "type":"image",
+        "position": "1741;43",
+        "size":"100;350",
+        "src":"button/button_next_white.png",
+        "visible":"true",
+        "click_id":"2"
+      },    
+      {
+        "id":"button_cash_off",
+        "type":"image",
+        "position":"663;190",
+        "size":"200;700",
+        "src":"button/pay/button_cash_off.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"button_cash_on",
+        "type":"image",
+        "position":"663;190",
+        "size":"200;700",
+        "src":"button/pay/button_cash_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_bank_card_off",
+        "type":"image",
+        "position":"923;190",
+        "size":"200;700",
+        "src":"button/pay/button_bank_card_off.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"button_bank_card_on",
+        "type":"image",
+        "position":"923;190",
+        "size":"200;700",
+        "src":"button/pay/button_bank_card_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"to_pay_cost",
+        "type": "digits",
+        "position": "479;284",
+        "font": "numbers_white",
+        "symbol_size":"50;40",
+        "length": "3",
+        "padding": "6",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"to_pay_cost_rub",
+        "type": "image",
+        "position": "479;235",
+        "size":"50;43",
+        "src":"rub.png",
+        "visible":"true"
+      }
+    ]
+  }

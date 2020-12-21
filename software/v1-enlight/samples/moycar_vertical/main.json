@@ -1,0 +1,84 @@
+{
+  "name": "default configuration",
+  "resolution": "1920x1080",
+  "screens": [
+    {
+      "id": "contract1",
+      "src": "screens/1_contract1.json"
+    },
+    {
+      "id": "contract2",
+      "src": "screens/2_contract2.json"
+    },
+    {
+      "id": "contract3",
+      "src": "screens/3_contract3.json"
+    },
+    {
+      "id": "contract4",
+      "src": "screens/4_contract4.json"
+    },
+    {
+      "id": "choose_program",
+      "src": "screens/6_choose_program.json"
+    },
+    {
+      "id": "choose_add_services",
+      "src": "screens/7_choose_add_services.json"
+    },
+    {
+      "id": "choose_payment_method",
+      "src": "screens/8_choose_payment_method.json"
+    },
+    {
+      "id": "payment",
+      "src": "screens/9_payment.json"
+    }
+    ,
+    {
+      "id": "washing_started",
+      "src": "screens/10_washing_started.json"
+    }
+
+  ],
+  "relays": 8,
+  "endpoint": "http://app.diae.ru/v0/gql/",
+  "programs": [
+    {
+      "id": "p1relay",
+      "src": "programs/p1/relay.json"
+    },
+    {
+      "id": "p2relay",
+      "src": "programs/p2/relay.json"
+    },
+    {
+      "id": "p3relay",
+      "src": "programs/p3/relay.json"
+    },
+    {
+      "id": "p4relay",
+      "src": "programs/p4/relay.json"
+    },
+    {
+      "id": "p5relay",
+      "src": "programs/p5/relay.json"
+    },
+    {
+      "id": "p6relay",
+      "src": "programs/p6/relay.json"
+    },
+    {
+      "id": "p7relay",
+      "src": "programs/p7/relay.json"
+    },
+    {
+      "id": "p8relay",
+      "src": "programs/p8/relay.json"
+    }
+  ],
+  "buttons": 8,
+  "last_button_pulse": false,
+  "script": "script.lua",
+  "include": "constants.lua"
+}
