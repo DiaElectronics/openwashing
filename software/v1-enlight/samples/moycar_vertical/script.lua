@@ -307,6 +307,19 @@ set_button_state = function(choose_program,name_buttons,is_on)
   choose_program:Set("button_" .. name_buttons .. "_on.visible", on_visible)
 end
 
+set_button_state_program = function(choose_program,name_buttons,is_on)
+  set_button_state(choose_program,name_buttons,is_on)
+  if is_on then
+    choose_program:Set(name_buttons.."_cost2.visible", "true")
+    choose_program:Set(name_buttons.."_cost.visible", "false")
+    choose_program:Set(name_buttons.."_cost_rub.src", "rub_red.png")
+  else
+    choose_program:Set(name_buttons.."_cost2.visible", "false")
+    choose_program:Set(name_buttons.."_cost.visible", "true")
+    choose_program:Set(name_buttons.."_cost_rub.src", "rub.png")
+  end      
+end
+
 cash = function()
   set_button_state(choose_payment_method,"cash",true)
   set_button_state(choose_payment_method,"bank_card",false)
@@ -320,23 +333,23 @@ bank_card = function()
 end
 
 express = function()
-  set_button_state(choose_program,"express",true)
-  set_button_state(choose_program,"daily",false)
-  set_button_state(choose_program,"premium",false)
+  set_button_state_program(choose_program,"express",true)
+  set_button_state_program(choose_program,"daily",false)
+  set_button_state_program(choose_program,"premium",false)
   main_chosen_program = "express"
 end 
 
 daily = function()
-  set_button_state(choose_program,"express",false)
-  set_button_state(choose_program,"daily",true)
-  set_button_state(choose_program,"premium",false)
+  set_button_state_program(choose_program,"express",false)
+  set_button_state_program(choose_program,"daily",true)
+  set_button_state_program(choose_program,"premium",false)
   main_chosen_program = "daily"
 end
 
 premium = function()
-  set_button_state(choose_program,"express",false)
-  set_button_state(choose_program,"daily",false)
-  set_button_state(choose_program,"premium",true)
+  set_button_state_program(choose_program,"express",false)
+  set_button_state_program(choose_program,"daily",false)
+  set_button_state_program(choose_program,"premium",true)
   main_chosen_program = "premium"
 end
 
@@ -418,6 +431,10 @@ show_choose_program = function()
   choose_program:Set("express_cost.value", express_cost)
   choose_program:Set("daily_cost.value", daily_cost)
   choose_program:Set("premium_cost.value", premium_cost)
+
+  choose_program:Set("express_cost2.value", express_cost)
+  choose_program:Set("daily_cost2.value", daily_cost)
+  choose_program:Set("premium_cost2.value", premium_cost)
   choose_program:Display()
 end
 
@@ -570,9 +587,9 @@ set_defaults = function()
    
 
 
-  set_button_state(choose_program,"express",false)
-  set_button_state(choose_program,"daily",false)
-  set_button_state(choose_program,"premium",false)
+  set_button_state_program(choose_program,"express",false)
+  set_button_state_program(choose_program,"daily",false)
+  set_button_state_program(choose_program,"premium",false)
 
   set_button_state(choose_add_services,"drying",false)
   set_button_state(choose_add_services,"disks",false)

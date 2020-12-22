@@ -89,6 +89,17 @@
         "is_vertical":"1"
       },
       {
+        "id":"express_cost2",
+        "type": "digits",
+        "position": "705;523",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
         "id":"express_cost_rub",
         "type": "image",
         "position": "705;490",
@@ -108,6 +119,17 @@
         "is_vertical":"1"
       },
       {
+        "id":"daily_cost2",
+        "type": "digits",
+        "position": "1138;523",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
         "id":"daily_cost_rub",
         "type": "image",
         "position": "1138;490",
@@ -120,6 +142,17 @@
         "type": "digits",
         "position": "1572;523",
         "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"premium_cost2",
+        "type": "digits",
+        "position": "1572;523",
+        "font": "numbers_red",
         "symbol_size":"30;24",
         "length": "3",
         "padding": "3",
