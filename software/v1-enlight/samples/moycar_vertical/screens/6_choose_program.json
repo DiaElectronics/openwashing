@@ -1,0 +1,171 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/2_program_selection.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position": "1741;685",
+        "size":"100;350",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_next_white",
+        "type":"image",
+        "position": "1741;43",
+        "size":"100;350",
+        "src":"button/button_next_white.png",
+        "visible":"true",
+        "click_id":"2"
+      },
+      {
+        "id":"button_express_off",
+        "type":"image",
+        "position":"403;190",
+        "size":"374;700",
+        "src":"button/program/button_express_program_off.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"button_express_on",
+        "type":"image",
+        "position":"403;190",
+        "size":"374;700",
+        "src":"button/program/button_express_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_daily_off",
+        "type":"image",
+        "position":"836;190",
+        "size":"374;700",
+        "src":"button/program/button_daily_program_off.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"button_daily_on",
+        "type":"image",
+        "position":"836;190",
+        "size":"374;700",
+        "src":"button/program/button_daily_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"button_premium_off",
+        "type":"image",
+        "position":"1269;190",
+        "size":"374;700",
+        "src":"button/program/button_premium_program_off.png",
+        "visible":"true",
+        "click_id":"5"
+      },
+      {
+        "id":"button_premium_on",
+        "type":"image",
+        "position":"1269;190",
+        "size":"374;700",
+        "src":"button/program/button_premium_program_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"express_cost",
+        "type": "digits",
+        "position": "705;523",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"express_cost2",
+        "type": "digits",
+        "position": "705;523",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"express_cost_rub",
+        "type": "image",
+        "position": "705;490",
+        "size":"30;26",
+        "src":"rub.png",
+        "visible":"true"
+      },
+      {
+        "id":"daily_cost",
+        "type": "digits",
+        "position": "1138;523",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"daily_cost2",
+        "type": "digits",
+        "position": "1138;523",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"daily_cost_rub",
+        "type": "image",
+        "position": "1138;490",
+        "size":"30;26",
+        "src":"rub.png",
+        "visible":"true"
+      },
+      {
+        "id":"premium_cost",
+        "type": "digits",
+        "position": "1572;523",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"premium_cost2",
+        "type": "digits",
+        "position": "1572;523",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      },
+      {
+        "id":"premium_cost_rub",
+        "type": "image",
+        "position": "1572;490",
+        "size":"30;26",
+        "src":"rub.png",
+        "visible":"true"
+      }
+    ]
+  }

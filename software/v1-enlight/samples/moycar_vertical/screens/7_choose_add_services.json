@@ -1,0 +1,265 @@
+{
+    "items": [
+      {
+        "id":"background",
+        "type":"image",
+        "position": "0;0",
+        "size":"1920;1080",
+        "src":"button/background/3_service.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_back_white",
+        "type":"image",
+        "position": "1741;685",
+        "size":"100;350",
+        "src":"button/button_back_white.png",
+        "visible":"true",
+        "click_id":"1"
+      },
+      {
+        "id":"button_next_white",
+        "type":"image",
+        "position": "1741;43",
+        "size":"100;350",
+        "src":"button/button_next_white.png",
+        "visible":"true",
+        "click_id":"2"
+      },
+      {
+        "id":"button_vacuum_cleaner_and_mats_off",
+        "type":"image",
+        "position":"403;190",
+        "size":"200;700",
+        "src":"button/service/button_vacuum_cleaner_and_mats_off.png",
+        "visible":"true",
+        "click_id":"3"
+      },
+      {
+        "id":"button_vacuum_cleaner_and_mats_on",
+        "type":"image",
+        "position":"403;190",
+        "size":"200;700",
+        "src":"button/service/button_vacuum_cleaner_and_mats_on.png",
+        "visible":" false"
+      },    
+      {
+        "id":"vacuum_cleaner_and_mats_cost",
+        "type": "digits",
+        "position": "502;265",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"vacuum_cleaner_and_mats_cost2",
+        "type": "digits",
+        "position": "502;265",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"false",
+        "is_vertical":"1"
+      },
+      {
+        "id":"vacuum_cleaner_and_mats_cost_rub",
+        "type": "image",
+        "position": "502;235",
+        "size":"30;26",
+        "src":"rub_red.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_interior_and_wheels_off",
+        "type":"image",
+        "position":"663;190",
+        "size":"200;700",
+        "src":"button/service/button_interior_and_wheels_off.png",
+        "visible":"true",
+        "click_id":"4"
+      },
+      {
+        "id":"button_interior_and_wheels_on",
+        "type":"image",
+        "position":"663;190",
+        "size":"200;700",
+        "src":"button/service/button_interior_and_wheels_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"interior_and_wheels_cost",
+        "type": "digits",
+        "position": "765;265",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"interior_and_wheels_cost2",
+        "type": "digits",
+        "position": "765;265",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"false",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"interior_and_wheels_cost_rub",
+        "type": "image",
+        "position": "765;235",
+        "size":"30;26",
+        "src":"rub_red.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_tire_off",
+        "type":"image",
+        "position":"923;190",
+        "size":"200;700",
+        "src":"button/service/button_tire_off.png",
+        "visible":"true",
+        "click_id":"5"
+      },
+      {
+        "id":"button_tire_on",
+        "type":"image",
+        "position":"923;190",
+        "size":"200;700",
+        "src":"button/service/button_tire_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"tire_cost",
+        "type": "digits",
+        "position": "1010;265",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"tire_cost2",
+        "type": "digits",
+        "position": "1010;265",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"false",
+        "is_vertical":"1"
+      },
+      {
+        "id":"tire_cost_rub",
+        "type": "image",
+        "position": "1010;235",
+        "size":"30;26",
+        "src":"rub_red.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_disks_off",
+        "type":"image",
+        "position":"1183;190",
+        "size":"200;700",
+        "src":"button/service/button_disks_off.png",
+        "visible":"true",
+        "click_id":"6"
+      },
+      {
+        "id":"button_disks_on",
+        "type":"image",
+        "position":"1183;190",
+        "size":"200;700",
+        "src":"button/service/button_disks_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"disks_cost",
+        "type": "digits",
+        "position": "1287;265",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"disks_cost2",
+        "type": "digits",
+        "position": "1287;265",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "3",
+        "padding": "3",
+        "visible":"false",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"disks_cost_rub",
+        "type": "image",
+        "position": "1287;235",
+        "size":"30;26",
+        "src":"rub_red.png",
+        "visible":"true"
+      },
+      {
+        "id":"button_drying_off",
+        "type":"image",
+        "position":"1443;190",
+        "size":"200;700",
+        "src":"button/service/button_drying_off.png",
+        "visible":"true",
+        "click_id":"7"
+      },
+      {
+        "id":"button_drying_on",
+        "type":"image",
+        "position":"1443;190",
+        "size":"200;700",
+        "src":"button/service/button_drying_on.png",
+        "visible":"false"
+      },
+      {
+        "id":"drying_cost",
+        "type": "digits",
+        "position": "1541;265",
+        "font": "numbers_red",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"true",
+        "is_vertical":"1"
+      }, 
+      {
+        "id":"drying_cost2",
+        "type": "digits",
+        "position": "1541;265",
+        "font": "numbers_white",
+        "symbol_size":"30;24",
+        "length": "2",
+        "padding": "3",
+        "visible":"false",
+        "is_vertical":"1"
+      },
+      {
+        "id":"drying_cost_rub",
+        "type": "image",
+        "position": "1541;235",
+        "size":"30;26",
+        "src":"rub_red.png",
+        "visible":"true"
+      }
+  ]
+}
