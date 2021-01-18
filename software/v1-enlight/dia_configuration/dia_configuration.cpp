@@ -116,6 +116,7 @@ DiaConfiguration::DiaConfiguration(std::string folder, DiaNetwork *newNet) {
     _Runtime = new DiaRuntime(registry);
     _Gpio = 0;
     _Screen = 0; // use Init();
+    _svcWeather = new DiaRuntimeSvcWeather(newNet);
 
     // let's init income
     _Income.totalIncomeCoins = 0;
@@ -284,5 +285,8 @@ DiaConfiguration::~DiaConfiguration() {
     }
     if(registry) {
         delete registry;
+    }
+    if(_svcWeather) {
+        delete _svcWeather;
     }
 }

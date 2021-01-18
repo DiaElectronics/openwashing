@@ -19,7 +19,7 @@ setup = function()
     time_hours = 13
 
     -- temperature variables
-    temp_degrees = 11
+    temp_degrees = 23
     temp_fraction = 6
 
     -- delay variables
@@ -91,6 +91,7 @@ end
 
 loop = function()
     update_time()
+    update_temp()
     update_post()
     currentMode = run_mode(currentMode)
     smart_delay(frame_delay)
@@ -100,6 +101,11 @@ end
 update_time = function()
     time_minutes = hardware:GetMinutes()
     time_hours = hardware:GetHours()
+end
+
+update_temp = function()
+    temp_degrees = weather:GetTempDegrees()
+    temp_fraction = weather:GetTempFraction()
 end
 
 init_prices = function()

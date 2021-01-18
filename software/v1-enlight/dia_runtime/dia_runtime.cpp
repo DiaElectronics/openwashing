@@ -112,6 +112,12 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("GetPostID", &DiaRuntimeRegistry::GetPostID)
     .endClass();
 
+    getGlobalNamespace(Lua)
+    .beginClass<DiaRuntimeSvcWeather>("DiaRuntimeSvcWeather")
+    .addFunction("GetTempDegrees", &DiaRuntimeSvcWeather::GetTempDegrees)
+    .addFunction("GetTempFraction", &DiaRuntimeSvcWeather::GetTempFraction)
+    .endClass();
+
     return 0;
 }
 
@@ -183,6 +189,13 @@ int DiaRuntime::AddRegistry(DiaRuntimeRegistry * reg) {
     luabridge::push(Lua, reg);
     lua_setglobal(Lua, "registry");
     printf("added registry\n");
+    return 0;
+}
+
+int DiaRuntime::AddSvcWeather(DiaRuntimeSvcWeather * svc) {
+    luabridge::push(Lua, svc);
+    lua_setglobal(Lua, "weather");
+    printf("added weather\n");
     return 0;
 }
 
