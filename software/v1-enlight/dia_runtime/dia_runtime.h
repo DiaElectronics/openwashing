@@ -17,6 +17,7 @@ extern "C" {
 #include "dia_runtime_screen.h"
 #include "dia_runtime_hardware.h"
 #include "dia_runtime_registry.h"
+#include "dia_runtime_svcweather.h"
 
 using namespace luabridge;
 
@@ -40,6 +41,7 @@ public:
     int AddScreen(DiaRuntimeScreen * screen);
     int AddHardware(DiaRuntimeHardware * hw);
     int AddRegistry(DiaRuntimeRegistry * hw);
+    int AddSvcWeather(DiaRuntimeSvcWeather * svc);
     int AddAnimations();
     int AddPrograms(std::map<std::string, int> *programs);
     int SetPostID(int newPostID);

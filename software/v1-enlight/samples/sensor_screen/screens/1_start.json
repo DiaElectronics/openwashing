@@ -87,6 +87,17 @@
       "is_vertical":"1"
     },
     {
+      "id":"temp_sign",
+      "type":"digits",
+      "position": "425;1015",
+      "font": "minus",
+      "symbol_size":"24;10",
+      "padding": "0",
+      "length": "1",
+      "visible":"true",
+      "is_vertical":"1"
+    },
+    {
       "id":"price_p1",
       "type": "digits",
       "position": "820;160",

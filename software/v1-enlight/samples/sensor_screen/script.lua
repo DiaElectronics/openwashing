@@ -19,8 +19,9 @@ setup = function()
     time_hours = 13
 
     -- temperature variables
-    temp_degrees = 11
+    temp_degrees = 23
     temp_fraction = 6
+    temp_is_negative = false
 
     -- delay variables
     thanks_mode_seconds = 20
@@ -91,6 +92,7 @@ end
 
 loop = function()
     update_time()
+    update_temp()
     update_post()
     currentMode = run_mode(currentMode)
     smart_delay(frame_delay)
@@ -100,6 +102,12 @@ end
 update_time = function()
     time_minutes = hardware:GetMinutes()
     time_hours = hardware:GetHours()
+end
+
+update_temp = function()
+    temp_degrees = weather:GetTempDegrees()
+    temp_fraction = weather:GetTempFraction()
+    temp_is_negative = weather:IsNegative()
 end
 
 init_prices = function()
@@ -347,11 +355,22 @@ thanks_mode = function()
     return mode_thanks
 end
 
+show_temp = function(obj) 
+    obj:Set("temp_fraction.value", temp_fraction)
+    obj:Set("temp_degrees.value", temp_degrees)
+
+    if temp_is_negative == true then 
+        obj:Set("temp_sign.visible", "true") 
+    else
+        obj:Set("temp_sign.visible", "false") 
+    end
+end
+
 show_start = function()
     start:Set("time_min.value", time_minutes)
     start:Set("time_hours.value", time_hours)
-    start:Set("temp_fraction.value", temp_fraction)
-    start:Set("temp_degrees.value", temp_degrees)
+
+    show_temp(start)
 
     price1_int = math.ceil(price_p[1])
     start:Set("price_p1.value", price1_int)
@@ -387,8 +406,8 @@ show_cash = function()
 
     cash:Set("time_min.value", time_minutes)
     cash:Set("time_hours.value", time_hours)
-    cash:Set("temp_fraction.value", temp_fraction)
-    cash:Set("temp_degrees.value", temp_degrees)
+
+    show_temp(cash)
 
     cash:Set("post_numbers.index", post_position-1)
     balance_int = math.ceil(balance)
@@ -400,8 +419,8 @@ end
 show_enter_price = function()
     enter_price:Set("time_min.value", time_minutes)
     enter_price:Set("time_hours.value", time_hours)
-    enter_price:Set("temp_fraction.value", temp_fraction)
-    enter_price:Set("temp_degrees.value", temp_degrees)
+
+    show_temp(enter_price)
 
     enter_price:Set("post_numbers.index", post_position-1)
     enter_price:Display()
@@ -410,8 +429,8 @@ end
 show_wait_for_card = function()
     card:Set("time_min.value", time_minutes)
     card:Set("time_hours.value", time_hours)
-    card:Set("temp_fraction.value", temp_fraction)
-    card:Set("temp_degrees.value", temp_degrees)
+
+    show_temp(card)
 
     card:Set("post_numbers.index", post_position-1)
     balance_int = math.ceil(balance)
@@ -439,8 +458,8 @@ show_working = function(sub_mode, balance_rur)
     
     working:Set("time_min.value", time_minutes)
     working:Set("time_hours.value", time_hours)
-    working:Set("temp_fraction.value", temp_fraction)
-    working:Set("temp_degrees.value", temp_degrees)
+
+    show_temp(working)
 
     working:Set("post_numbers.index", post_position-1)
 

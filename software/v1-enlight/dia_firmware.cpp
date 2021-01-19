@@ -308,7 +308,6 @@ int CentralServerDialog() {
         _IntervalsCountRelay = 0;
     }
 
-    
     printf("Sending another PING request to server...\n");
 
     int serviceMoney = 0;
@@ -342,6 +341,16 @@ int CentralServerDialog() {
         
         network->SendRelayReport(relays);
         delete relays;
+    }
+
+    {   // Every 30 min (1800 sec) we go inside this
+        static const int maxIntervalsCountWeather = 1800;
+        static int intervalsCountWeather = maxIntervalsCountWeather;
+        if (intervalsCountWeather >= maxIntervalsCountWeather) {
+            intervalsCountWeather = 0;
+            config->GetSvcWeather()->SetCurrentTemperature();
+        }
+        ++intervalsCountWeather;
     }
     return 0;
 }
@@ -656,6 +665,7 @@ int main(int argc, char ** argv) {
 
     config->GetRuntime()->AddHardware(hardware);
     config->GetRuntime()->AddRegistry(config->GetRuntime()->Registry);
+    config->GetRuntime()->AddSvcWeather(config->GetSvcWeather());
     config->GetRuntime()->Registry->SetPostID(stationID);
     
     //InitSensorButtons();

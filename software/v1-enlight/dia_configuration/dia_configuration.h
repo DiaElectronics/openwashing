@@ -57,6 +57,11 @@ public:
         #endif
         return 0;        
     }
+
+    DiaRuntimeSvcWeather *GetSvcWeather() {
+        assert(_svcWeather);
+        return _svcWeather;
+    }
     
     int GetResX() {
         assert(_ResX);
@@ -93,6 +98,7 @@ public:
     DiaScreen * _Screen;
     DiaRuntime * _Runtime;
     DiaGpio * _Gpio;
+    DiaRuntimeSvcWeather * _svcWeather;
     storage_interface_t * _Storage;
     
     
