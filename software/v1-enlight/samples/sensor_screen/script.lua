@@ -22,7 +22,6 @@ setup = function()
     temp_degrees = 23
     temp_fraction = 6
     temp_is_negative = false
-    temp_has_two_digits = true
 
     -- delay variables
     thanks_mode_seconds = 20
@@ -109,7 +108,6 @@ update_temp = function()
     temp_degrees = weather:GetTempDegrees()
     temp_fraction = weather:GetTempFraction()
     temp_is_negative = weather:IsNegative()
-    temp_has_two_digits = weather:HasTwoDigits()
 end
 
 init_prices = function()
@@ -357,32 +355,22 @@ thanks_mode = function()
     return mode_thanks
 end
 
+show_temp = function(obj) 
+    obj:Set("temp_fraction.value", temp_fraction)
+    obj:Set("temp_degrees.value", temp_degrees)
+
+    if temp_is_negative == true then 
+        obj:Set("temp_sign.visible", "true") 
+    else
+        obj:Set("temp_sign.visible", "false") 
+    end
+end
+
 show_start = function()
     start:Set("time_min.value", time_minutes)
     start:Set("time_hours.value", time_hours)
 
-    start:Set("temp_fraction.value", temp_fraction)
-    start:Set("temp_degrees.value", temp_degrees)
-
-    if temp_is_negative == true then 
-        if temp_has_two_digits == true then
-            start:Set("temp_degrees.length", "2") 
-            start:Set("temp_sign_two_digits.visible", "true") 
-            start:Set("temp_sign_one_digit.visible", "false") 
-        else 
-            start:Set("temp_degrees.length", "1")  
-            start:Set("temp_sign_two_digits.visible", "false") 
-            start:Set("temp_sign_one_digit.visible", "true")  
-        end
-    else
-        if temp_has_two_digits == true then
-            start:Set("temp_degrees.length", "2") 
-        else 
-            start:Set("temp_degrees.length", "1")  
-        end
-        start:Set("temp_sign_two_digits.visible", "false") 
-        start:Set("temp_sign_one_digit.visible", "false")
-    end
+    show_temp(start)
 
     price1_int = math.ceil(price_p[1])
     start:Set("price_p1.value", price1_int)
@@ -419,28 +407,7 @@ show_cash = function()
     cash:Set("time_min.value", time_minutes)
     cash:Set("time_hours.value", time_hours)
 
-    cash:Set("temp_fraction.value", temp_fraction)
-    cash:Set("temp_degrees.value", temp_degrees)
-
-    if temp_is_negative == true then 
-        if temp_has_two_digits == true then
-            cash:Set("temp_degrees.length", "2") 
-            cash:Set("temp_sign_two_digits.visible", "true") 
-            cash:Set("temp_sign_one_digit.visible", "false") 
-        else 
-            cash:Set("temp_degrees.length", "1")  
-            cash:Set("temp_sign_two_digits.visible", "false") 
-            cash:Set("temp_sign_one_digit.visible", "true")  
-        end
-    else
-        if temp_has_two_digits == true then
-            cash:Set("temp_degrees.length", "2") 
-        else 
-            cash:Set("temp_degrees.length", "1")  
-        end
-        cash:Set("temp_sign_two_digits.visible", "false") 
-        cash:Set("temp_sign_one_digit.visible", "false")
-    end
+    show_temp(cash)
 
     cash:Set("post_numbers.index", post_position-1)
     balance_int = math.ceil(balance)
@@ -453,28 +420,7 @@ show_enter_price = function()
     enter_price:Set("time_min.value", time_minutes)
     enter_price:Set("time_hours.value", time_hours)
 
-    enter_price:Set("temp_fraction.value", temp_fraction)
-    enter_price:Set("temp_degrees.value", temp_degrees)
-
-    if temp_is_negative == true then 
-        if temp_has_two_digits == true then
-            enter_price:Set("temp_degrees.length", "2") 
-            enter_price:Set("temp_sign_two_digits.visible", "true") 
-            enter_price:Set("temp_sign_one_digit.visible", "false") 
-        else 
-            enter_price:Set("temp_degrees.length", "1")  
-            enter_price:Set("temp_sign_two_digits.visible", "false") 
-            enter_price:Set("temp_sign_one_digit.visible", "true")  
-        end
-    else
-        if temp_has_two_digits == true then
-            enter_price:Set("temp_degrees.length", "2") 
-        else 
-            enter_price:Set("temp_degrees.length", "1")  
-        end
-        enter_price:Set("temp_sign_two_digits.visible", "false") 
-        enter_price:Set("temp_sign_one_digit.visible", "false")
-    end
+    show_temp(enter_price)
 
     enter_price:Set("post_numbers.index", post_position-1)
     enter_price:Display()
@@ -484,28 +430,7 @@ show_wait_for_card = function()
     card:Set("time_min.value", time_minutes)
     card:Set("time_hours.value", time_hours)
 
-    card:Set("temp_fraction.value", temp_fraction)
-    card:Set("temp_degrees.value", temp_degrees)
-
-    if temp_is_negative == true then 
-        if temp_has_two_digits == true then
-            card:Set("temp_degrees.length", "2") 
-            card:Set("temp_sign_two_digits.visible", "true") 
-            card:Set("temp_sign_one_digit.visible", "false") 
-        else 
-            card:Set("temp_degrees.length", "1")  
-            card:Set("temp_sign_two_digits.visible", "false") 
-            card:Set("temp_sign_one_digit.visible", "true")  
-        end
-    else
-        if temp_has_two_digits == true then
-            card:Set("temp_degrees.length", "2") 
-        else 
-            card:Set("temp_degrees.length", "1")  
-        end
-        card:Set("temp_sign_two_digits.visible", "false") 
-        card:Set("temp_sign_one_digit.visible", "false")
-    end
+    show_temp(card)
 
     card:Set("post_numbers.index", post_position-1)
     balance_int = math.ceil(balance)
@@ -534,28 +459,7 @@ show_working = function(sub_mode, balance_rur)
     working:Set("time_min.value", time_minutes)
     working:Set("time_hours.value", time_hours)
 
-    working:Set("temp_fraction.value", temp_fraction)
-    working:Set("temp_degrees.value", temp_degrees)
-
-    if temp_is_negative == true then 
-        if temp_has_two_digits == true then
-            working:Set("temp_degrees.length", "2") 
-            working:Set("temp_sign_two_digits.visible", "true") 
-            working:Set("temp_sign_one_digit.visible", "false") 
-        else 
-            working:Set("temp_degrees.length", "1")  
-            working:Set("temp_sign_two_digits.visible", "false") 
-            working:Set("temp_sign_one_digit.visible", "true")  
-        end
-    else
-        if temp_has_two_digits == true then
-            working:Set("temp_degrees.length", "2") 
-        else 
-            working:Set("temp_degrees.length", "1")  
-        end
-        working:Set("temp_sign_two_digits.visible", "false") 
-        working:Set("temp_sign_one_digit.visible", "false")
-    end
+    show_temp(working)
 
     working:Set("post_numbers.index", post_position-1)
 
