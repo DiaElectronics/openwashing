@@ -549,8 +549,8 @@ end
 show_thanks =  function()
     thanks:Set("time_min.value", time_minutes)
     thanks:Set("time_hours.value", time_hours)
-    thanks:Set("temp_fraction.value", temp_fraction)
-    thanks:Set("temp_degrees.value", temp_degrees)
+    
+    show_temp(thanks)
 
     thanks:Set("post_numbers.index", post_position-1)
 

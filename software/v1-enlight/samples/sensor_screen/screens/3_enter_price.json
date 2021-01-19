@@ -114,6 +114,17 @@
 		"is_vertical":"1"
 	  },
 	  {
+      		"id":"temp_sign",
+      		"type":"digits",
+      		"position": "425;1015",
+      		"font": "minus",
+      		"symbol_size":"24;10",
+      		"padding": "0",
+      		"length": "1",
+      		"visible":"false",
+      		"is_vertical":"1"
+    	  },
+	  {
 		"id":"post_numbers",
 		"type":"image_array",
 		"position": "150;55",
