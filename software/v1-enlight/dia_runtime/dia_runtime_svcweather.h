@@ -22,10 +22,11 @@ private:
     DiaNetwork * _network;
     int _temp_degrees;
     int _temp_fraction;
+    bool _isNegative;
+    int _num_digits;
 
 public:
-    DiaRuntimeSvcWeather(DiaNetwork * network) {
-        _network = network;
+    DiaRuntimeSvcWeather(DiaNetwork * network) : _network{network} {
     }
 
     void SetCurrentTemperature() {
@@ -38,7 +39,13 @@ public:
 
 	    try {
             int degrees = std::stoi(degrees_value);
-            _temp_degrees = degrees;
+            if (degrees >= 0) {
+                _isNegative = false;
+                _temp_degrees = degrees;
+            } else {
+                _isNegative = true;
+                _temp_degrees = 0 - degrees;
+            }
 	    }
         catch (std::invalid_argument &err) {
             fprintf(stderr, "Value is not an int, returning ...\n");
@@ -53,16 +60,24 @@ public:
             fprintf(stderr, "Value is not an int, returning ...\n");
             return;
         }
+
+        _num_digits = decimal - _isNegative;
     }
 
     int GetTempDegrees() {
-        // printf("Temp degrees: %d\n", _temp_degrees);
         return _temp_degrees;
     }
 
     int GetTempFraction() {
-        // printf("Temp fraction: %d\n", _temp_fraction);
         return _temp_fraction;
+    }
+
+    bool isNegative() {
+        return _isNegative;
+    }
+
+    bool hasTwoDigits() {
+        return _num_digits == 2;
     }
 };
 

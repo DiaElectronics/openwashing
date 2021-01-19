@@ -116,6 +116,8 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .beginClass<DiaRuntimeSvcWeather>("DiaRuntimeSvcWeather")
     .addFunction("GetTempDegrees", &DiaRuntimeSvcWeather::GetTempDegrees)
     .addFunction("GetTempFraction", &DiaRuntimeSvcWeather::GetTempFraction)
+    .addFunction("IsNegative", &DiaRuntimeSvcWeather::isNegative)
+    .addFunction("HasTwoDigits", &DiaRuntimeSvcWeather::hasTwoDigits)
     .endClass();
 
     return 0;
