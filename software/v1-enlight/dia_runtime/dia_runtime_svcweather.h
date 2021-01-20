@@ -34,7 +34,7 @@ public:
         std::string response = _network->GetRegistryValueByKey("curr_temp");
         auto decimal = response.find('.');
         auto degrees_value  = response.substr(0, decimal);
-        auto fraction_value = response.substr(decimal+1);
+        auto fraction_value = response.substr(decimal+1, 1);
 
 	    try {
             int degrees = std::stoi(degrees_value);
@@ -52,8 +52,8 @@ public:
         }
 
 	    try {
-            // int fraction = std::stoi(fraction_value);
-            _temp_fraction = std::rand() % 10;//fraction;
+            int fraction = std::stoi(fraction_value);
+            _temp_fraction = fraction;
 	    }
         catch (std::invalid_argument &err) {
             fprintf(stderr, "Value is not an int, returning ...\n");
