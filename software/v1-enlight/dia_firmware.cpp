@@ -340,7 +340,7 @@ int CentralServerDialog() {
         }
         
         network->SendRelayReport(relays);
-        delete relays;
+        delete[] relays;
     }
 
     {   // Every 30 min (1800 sec) we go inside this
