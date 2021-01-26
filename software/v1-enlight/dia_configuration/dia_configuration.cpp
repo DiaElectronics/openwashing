@@ -118,13 +118,6 @@ DiaConfiguration::DiaConfiguration(std::string folder, DiaNetwork *newNet) {
     _Screen = 0; // use Init();
     _svcWeather = new DiaRuntimeSvcWeather(newNet);
 
-    // let's init income
-    _Income.totalIncomeCoins = 0;
-    _Income.totalIncomeBanknotes = 0;
-    _Income.totalIncomeElectron = 0;
-    _Income.totalIncomeService = 0;
-    _Income.carsTotal = 0;
-
     _Storage = CreateEmptyInterface();
 }
 int DiaConfiguration::InitFromJson(json_t * configuration_json) {
