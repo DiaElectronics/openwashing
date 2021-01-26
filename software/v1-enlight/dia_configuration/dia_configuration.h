@@ -11,14 +11,6 @@
 
 #define DIA_DEFAULT_FIRMWARE_FILENAME "main.json"
 
-typedef struct income {
-    double totalIncomeCoins;
-    double totalIncomeBanknotes;
-    double totalIncomeElectron;
-    double totalIncomeService;
-    double carsTotal;
-} income_t;
-
 class DiaConfiguration {
 private:
     DiaRuntimeRegistry * registry;
@@ -88,7 +80,6 @@ public:
     int UseLastButtonAsPulse() {
         return _LastButtonPulse;
     }
-    income_t _Income;
     
     private:
     std::string _Name;

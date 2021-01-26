@@ -79,17 +79,12 @@ int GetKey(DiaGpio * _gpio) {
 DiaNetwork * network = new DiaNetwork();
 
 // Saves new income money and creates money report to Central Server.
-void SaveIncome() {
-    if (config && config->GetStorage()) {
-        storage_interface_t * storage = config->GetStorage();
-        storage->save(storage->object, "income", &(config->_Income), sizeof(income));
-
-        network->SendMoneyReport((int)config->_Income.carsTotal,
-        (int)config->_Income.totalIncomeCoins,
-        (int)config->_Income.totalIncomeBanknotes,
-        (int)config->_Income.totalIncomeElectron,
-        (int)config->_Income.totalIncomeService);
-    }
+void SaveIncome(int cars_total, int coins_total, int banknotes_total, int cashless_total, int service_total) {
+        network->SendMoneyReport(cars_total,
+        coins_total,
+        banknotes_total,
+        cashless_total,
+        service_total);
 }
 
 ////// Runtime functions ///////
@@ -116,10 +111,7 @@ int send_receipt(int postPosition, int isCard, int amount) {
 // Increases car counter in config
 int increment_cars() {
     printf("Cars incremented\n");
-    if (config) {
-        config->_Income.carsTotal += 1;
-        SaveIncome();
-    }
+    SaveIncome(1,0,0,0,0);
     return 0;
 }
 
@@ -141,11 +133,7 @@ int get_service() {
         
     if (curMoney > 0) {
         printf("service %d\n", curMoney);
-
-        if (config) {
-            config->_Income.totalIncomeService += curMoney;
-            SaveIncome();
-        }
+        SaveIncome(0,0,0,0,curMoney);
     }
     return curMoney;
 }
@@ -186,9 +174,8 @@ int get_coins(void *object) {
   if (gpioCoinAdditional > 0) printf("coins from additional gpio %d\n", gpioCoinAdditional);
 
   int totalMoney = curMoney + gpioCoin + gpioCoinAdditional;
-  if (totalMoney>0 && config) {
-      config->_Income.totalIncomeCoins += curMoney;
-      SaveIncome();
+  if (curMoney>0) {
+      SaveIncome(0,curMoney,0,0,0);
   }
 
   return totalMoney;
@@ -211,9 +198,8 @@ int get_banknotes(void *object) {
   if (curMoney > 0) printf("banknotes from manager %d\n", curMoney);
   if (gpioBanknote > 0) printf("banknotes from GPIO %d\n", gpioBanknote);
   int totalMoney = curMoney + gpioBanknote;
-  if (totalMoney > 0 && config) {
-    config->_Income.totalIncomeBanknotes += curMoney;
-    SaveIncome();
+  if (curMoney > 0) {
+    SaveIncome(0,0,curMoney,0,0);
   }
   return totalMoney;
 }
@@ -223,10 +209,7 @@ int get_electronical(void *object) {
     int curMoney = manager->ElectronMoney;
     if (curMoney>0) {
         printf("electron %d\n", curMoney);
-        if (config) {
-            config->_Income.totalIncomeElectron += curMoney;
-            SaveIncome();
-        }
+        SaveIncome(0,0,0,curMoney,0);
         manager->ElectronMoney  = 0;
     }
     return curMoney;
@@ -328,19 +311,19 @@ int CentralServerDialog() {
     // Every 5 min (300 sec) we go inside this
     if (_IntervalsCountRelay > 300) {
         _IntervalsCountRelay = 0;
-        
-        printf("Sending relay report to server...\n");
-        
-        RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
-        DiaGpio * gpio = config->GetGpio();
 
-        for (int i = 0; i < MAX_RELAY_NUM; i++) {
-            relays[i].switched_count = gpio->Stat.relay_switch[i+1];
-            relays[i].total_time_on = gpio->Stat.relay_time[i+1];
-        }
+        if (config->GetGpio()) {
+            printf("Sending relay report to server...\n");
         
-        network->SendRelayReport(relays);
-        delete[] relays;
+            RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
+            DiaGpio * gpio = config->GetGpio();
+            for (int i = 0; i < MAX_RELAY_NUM; i++) {
+                relays[i].switched_count = gpio->Stat.relay_switch[i+1];
+                relays[i].total_time_on = gpio->Stat.relay_time[i+1];
+            }
+            network->SendRelayReport(relays);
+            delete[] relays;
+        }
     }
 
     {   // Every 30 min (1800 sec) we go inside this
@@ -362,45 +345,6 @@ void * pinging_func(void * ptr) {
     }
     pthread_exit(0);
     return 0;
-}
-
-int RecoverMoney() {
-    money_report_t* last_money_report = new money_report_t;
-
-    int err = network->GetLastMoneyReport(last_money_report);
-
-    if (err == 0) 
-    {
-        fprintf(stderr,"CarsTotal:%d CoinsTotal:%d BanknotesTotal:%d CashlessTotal:%d TestTotal:%d\n",
-        last_money_report->cars_total,
-        last_money_report->coins_total,
-        last_money_report->banknotes_total,
-        last_money_report->cashless_total,
-        last_money_report->service_total);
-
-        // Update the local storage if needed
-        if ((config->_Income.totalIncomeCoins < last_money_report->coins_total) ||
-        (config->_Income.totalIncomeBanknotes < last_money_report->banknotes_total) ||
-        (config->_Income.totalIncomeElectron < last_money_report->cashless_total) ||
-        (config->_Income.totalIncomeService < last_money_report->service_total) ||
-        (config->_Income.carsTotal < last_money_report->cars_total)) 
-        {
-	    printf("Money in config updated\n");
-            config->_Income.totalIncomeCoins = last_money_report->coins_total;
-            config->_Income.totalIncomeBanknotes = last_money_report->banknotes_total;
-            config->_Income.totalIncomeElectron = last_money_report->cashless_total;
-            config->_Income.totalIncomeService = last_money_report->service_total;
-            config->_Income.carsTotal = last_money_report->cars_total;
-            SaveIncome();
-        }
-    } 
-    else 
-    {
-        fprintf(stderr,"Get last money report error: %d\n",err);
-    }
-
-    delete last_money_report;
-    return err;
 }
 
 int RecoverRelay() {
@@ -503,7 +447,6 @@ int RecoverRegistry() {
 // Just compilation of recovers.
 void RecoverData() {
     RecoverRegistry();
-    RecoverMoney();
     RecoverRelay();
 }
 

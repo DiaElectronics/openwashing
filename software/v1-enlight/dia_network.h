@@ -769,32 +769,27 @@ private:
     // Pop message from channel (queue) and send it to the Central Server. 
     int PopAndSend() {
         NetworkMessage * message;
-        int err = channel.Pop(&message);
+        int err = channel.Peek(&message);
 
-        if (!err) {
-            if(message && message->json_request != "") {
-		        printf("New message popped\n");
-                std::string answer;
-		        std::string url = _Host + _Port + message->route;
-                int res = SendRequest(&(message->json_request), &answer, url);
-                delete message;
-
-		        printf("Answer from server: %s\n", answer.c_str());
-                //let's ignore the answer for now;
-                if (res == SERVER_UNAVAILABLE) {
-                    printf("ERR: SERVER IS NOT AVAILABLE\n");
-                    return SERVER_UNAVAILABLE;
-                }
-                
-                return res;
-            } else {
-                printf("ERROR: something is wrong with the channel\n");
-            }
-        } else {
+        if (err) {
+            //CHANNEL_BUFFER_EMPTY IS THE ONLY ERR
             sleep(1);
-            //no elements in channel
+            return err;
         }
-        return err;
+
+        std::string answer;
+        std::string url = _Host + _Port + message->route;
+
+        int res = SendRequest(&(message->json_request), &answer, url);
+
+        if (res > 0) {
+            printf("No connection to server\n");
+            return SERVER_UNAVAILABLE;
+        } else {
+            channel.DropOne();
+        }
+
+        return 0;
     }
 
     // Add new message (report) to the channel. Thread will pop it in the future.
