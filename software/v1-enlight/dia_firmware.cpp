@@ -79,17 +79,12 @@ int GetKey(DiaGpio * _gpio) {
 DiaNetwork * network = new DiaNetwork();
 
 // Saves new income money and creates money report to Central Server.
-void SaveIncome() {
-    if (config && config->GetStorage()) {
-        storage_interface_t * storage = config->GetStorage();
-        storage->save(storage->object, "income", &(config->_Income), sizeof(income));
-
-        network->SendMoneyReport((int)config->_Income.carsTotal,
-        (int)config->_Income.totalIncomeCoins,
-        (int)config->_Income.totalIncomeBanknotes,
-        (int)config->_Income.totalIncomeElectron,
-        (int)config->_Income.totalIncomeService);
-    }
+void SaveIncome(int cars_total, int coins_total, int banknotes_total, int cashless_total, int service_total) {
+        network->SendMoneyReport(cars_total,
+        coins_total,
+        banknotes_total,
+        cashless_total,
+        service_total);
 }
 
 ////// Runtime functions ///////
@@ -118,7 +113,7 @@ int increment_cars() {
     printf("Cars incremented\n");
     if (config) {
         config->_Income.carsTotal += 1;
-        SaveIncome();
+        SaveIncome(1,0,0,0,0);
     }
     return 0;
 }
@@ -141,10 +136,10 @@ int get_service() {
         
     if (curMoney > 0) {
         printf("service %d\n", curMoney);
+        SaveIncome(0,0,0,0,curMoney);
 
         if (config) {
             config->_Income.totalIncomeService += curMoney;
-            SaveIncome();
         }
     }
     return curMoney;
@@ -188,7 +183,7 @@ int get_coins(void *object) {
   int totalMoney = curMoney + gpioCoin + gpioCoinAdditional;
   if (totalMoney>0 && config) {
       config->_Income.totalIncomeCoins += curMoney;
-      SaveIncome();
+      SaveIncome(0,curMoney,0,0,0);
   }
 
   return totalMoney;
@@ -213,7 +208,7 @@ int get_banknotes(void *object) {
   int totalMoney = curMoney + gpioBanknote;
   if (totalMoney > 0 && config) {
     config->_Income.totalIncomeBanknotes += curMoney;
-    SaveIncome();
+    SaveIncome(0,0,curMoney,0,0);
   }
   return totalMoney;
 }
@@ -225,7 +220,7 @@ int get_electronical(void *object) {
         printf("electron %d\n", curMoney);
         if (config) {
             config->_Income.totalIncomeElectron += curMoney;
-            SaveIncome();
+            SaveIncome(0,0,0,curMoney,0);
         }
         manager->ElectronMoney  = 0;
     }
@@ -391,7 +386,7 @@ int RecoverMoney() {
             config->_Income.totalIncomeElectron = last_money_report->cashless_total;
             config->_Income.totalIncomeService = last_money_report->service_total;
             config->_Income.carsTotal = last_money_report->cars_total;
-            SaveIncome();
+            // SaveIncome();
         }
     } 
     else 
@@ -503,7 +498,7 @@ int RecoverRegistry() {
 // Just compilation of recovers.
 void RecoverData() {
     RecoverRegistry();
-    RecoverMoney();
+    // RecoverMoney();
     RecoverRelay();
 }
 
