@@ -447,7 +447,6 @@ int RecoverRegistry() {
 // Just compilation of recovers.
 void RecoverData() {
     RecoverRegistry();
-    // RecoverMoney();
     RecoverRelay();
 }
 
