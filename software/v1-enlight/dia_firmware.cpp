@@ -52,6 +52,8 @@ int _DebugKey = 0;
 // For instance, service money from Central Server can be transfered inside.
 int _Balance = 0;
 int _OpenLid = 0;
+int _BalanceCoins = 0;
+int _BalanceBanknotes = 0;
 
 int _to_be_destroyed = 0;
 
@@ -104,8 +106,8 @@ int turn_light(void *object, int pin, int animation_id) {
 pthread_t pinging_thread;
 
 // Creates receipt request to Online Cash Register.
-int send_receipt(int postPosition, int isCard, int amount) {
-    return network->ReceiptRequest(postPosition, isCard, amount);
+int send_receipt(int postPosition, int cash, int electronical) {
+    return network->ReceiptRequest(postPosition, cash, electronical);
 }
 
 // Increases car counter in config
@@ -149,6 +151,12 @@ int get_coins(void *object) {
   DiaDeviceManager * manager = (DiaDeviceManager *)object;
   int curMoney = manager->CoinMoney;
   manager->CoinMoney  = 0;  
+
+  if (_BalanceCoins>0) {
+        curMoney += _BalanceCoins;
+        _BalanceCoins = 0;
+  }
+
   int gpioCoin = 0;
 
   if (ALLOW_PULSE && config) {
@@ -185,6 +193,11 @@ int get_banknotes(void *object) {
   DiaDeviceManager * manager = (DiaDeviceManager *)object;
   int curMoney = manager->BanknoteMoney;
   manager->BanknoteMoney = 0;
+
+  if (_BalanceBanknotes>0) {
+        curMoney += _BalanceBanknotes;
+        _BalanceBanknotes = 0;
+  }
 
   int gpioBanknote = 0;
   if (ALLOW_PULSE && config) {
@@ -668,13 +681,13 @@ int main(int argc, char ** argv) {
                     switch(event.key.keysym.sym) {
                         case SDLK_UP:
                             // Debug service money addition
-                            _Balance += 10;
+                            _BalanceBanknotes += 10;
 
                             printf("UP\n"); fflush(stdout);
                             break;
                         case SDLK_DOWN:
                             // Debug service money addition
-                            _Balance += 1;
+                            _BalanceCoins += 1;
 
                             printf("UP\n"); fflush(stdout);
                             break;
