@@ -46,12 +46,12 @@ class NetworkMessage {
 class ReceiptToSend {
 public:
     int PostPosition;
-    int IsCard;
-    int Amount;
-    ReceiptToSend(int postPosition, int isCard, int amount) {
+    int Cash;
+    int Electronical;
+    ReceiptToSend(int postPosition, int cash, int electronical) {
         PostPosition = postPosition;
-        IsCard = isCard;
-        Amount = amount;
+        Cash = cash;
+        Electronical = electronical;
     }
 };
 
@@ -407,14 +407,16 @@ public:
 
 
     // Adds a receipt to a queue.
-    int ReceiptRequest(int postPosition, int isCard, int amount) {
-        ReceiptToSend * incomingReceipt = new ReceiptToSend(postPosition, isCard, amount);
-        receipts_channel->Push(incomingReceipt);
+    int ReceiptRequest(int postPosition, int cash, int electronical) {
+        if ((cash + electronical) >0) {
+            ReceiptToSend * incomingReceipt = new ReceiptToSend(postPosition, cash, electronical);
+            receipts_channel->Push(incomingReceipt);
+        }
         return 0;
     }
 
     // Base function for receipt sending to Online Cash Register.
-    int SendReceiptRequest(int postPosition, int isCard, int amount) {
+    int SendReceiptRequest(int postPosition, int cash, int electronical) {
         CURL *curl;
         CURLcode res;
 
@@ -427,13 +429,14 @@ public:
 
         std::string reqUrl;	    
         reqUrl = "https://" + _OnlineCashRegister + ":8443/";
-        reqUrl += std::to_string(postPosition) + "/" + std::to_string(amount) + "/" + std::to_string(isCard);
+        reqUrl += "V2/" + std::to_string(postPosition) + "/" + std::to_string(cash) + "/" + std::to_string(electronical);
 
         curl_easy_setopt(curl, CURLOPT_URL, reqUrl.c_str());
-        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "diae/0.1");
 	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
         res = curl_easy_perform(curl);
         if (res != CURLE_OK) {
@@ -745,10 +748,10 @@ private:
         if (err) {
             //CHANNEL_BUFFER_EMPTY IS THE ONLY ERR
             sleep(1);
-            return err;
+            return 0;
         }
 
-        int res = SendReceiptRequest(extractedReceipt->PostPosition, extractedReceipt->IsCard, extractedReceipt->Amount);
+        int res = SendReceiptRequest(extractedReceipt->PostPosition, extractedReceipt->Cash, extractedReceipt->Electronical);
 
         if (res > 0) {
             printf("No connection to server\n");
@@ -774,7 +777,7 @@ private:
         if (err) {
             //CHANNEL_BUFFER_EMPTY IS THE ONLY ERR
             sleep(1);
-            return err;
+            return 0;
         }
 
         std::string answer;

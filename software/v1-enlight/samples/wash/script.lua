@@ -14,7 +14,8 @@ setup = function()
     electron_balance = min_electron_balance
     
     balance_seconds = 0
-    kasse_balance = 0.0
+    cash_balance = 0.0
+    electronical_balance = 0.0
     post_position = 1
 
     -- constants
@@ -324,17 +325,19 @@ thanks_mode = function()
         end
         update_balance()
         if balance > 0.99 then
-            send_receipt(post_position, 0, kasse_balance)
-            kasse_balance = 0
+            send_receipt(post_position, cash_balance, electronical_balance)
+            cash_balance = 0
+            electronical_balance = 0
             is_waiting_receipt = false
             increment_cars() 
             return mode_work 
         end
         waiting_loops = waiting_loops - 1
     else
-        send_receipt(post_position, 0, kasse_balance)
-        kasse_balance = 0
-        is_waiting_receipt = false
+        send_receipt(post_position, cash_balance, electronical_balance)
+        cash_balance = 0
+        electronical_balance = 0
+    is_waiting_receipt = false
         increment_cars()
 	if hascardreader == true then
         	return mode_choose_method
@@ -436,8 +439,8 @@ turn_light = function(rel_num, animation_code)
     hardware:TurnLight(rel_num, animation_code)
 end
 
-send_receipt = function(post_pos, is_card, amount)
-    hardware:SendReceipt(post_pos, is_card, amount)
+send_receipt = function(post_pos, cash, electronical)
+    hardware:SendReceipt(post_pos, cash, electronical)
 end
 
 increment_cars = function()
@@ -474,10 +477,9 @@ update_balance = function()
     new_electronical = hardware:GetElectronical()
     new_service = hardware:GetService()
 
-    kasse_balance = kasse_balance + new_coins
-    kasse_balance = kasse_balance + new_banknotes
-    kasse_balance = kasse_balance + new_electronical
-    kasse_balance = kasse_balance + new_service
+    cash_balance = cash_balance + new_coins
+    cash_balance = cash_balance + new_banknotes
+    electronical_balance = electronical_balance + new_electronical
     balance = balance + new_coins
     balance = balance + new_banknotes
     balance = balance + new_electronical

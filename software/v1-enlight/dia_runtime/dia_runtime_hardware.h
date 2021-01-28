@@ -45,11 +45,11 @@ public:
         return 0;
     }
 
-    int (*send_receipt_function)(int postPosition, int isCard, int amount);
+    int (*send_receipt_function)(int postPosition, int cash, int electronical);
     
-    int SendReceipt(int postPosition, int isCard, int amount) {
+    int SendReceipt(int postPosition, int cash, int electronical) {
         if(send_receipt_function) {
-            send_receipt_function(postPosition, isCard, amount);
+            send_receipt_function(postPosition, cash, electronical);
         } else {
             printf("error: NIL function SendReceipt\n");
         }
