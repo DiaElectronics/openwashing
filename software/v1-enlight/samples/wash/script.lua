@@ -337,7 +337,7 @@ thanks_mode = function()
         send_receipt(post_position, cash_balance, electronical_balance)
         cash_balance = 0
         electronical_balance = 0
-    is_waiting_receipt = false
+        is_waiting_receipt = false
         increment_cars()
 	if hascardreader == true then
         	return mode_choose_method
