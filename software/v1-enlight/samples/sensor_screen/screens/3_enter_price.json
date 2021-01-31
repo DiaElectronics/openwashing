@@ -9,6 +9,14 @@
         "visible":"true"
       },
       {
+      "id":"website",
+      "type":"image",
+      "position": "1785;400",
+      "size":"50;270",
+      "src":"pic/background/website.png",
+      "visible":"true"
+    },
+      {
       	"id":"button_begin_washing",
       	"type":"image",
       	"position": "1383;60",

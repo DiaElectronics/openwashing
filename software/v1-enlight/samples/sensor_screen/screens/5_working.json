@@ -8,6 +8,14 @@
         "src":"pic/background/5_background_work.png",
         "visible":"true"
       },
+      {
+      "id":"website",
+      "type":"image",
+      "position": "1785;400",
+      "size":"50;270",
+      "src":"pic/background/website.png",
+      "visible":"true"
+    },
       {	
         "id":"button_p1",
         "type":"image",
