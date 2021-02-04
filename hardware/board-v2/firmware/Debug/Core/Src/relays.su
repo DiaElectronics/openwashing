@@ -1,0 +1,2 @@
+relays.c:10:6:add_relay	24	static
+relays.c:16:6:init_gpio_entity	16	static

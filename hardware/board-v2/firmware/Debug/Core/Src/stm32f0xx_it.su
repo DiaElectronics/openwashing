@@ -1,0 +1,12 @@
+stm32f0xx_it.c:49:6:NMI_Handler	8	static
+stm32f0xx_it.c:57:6:HardFault_Handler	8	static
+stm32f0xx_it.c:62:6:TIM6_IRQHandler	8	static
+stm32f0xx_it.c:66:8:init_bufferptr	8	static
+stm32f0xx_it.c:72:6:init_sendbufferptr	8	static
+stm32f0xx_it.c:78:9:send_bytes	32	static
+stm32f0xx_it.c:100:9:_send_byte_from_buffer	16	static
+stm32f0xx_it.c:115:9:is_acceptable	16	static
+stm32f0xx_it.c:123:6:_byte_accepted	16	static
+stm32f0xx_it.c:135:6:usart1_sending_on	8	static
+stm32f0xx_it.c:139:6:usart1_sending_off	8	static
+stm32f0xx_it.c:143:6:USART1_IRQHandler	8	static
