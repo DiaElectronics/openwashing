@@ -346,6 +346,58 @@ public:
         return serverIP;
     }
 
+    // GetCardReaderConig request to specified URL with method POST. 
+    // Returns 0, if request was OK, other value - in case of failure.
+    int GetCardReaderConig(std::string& cardReaderType, std::string& host, std::string& port) {
+        std::string answer;
+	    std::string url = _Host+ _Port + "/card-reader-config-by-hash";
+        
+        int result;
+        std::string json_ping_request = json_create_card_raeder_config();
+        result = SendRequest(&json_ping_request, &answer, url);
+	
+        if (result) {
+            return 1;
+        }
+	
+        json_t *object;
+        json_error_t error;
+
+        int err = 0;
+        object = json_loads(answer.c_str(), 0, &error);
+        printf("GetCardReaderConig answer %s\n", answer.c_str());
+        do {
+            if (!object) {
+                printf("Error in GetCardReaderConig: %d: %s\n", error.line, error.text );
+                err = 1;
+                break;
+            }
+
+            if(!json_is_object(object)) {
+		        printf("Not a JSON\n");
+                break;
+            }
+
+            json_t *obj_card_reader_type;
+            obj_card_reader_type = json_object_get(object, "cardReaderType");
+            cardReaderType = json_string_value(obj_card_reader_type);
+
+            json_t *obj_host;
+            obj_host = json_object_get(object, "host");
+            if (obj_host) {
+                host = json_string_value(obj_host);
+            }
+
+            json_t *obj_port;
+            obj_port = json_object_get(object, "port");
+            if (obj_port) {
+                port = json_string_value(obj_port);
+            }
+        } while (0);
+        json_decref(object);
+        return err;
+    }
+
     // PING request to specified URL with method GET. 
     // Returns 0, if request was OK, other value - in case of failure.
     int SendPingRequestGet(std::string url) {
@@ -817,6 +869,19 @@ private:
 
     // Encodes _PublicKey to JSON string.
     std::string json_create_ping_report() {
+        json_t *object = json_object();
+
+        json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        str = 0;
+        json_decref(object);
+        return res;
+    }
+
+    std::string json_create_card_raeder_config() {
         json_t *object = json_object();
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));

@@ -485,6 +485,37 @@ int onlyOneInstanceCheck() {
 
   return 1;
 }
+int addCardReader(DiaDeviceManager *manager) {
+    std::string cardReaderType;
+    std::string host;
+    std::string port;
+    network->GetCardReaderConig(cardReaderType, host, port);
+    
+    if (cardReaderType == "PAYMENT_WORLD") {
+        DiaDeviceManager_AddCardReader(manager);
+        printf("card reader PAYMENT_WORLD\n");
+        return 0;
+    }
+    if (cardReaderType == "VENDOTEK") {
+        printf("card reader VENDOTEK\n");
+        if ((host == "") || (port == "")) {
+            printf("host and port required. host='%s', port='%s'\n", host.c_str(), port.c_str());
+            return 1;
+        }
+        int errAddVendotek = DiaDeviceManager_AddVendotek(manager, host.c_str(), port.c_str());
+        if (errAddVendotek !=0) {
+            return errAddVendotek;
+        }
+
+        while (DiaDeviceManager_GetCardReaderStatus(manager) ==0 ) {
+            printf("Not found card reader\n");
+            sleep(1);
+        }
+        return 0;
+    }
+    printf("card reader not used\n");
+    return 0;
+}
 
 int main(int argc, char ** argv) {
     config = 0;
@@ -538,7 +569,10 @@ int main(int argc, char ** argv) {
 
     // Runtime and firmware initialization
     DiaDeviceManager *manager = new DiaDeviceManager;
-    DiaDeviceManager_AddCardReader(manager);
+    int errCardReader = addCardReader(manager);
+    if (errCardReader !=0) {
+       return errCardReader;
+    }
 
     SDL_Event event;
 
