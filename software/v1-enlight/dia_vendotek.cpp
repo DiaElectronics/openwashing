@@ -538,7 +538,6 @@ int DiaVendotek_PerformTransaction(void * specificDriver, int money) {
     vtk_logi("DiaVendotek started Perform Transaction, money = %d", money);
     pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = money;
-    vtk_logi("Money inside driver: %d", driver->RequestedMoney);
     pthread_mutex_unlock(&driver->MoneyLock);
 
     int err = pthread_create(&driver->ExecuteDriverProgramThread,

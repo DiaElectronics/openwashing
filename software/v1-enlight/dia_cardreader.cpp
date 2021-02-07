@@ -74,7 +74,6 @@ int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
 
     pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = money;
-    printf("Money inside driver: %d\n", driver->RequestedMoney);
     pthread_mutex_unlock(&driver->MoneyLock);
 
     int err = pthread_create(&driver->ExecuteDriverProgramThread,
