@@ -353,7 +353,7 @@ public:
 	    std::string url = _Host+ _Port + "/card-reader-config-by-hash";
         
         int result;
-        std::string json_ping_request = json_create_card_raeder_config();
+        std::string json_ping_request = json_create_card_reader_config();
         result = SendRequest(&json_ping_request, &answer, url);
 	
         if (result) {
@@ -881,7 +881,7 @@ private:
         return res;
     }
 
-    std::string json_create_card_raeder_config() {
+    std::string json_create_card_reader_config() {
         json_t *object = json_object();
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));

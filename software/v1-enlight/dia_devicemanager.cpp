@@ -273,8 +273,7 @@ void DiaDeviceManager_PerformTransaction(void *manager, int money) {
     printf("DiaDeviceManager got Perform Transaction, money = %d\n", money);
     if (Manager->_CardReader) {
        DiaCardReader_PerformTransaction(Manager->_CardReader, money);
-    }
-    if (Manager->_Vendotek) {
+    } else if (Manager->_Vendotek) {
         DiaVendotek_PerformTransaction(Manager->_Vendotek, money);
     }
 }
@@ -288,8 +287,7 @@ void DiaDeviceManager_AbortTransaction(void *manager) {
     }
     if (Manager->_CardReader) {
         DiaCardReader_AbortTransaction(Manager->_CardReader);
-    }
-    if (Manager->_Vendotek) {
+    } else if (Manager->_Vendotek) {
         DiaVendotek_AbortTransaction(Manager->_Vendotek);
     }
 }
@@ -304,8 +302,7 @@ int DiaDeviceManager_GetTransactionStatus(void *manager) {
     int res = 0;
     if (Manager->_CardReader) {
         res = DiaCardReader_GetTransactionStatus(Manager->_CardReader);
-    }
-    if (Manager->_Vendotek) {
+    } else if (Manager->_Vendotek) {
         res = DiaVendotek_GetTransactionStatus(Manager->_Vendotek);
     }
     return res;
@@ -321,8 +318,7 @@ int DiaDeviceManager_GetCardReaderStatus(void *manager) {
     int res = 0;
     if (Manager->_CardReader) {
         res = 1;
-    }
-    if (Manager->_Vendotek) {
+    } else if (Manager->_Vendotek) {
         res = DiaVendotek_GetAvailableStatus(Manager->_Vendotek);
     }
     return res;
