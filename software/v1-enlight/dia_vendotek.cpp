@@ -377,9 +377,11 @@ void * DiaVendotek_ExecuteDriverProgramThread(void * driverPtr) {
     }
 
     DiaVendotek * driver = reinterpret_cast<DiaVendotek *>(driverPtr);
-
-    vtk_logi("reader request %d RUB...", driver->RequestedMoney);
+    pthread_mutex_lock(&driver->MoneyLock);
     int sum = driver->RequestedMoney;
+    pthread_mutex_unlock(&driver->MoneyLock);
+
+    vtk_logi("reader request %d RUB...", sum);
     payment_opts_t popts;
     popts.timeout   = 2;
     popts.verbose   = LOG_DEBUG;
@@ -428,6 +430,10 @@ void * DiaVendotek_ExecuteDriverProgramThread(void * driverPtr) {
         } else {
             vtk_loge("No handler to report: %d", sum);
         }
+    } else {
+        pthread_mutex_lock(&driver->MoneyLock);
+        driver->RequestedMoney = 0;
+        pthread_mutex_unlock(&driver->MoneyLock);
     }
 
     pthread_exit(NULL);
@@ -532,7 +538,6 @@ int DiaVendotek_PerformTransaction(void * specificDriver, int money) {
     vtk_logi("DiaVendotek started Perform Transaction, money = %d", money);
     pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = money;
-    vtk_logi("Money inside driver: %d", driver->RequestedMoney);
     pthread_mutex_unlock(&driver->MoneyLock);
 
     int err = pthread_create(&driver->ExecuteDriverProgramThread,

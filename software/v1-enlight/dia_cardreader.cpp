@@ -26,8 +26,12 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
 
     DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(driverPtr);
 
-    fprintf(stderr, "reader request %d RUB...\n", driver->RequestedMoney);
-    int money_command = driver->RequestedMoney * 100;
+    pthread_mutex_lock(&driver->MoneyLock);
+    int sum = driver->RequestedMoney;
+    pthread_mutex_unlock(&driver->MoneyLock);
+
+    fprintf(stderr, "reader request %d RUB...\n", sum);
+    int money_command = sum * 100;
 
     std::string money = std::to_string(money_command);
 
@@ -37,17 +41,20 @@ void * DiaCardReader_ExecuteDriverProgramThread(void * driverPtr) {
     fprintf(stderr, "Card reader returned status code: %d\n", statusCode);
     if (statusCode == 0 || statusCode == 23040) {
         if (driver->IncomingMoneyHandler != NULL) {
+            pthread_mutex_lock(&driver->MoneyLock);
             int sum = driver->RequestedMoney;
             driver->IncomingMoneyHandler(driver->_Manager, DIA_ELECTRON, sum);
-            printf("Reported money: %d\n", driver->RequestedMoney);
+            driver->RequestedMoney = 0;
+            pthread_mutex_unlock(&driver->MoneyLock);
+            printf("Reported money: %d\n", sum);
         } else {
-            printf("No handler to report: %d\n", driver->RequestedMoney);
+            printf("No handler to report: %d\n", sum);
         }
+    } else {
+        pthread_mutex_lock(&driver->MoneyLock);
+        driver->RequestedMoney = 0;
+        pthread_mutex_unlock(&driver->MoneyLock);
     }
-
-    pthread_mutex_lock(&driver->MoneyLock);
-    driver->RequestedMoney = 0;
-    pthread_mutex_unlock(&driver->MoneyLock);
 
     pthread_exit(NULL);
     return NULL;
@@ -65,8 +72,9 @@ int DiaCardReader_PerformTransaction(void * specificDriver, int money) {
 
     printf("DiaCardReader started Perform Transaction, money = %d\n", money);
 
+    pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = money;
-    printf("Money inside driver: %d\n", driver->RequestedMoney);
+    pthread_mutex_unlock(&driver->MoneyLock);
 
     int err = pthread_create(&driver->ExecuteDriverProgramThread,
         NULL,
@@ -88,7 +96,9 @@ int DiaCardReader_StopDriver(void * specificDriver) {
     }
 
     DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(specificDriver);
+    pthread_mutex_lock(&driver->MoneyLock);
     driver->RequestedMoney = 0;
+    pthread_mutex_unlock(&driver->MoneyLock);
     printf("Trying to kill cardreader thread...\n");
 
     char line[10];
@@ -96,17 +106,18 @@ int DiaCardReader_StopDriver(void * specificDriver) {
     int64_t pid = 0;
 
     char * res = fgets(line, 10, cmd);
-    assert(res);
-    pid = strtoul(line, NULL, 10);
+    if (res) {
+        assert(res);
+        pid = strtoul(line, NULL, 10);
 
-    if (pid != 0) {
-        std::string kill_line = std::string("kill -INT ") + std::to_string(pid);
-        int err = system(kill_line.c_str());
-        if (err) {
-            printf("can't kill cardreader thread %d\n", err);
+        if (pid != 0) {
+            std::string kill_line = std::string("kill -INT ") + std::to_string(pid);
+            int err = system(kill_line.c_str());
+            if (err) {
+                printf("can't kill cardreader thread %d\n", err);
+            }
         }
     }
-
     pthread_join(driver->ExecuteDriverProgramThread, NULL);
 
     printf("Cardreader thread killed\n");
@@ -133,5 +144,8 @@ int DiaCardReader_GetTransactionStatus(void * specificDriver) {
     }
 
     DiaCardReader * driver = reinterpret_cast<DiaCardReader *>(specificDriver);
-    return driver->RequestedMoney;
+    pthread_mutex_lock(&driver->MoneyLock);
+    int sum = driver->RequestedMoney;
+    pthread_mutex_unlock(&driver->MoneyLock);
+    return sum;
 }

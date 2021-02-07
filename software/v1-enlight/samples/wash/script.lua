@@ -203,9 +203,10 @@ wait_for_card_mode = function()
         waiting_loops = 0
     end
 
+    status = get_transaction_status()
     update_balance()
+
     if balance > 0.99 then
-        status = get_transaction_status()
         if status ~= 0 then 
             abort_transaction()
         end
@@ -214,13 +215,18 @@ wait_for_card_mode = function()
     end
 
     if waiting_loops <= 0 then
-        is_transaction_started = false
-	status = get_transaction_status()
+    is_transaction_started = false
 	if status ~= 0 then
 	    abort_transaction()
 	end
         return mode_choose_method
     end
+
+    if (status == 0) and (is_transaction_started == true) then
+        is_transaction_started = false
+        abort_transaction()
+        return mode_choose_method        
+	end
 
     smart_delay(100)
     waiting_loops = waiting_loops - 1
