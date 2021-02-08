@@ -494,6 +494,9 @@ debug_message = function(text)
     if is_debug then printMessage(text) end
 end
 
+set_current_state = function(current_balance, current_program)
+  return hardware:SetCurrentState(math.floor(current_balance), current_program)
+end
 
 update_balance = function()
   new_coins = hardware:GetCoins()

@@ -102,6 +102,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("GetMinutes", &DiaRuntimeHardware::GetMinutes)
     .addFunction("GetTransactionStatus", &DiaRuntimeHardware::GetTransactionStatus)
     .addFunction("AbortTransaction", &DiaRuntimeHardware::AbortTransaction)
+    .addFunction("SetCurrentState", &DiaRuntimeHardware::SetCurrentState)
     .endClass();
 
     getGlobalNamespace(Lua)

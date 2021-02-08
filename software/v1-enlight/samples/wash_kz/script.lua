@@ -260,6 +260,7 @@ program_mode = function(working_mode)
   end
   
   charge_balance(price_p[sub_mode])
+  set_current_state(balance,sub_mode)
   if balance <= 0.01 then 
     return mode_thanks 
   end
@@ -281,6 +282,8 @@ pause_mode = function()
         charge_balance(price_p[6])
     end
     
+    set_current_state(balance,6)  
+    
     if balance <= 0.01 then return mode_thanks end
     
     suggested_mode = get_mode_by_pressed_key()
@@ -289,6 +292,7 @@ pause_mode = function()
 end
 
 thanks_mode = function()
+    set_current_state(0,0)
     if is_waiting_receipt == false then
         balance = 0
         show_thanks(thanks_mode_seconds)
@@ -443,6 +447,10 @@ end
 
 abort_transaction = function()
     return hardware:AbortTransaction()
+end
+
+set_current_state = function(current_balance, current_program)
+    return hardware:SetCurrentState(math.floor(current_balance), current_program)
 end
 
 update_balance = function()
