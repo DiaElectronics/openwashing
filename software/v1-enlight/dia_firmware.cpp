@@ -57,6 +57,8 @@ int _BalanceBanknotes = 0;
 
 int _to_be_destroyed = 0;
 
+int _CurrentBalance = 0;
+int _CurrentProgram = 0;
 int GetKey(DiaGpio * _gpio) {
     int key = 0;
 
@@ -79,6 +81,12 @@ int GetKey(DiaGpio * _gpio) {
 
 // Main object for Client-Server communication.
 DiaNetwork * network = new DiaNetwork();
+
+int set_current_state(int balance, int program) {
+    _CurrentBalance = balance;
+    _CurrentProgram = program;
+    return 0;
+}
 
 // Saves new income money and creates money report to Central Server.
 void SaveIncome(int cars_total, int coins_total, int banknotes_total, int cashless_total, int service_total) {
@@ -308,7 +316,7 @@ int CentralServerDialog() {
 
     int serviceMoney = 0;
     bool openStation = false;
-    network->SendPingRequest(network->GetHostName(), serviceMoney, openStation);
+    network->SendPingRequest(serviceMoney, openStation, _CurrentBalance, _CurrentProgram);
     
     if (serviceMoney > 0) {
         // TODO protect with mutex
@@ -430,7 +438,7 @@ int RecoverRegistry() {
     std::string default_price = "15";
     int err = 1;
     while (err) {
-        err = network->SendPingRequest(network->GetHostName(), tmp, openStation);
+        err = network->SendPingRequest(tmp, openStation, _CurrentBalance, _CurrentProgram);
         if (err) {
             printf("waiting for server proper answer \n");
             sleep(5);
@@ -649,6 +657,7 @@ int main(int argc, char ** argv) {
     hardware->request_transaction_function = request_transaction;  
     hardware->get_transaction_status_function = get_transaction_status;
     hardware->abort_transaction_function = abort_transaction;
+    hardware->set_current_state_function = set_current_state;
 
     hardware->delay_object = &stored_time;
     hardware->smart_delay_function = smart_delay_function;

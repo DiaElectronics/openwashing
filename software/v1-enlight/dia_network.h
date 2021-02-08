@@ -410,15 +410,14 @@ public:
     // PING request to specified URL with method POST. 
     // Returns 0, if request was OK, other value - in case of failure.
     // Modifies service money, if server returned that kind of data.
-    int SendPingRequest(std::string url, int& service_money, bool& open_station) {
+    int SendPingRequest(int& service_money, bool& open_station, int balance, int program) {
         std::string answer;
-	    url += _Port + "/ping";
+	    std::string url = _Host + _Port + "/ping";
         
         int result;
-        std::string json_ping_request = json_create_ping_report();
+        std::string json_ping_request = json_create_ping_report(balance, program);
         result = SendRequest(&json_ping_request, &answer, url);
 	//printf("Server answer on PING:\n%s\n", answer.c_str());
-
 	
         if (result == 2) {
             return 3;
@@ -868,10 +867,12 @@ private:
     }
 
     // Encodes _PublicKey to JSON string.
-    std::string json_create_ping_report() {
+    std::string json_create_ping_report(int balance, int program) {
         json_t *object = json_object();
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "CurrentBalance", json_integer(balance));
+        json_object_set_new(object, "CurrentProgram", json_integer(program));
         char *str = json_dumps(object, 0);
         std::string res = str;
 

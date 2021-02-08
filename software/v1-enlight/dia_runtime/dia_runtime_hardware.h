@@ -56,6 +56,16 @@ public:
 	    return 0;
     }
 
+    int (*set_current_state_function)(int balance, int program);
+    int SetCurrentState(int balance, int program) {
+        if(set_current_state_function) {
+            return set_current_state_function(balance, program);
+        } else {
+            printf("error: NIL object or function SetCurrentState\n");
+        }
+        return 0;
+    }
+
     int (*increment_cars_function)();
     int IncrementCars() {
 	if(increment_cars_function) {
@@ -220,6 +230,7 @@ public:
 
         delay_object = 0;
         smart_delay_function = 0;
+        set_current_state_function = 0;
     }
 };
 
