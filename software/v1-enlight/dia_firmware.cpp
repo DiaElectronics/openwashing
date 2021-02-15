@@ -293,81 +293,6 @@ int smart_delay_function(void * arg, int ms) {
 /////// End of Runtime functions ///////
 
 
-/////// Central server communication functions //////
-
-// Sends PING request to Central Server every 2 seconds.
-// May get service money from server.
-int CentralServerDialog() {
-    printf("PING CENTRAL SERVER\n");
-    
-    _IntervalsCount++;
-    if(_IntervalsCount < 0) {
-        printf("Memory corruption on _IntervalsCount\n");
-        _IntervalsCount = 0;
-    }
-
-    _IntervalsCountRelay++;
-    if(_IntervalsCountRelay < 0) {
-        printf("Memory corruption on _IntervalsCountRelay\n");
-        _IntervalsCountRelay = 0;
-    }
-
-    printf("Sending another PING request to server...\n");
-
-    int serviceMoney = 0;
-    bool openStation = false;
-    network->SendPingRequest(serviceMoney, openStation, _CurrentBalance, _CurrentProgram);
-    
-    if (serviceMoney > 0) {
-        // TODO protect with mutex
-        _Balance += serviceMoney;
-    }
-    if (openStation) {
-        _OpenLid = _OpenLid + 1;
-        printf("Door is going to be opened... \n");
-        // TODO: add the function of turning on the relay, which will open the lock.
-    }
-    
-
-    // Every 5 min (300 sec) we go inside this
-    if (_IntervalsCountRelay > 300) {
-        _IntervalsCountRelay = 0;
-
-        if (config->GetGpio()) {
-            printf("Sending relay report to server...\n");
-        
-            RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
-            DiaGpio * gpio = config->GetGpio();
-            for (int i = 0; i < MAX_RELAY_NUM; i++) {
-                relays[i].switched_count = gpio->Stat.relay_switch[i+1];
-                relays[i].total_time_on = gpio->Stat.relay_time[i+1];
-            }
-            network->SendRelayReport(relays);
-            delete[] relays;
-        }
-    }
-
-    {   // Every 30 min (1800 sec) we go inside this
-        static const int maxIntervalsCountWeather = 1800;
-        static int intervalsCountWeather = maxIntervalsCountWeather;
-        if (intervalsCountWeather >= maxIntervalsCountWeather) {
-            intervalsCountWeather = 0;
-            config->GetSvcWeather()->SetCurrentTemperature();
-        }
-        ++intervalsCountWeather;
-    }
-    return 0;
-}
-
-void * pinging_func(void * ptr) {
-    while(!_to_be_destroyed) {
-        CentralServerDialog();
-        sleep(1);
-    }
-    pthread_exit(0);
-    return 0;
-}
-
 int RecoverRelay() {
     relay_report_t* last_relay_report = new relay_report_t;
 
@@ -469,6 +394,84 @@ int RecoverRegistry() {
 void RecoverData() {
     RecoverRegistry();
     RecoverRelay();
+}
+
+
+
+/////// Central server communication functions //////
+
+// Sends PING request to Central Server every 2 seconds.
+// May get service money from server.
+int CentralServerDialog() {
+    printf("PING CENTRAL SERVER\n");
+    
+    _IntervalsCount++;
+    if(_IntervalsCount < 0) {
+        printf("Memory corruption on _IntervalsCount\n");
+        _IntervalsCount = 0;
+    }
+
+    _IntervalsCountRelay++;
+    if(_IntervalsCountRelay < 0) {
+        printf("Memory corruption on _IntervalsCountRelay\n");
+        _IntervalsCountRelay = 0;
+    }
+
+    printf("Sending another PING request to server...\n");
+
+    int serviceMoney = 0;
+    bool openStation = false;
+    network->SendPingRequest(serviceMoney, openStation, _CurrentBalance, _CurrentProgram);
+    
+    if (serviceMoney > 0) {
+        // TODO protect with mutex
+        _Balance += serviceMoney;
+    }
+    if (openStation) {
+        _OpenLid = _OpenLid + 1;
+        printf("Door is going to be opened... \n");
+        // TODO: add the function of turning on the relay, which will open the lock.
+    }
+    
+
+    // Every 5 min (300 sec) we go inside this
+    if (_IntervalsCountRelay > 300) {
+        _IntervalsCountRelay = 0;
+
+        if (config->GetGpio()) {
+            printf("Sending relay report to server...\n");
+        
+            RelayStat *relays = new RelayStat[MAX_RELAY_NUM];
+            DiaGpio * gpio = config->GetGpio();
+            for (int i = 0; i < MAX_RELAY_NUM; i++) {
+                relays[i].switched_count = gpio->Stat.relay_switch[i+1];
+                relays[i].total_time_on = gpio->Stat.relay_time[i+1];
+            }
+            network->SendRelayReport(relays);
+            delete[] relays;
+        }
+    }
+
+    {   // Every 10 sec we go inside this
+        static const int maxIntervalsCountWeather = 10;
+        static int intervalsCountWeather = maxIntervalsCountWeather;
+        if (intervalsCountWeather >= maxIntervalsCountWeather) {
+            intervalsCountWeather = 0;
+            config->GetSvcWeather()->SetCurrentTemperature();
+            RecoverRegistry();
+        }
+        ++intervalsCountWeather;
+    }
+    return 0;
+}
+
+void * pinging_func(void * ptr) {
+    while(!_to_be_destroyed) {
+        CentralServerDialog();
+        sleep(1);
+    }
+    pthread_exit(0);
+    return 0;
 }
 
 int onlyOneInstanceCheck() {
