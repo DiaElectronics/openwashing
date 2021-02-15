@@ -95,6 +95,7 @@ loop = function()
     update_time()
     update_temp()
     update_post()
+    init_prices()
     currentMode = run_mode(currentMode)
     smart_delay(frame_delay)
     return 0
