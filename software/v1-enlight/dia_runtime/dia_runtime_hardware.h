@@ -56,10 +56,10 @@ public:
 	    return 0;
     }
 
-    int (*set_current_state_function)(int balance, int program);
-    int SetCurrentState(int balance, int program) {
+    int (*set_current_state_function)(int balance);
+    int SetCurrentState(int balance) {
         if(set_current_state_function) {
-            return set_current_state_function(balance, program);
+            return set_current_state_function(balance);
         } else {
             printf("error: NIL object or function SetCurrentState\n");
         }
@@ -104,6 +104,16 @@ public:
     int GetService() {
         if(get_service_function) {
             return get_service_function();
+        } else {
+            printf("error: NIL object or function GetService\n");
+        }
+        return 0;
+    }
+
+    int (*get_is_preflight_function)();
+    int GetIsPreflight() {
+        if(get_is_preflight_function) {
+            return get_is_preflight_function();
         } else {
             printf("error: NIL object or function GetService\n");
         }

@@ -64,6 +64,15 @@ public:
     std::string SetValueByKeyIfNotExists(std::string key, std::string value) {
         return network->SetRegistryValueByKeyIfNotExists(key, value);
     }
+    int (*get_price_function)(int button);
+    int GetPrice(int button) {
+        if(get_price_function) {
+            return get_price_function(button);
+        } else {
+            printf("error: NIL object or function GetPrice\n");
+        }
+        return 0;
+    }
 
 private:
     std::map<std::string, std::string> values;

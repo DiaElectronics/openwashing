@@ -91,6 +91,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("GetCoins", &DiaRuntimeHardware::GetCoins)
     .addFunction("GetBanknotes", &DiaRuntimeHardware::GetBanknotes)
     .addFunction("GetService", &DiaRuntimeHardware::GetService)
+    .addFunction("GetIsPreflight", &DiaRuntimeHardware::GetIsPreflight)
     .addFunction("GetOpenLid", &DiaRuntimeHardware::GetOpenLid)
     .addFunction("SmartDelay", &DiaRuntimeHardware::SmartDelay)
     .addFunction("GetKey", &DiaRuntimeHardware::GetKey)
@@ -111,6 +112,7 @@ int DiaRuntime::InitStr(std::string folder, std::string src_str, std::string inc
     .addFunction("ValueInt", &DiaRuntimeRegistry::ValueInt)
     .addFunction("SetValueByKeyIfNotExists", &DiaRuntimeRegistry::SetValueByKeyIfNotExists)
     .addFunction("GetPostID", &DiaRuntimeRegistry::GetPostID)
+    .addFunction("GetPrice", &DiaRuntimeRegistry::GetPrice)
     .endClass();
 
     getGlobalNamespace(Lua)
@@ -132,6 +134,7 @@ int DiaRuntime::AddScreen(DiaRuntimeScreen * screen) {
     return 0;
 }
 
+/*
 int DiaRuntime::AddPrograms(std::map<std::string, int> *programs) {
     lua_newtable(Lua);
 
@@ -152,6 +155,7 @@ int DiaRuntime::AddPrograms(std::map<std::string, int> *programs) {
 
     return 0;
 }
+*/
 
 int DiaRuntime::AddAnimations() {
     lua_newtable(Lua);

@@ -19,7 +19,7 @@
 typedef struct stage_req_s {
     uint16_t  id;
     char     *valstr;
-    ssize_t  *valint;
+    long int  *valint;
 } stage_req_t;
 
 typedef struct stage_resp_s {
@@ -97,7 +97,7 @@ int do_stage(stage_opts_t *opts, stage_req_t *req, stage_resp_t *resp)
     }
     for (int i = 0; resp[i].id; i++) {
         char    *valstr = NULL;
-        ssize_t  valint = 0;
+        long int valint = 0;
         int      idfound = vtk_msg_find_param(opts->mresp, resp[i].id, NULL, &valstr) >= 0;
         int      vsfound = valstr != NULL;
         int      vifound = vsfound && (sscanf(valstr, "%ld", &valint) == 1);

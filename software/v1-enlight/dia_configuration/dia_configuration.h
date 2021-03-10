@@ -26,6 +26,8 @@ public:
     int Setup();
     int Loop();
     int RunCommand(std::string command);
+    int LoadConfig();
+
     // DELETE methods above
     DiaScreen * GetScreen() {
         assert(_Screen);
@@ -68,9 +70,34 @@ public:
     int GetButtonsNumber() {
         return _ButtonsNumber;
     }
+
+    int GetPrice(int button) {
+        if (_Programs[button]) {
+            return _Programs[button]->Price;
+        }
+        return 0;
+    }
+    int GetPreflightSec(int button) {
+        if ((_Programs[button]) && (_PreflightSec>0)) {
+            if (_Programs[button]->PreflightEnabled) {
+                return _PreflightSec;
+            }
+        }
+        return 0;
+    }
+    int GetProgramID(int button) {
+        if (_Programs[button]) {
+            return _Programs[button]->ProgramID;
+        }
+        return 0;
+    }
     
     int GetRelaysNumber() {
         return _RelaysNumber;
+    }
+
+    int GetServerRelayBoard() {
+        return _ServerRelayBoard;
     }
 
     inline int NeedRotateTouch() {
@@ -84,13 +111,15 @@ public:
     private:
     std::string _Name;
     std::string _Folder;
-    std::map<std::string, DiaProgram*> _Programs;
-    
+    std::map<int, DiaProgram*> _Programs;
+    int _PreflightSec;
+    int _ServerRelayBoard;
     DiaScreen * _Screen;
     DiaRuntime * _Runtime;
     DiaGpio * _Gpio;
     DiaRuntimeSvcWeather * _svcWeather;
     storage_interface_t * _Storage;
+    DiaNetwork * _Net;
     
     
     int _ResX;

@@ -7,64 +7,100 @@
 
 class DiaProgram {
     public:
-    std::string ID;
-    std::string Source;
     int _InitializedOk;
+
+    int ButtonID;
+    int ProgramID;
+    std::string Name;
+    int Price;
+    int MotorSpeedPercent;
+    DiaRelayConfig Relays;
+    bool PreflightEnabled;
+    int PreflightMotorSpeedPercent;
+    DiaRelayConfig PreflightRelays;
     
-    DiaRelayConfig Config;
-    
-    DiaProgram(json_t * program_node, std::string currentFolder) {
+    DiaProgram(json_t * program_node) {
         _InitializedOk = 0;
         // Let's unpack buttons #
-        json_t *id_json = json_object_get(program_node, "id");
-        if(!json_is_string(id_json)) {
-            fprintf(stderr, "error: id is not string for program \n");
+        json_t *id_json = json_object_get(program_node, "buttonID");
+        if(!json_is_integer(id_json)) {
+            fprintf(stderr, "error: buttonID is not int for program \n");
             return;
         }
-        ID = json_string_value(id_json);
-        
-        json_t *src_json = json_object_get(program_node, "src");
-        if(!json_is_string(src_json)) {
-            fprintf(stderr, "error: src is not string for program \n");
+        ButtonID = json_integer_value(id_json);
+
+        program_node = json_object_get(program_node, "program");
+        if(!json_is_object(program_node)) {
+            printf("program is not an object\n");
             return;
         }
-        Source = json_string_value(src_json);
-        int err = _LoadProgram(currentFolder, Source.c_str());
+
+        json_t *program_id_json = json_object_get(program_node, "id");
+        if(!json_is_integer(program_id_json)) {
+            fprintf(stderr, "error: programID is not int for program \n");
+            return;
+        }
+        ProgramID = json_integer_value(program_id_json);
+
+        json_t *price_json = json_object_get(program_node, "price");
+        if(!json_is_integer(price_json)) {
+            fprintf(stderr, "error: price is not int for program \n");
+            return;
+        }
+        Price = json_integer_value(price_json);
+
+        json_t *motor_speed_percent_json = json_object_get(program_node, "motorSpeedPercent");
+        if(json_is_integer(motor_speed_percent_json)) {
+            MotorSpeedPercent = json_integer_value(motor_speed_percent_json);
+        }
+
+        json_t *preflight_motor_speed_percent_json = json_object_get(program_node, "preflightMotorSpeedPercent");
+        if(json_is_integer(preflight_motor_speed_percent_json)) {
+            PreflightMotorSpeedPercent = json_integer_value(preflight_motor_speed_percent_json);
+        }
+
+        json_t *preflight_enabled_json = json_object_get(program_node, "preflightEnabled");
+        if(json_is_boolean(preflight_enabled_json)) {
+            PreflightEnabled = json_boolean_value(preflight_enabled_json);
+        }
+
+        json_t *name_json = json_object_get(program_node, "name");
+        if(json_is_string(name_json)) {
+            Name = json_string_value(name_json);
+        }
+        printf("program %s, buttonID %d, programID %d, motorSpeed %d, PreflightEnabled %d, PreflightMotorSpeed %d\n", Name.c_str(),ButtonID,ProgramID,MotorSpeedPercent,PreflightEnabled,PreflightMotorSpeedPercent);
+        int err = _LoadRelays(json_object_get(program_node, "relays"), false);
+        if (err !=0 ) {
+            return;
+        }
+        if (PreflightEnabled) {
+            err = _LoadRelays(json_object_get(program_node, "preflightRelays"), true);
+        }
         if (err ==0 ) {
             _InitializedOk = 1;
         }
     }
     
-    int _LoadProgram(std::string folder, const char * source) {
-        json_t * program_src = dia_get_resource_json(folder.c_str(), source);
-        if (program_src==0) {
-            printf("program file [%s] is not found in folder [%s]\n",source, folder.c_str());
-            return 1;
-        }
-        json_t *relays_src = json_object_get(program_src, "relays");
-        if (program_src==0) {
-            printf("relays element is not found in file [%s], folder [%s]\n",source, folder.c_str());
-            return 1;
-        }
+    int _LoadRelays(json_t * relays_src, bool preflight) {
         if(!json_is_array(relays_src)) {
-            printf("relays element must be an array in file [%s], folder [%s]\n",source, folder.c_str());
+            printf("relays element must be an array\n");
             return 1;
         }
         for (unsigned int i=0;i<json_array_size(relays_src); i++) {
             //printf("relays reading loop\n");
             json_t * relay_json = json_array_get(relays_src, i);
             if(!json_is_object(relay_json)) {
-                printf("relays element %d is not an object in file [%s], folder [%s]\n", i, source, folder.c_str());
+                printf("relays element %d is not an object\n", i);
                 return 1;
             }
-            int err = _ReadRelay(relay_json);
+            int err = _ReadRelay(relay_json, preflight);
             if (err) {
                 return 1;
             }
         }
         return 0;
     }
-    int _ReadRelay(json_t *relay_json) {
+    int _ReadRelay(json_t *relay_json, bool preflight) {
         assert(relay_json);
         json_t * id_json =json_object_get(relay_json, "id");
         if (!json_is_integer(id_json)) {
@@ -75,14 +111,19 @@ class DiaProgram {
         int ontime = 1000;
         int offtime = 0;
         
-        json_t * ontime_json = json_object_get(relay_json, "ontime");
-        json_t * offtime_json = json_object_get(relay_json, "offtime");
+        json_t * ontime_json = json_object_get(relay_json, "timeon");
+        json_t * offtime_json = json_object_get(relay_json, "timeoff");
         if (json_is_integer(ontime_json) && json_is_integer(offtime_json)) {
             ontime = json_integer_value(ontime_json);
             offtime = json_integer_value(offtime_json);
         }
-        int err = Config.InitRelay(id, ontime, offtime);
-        
+        printf("relay id %d, preflight %d, on %d, off %d\n",id, preflight, ontime, offtime);
+        int err = 0;
+        if (preflight) {
+            err = PreflightRelays.InitRelay(id, ontime, offtime);
+        } else {
+            err = Relays.InitRelay(id, ontime, offtime);
+        }
         return err;
     }
 };

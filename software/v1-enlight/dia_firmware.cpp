@@ -58,7 +58,16 @@ int _BalanceBanknotes = 0;
 int _to_be_destroyed = 0;
 
 int _CurrentBalance = 0;
-int _CurrentProgram = 0;
+int _CurrentProgram = -1;
+int _CurrentProgramID = 0;
+int _OldProgram = -1;
+int _IsPreflight = 0;
+int _IsServerRelayBoard = 0;
+int _IntervalsCountProgram = 0;
+int _IntervalsCountPreflight = 0;
+
+pthread_t run_program_thread;
+
 int GetKey(DiaGpio * _gpio) {
     int key = 0;
 
@@ -82,9 +91,8 @@ int GetKey(DiaGpio * _gpio) {
 // Main object for Client-Server communication.
 DiaNetwork * network = new DiaNetwork();
 
-int set_current_state(int balance, int program) {
+int set_current_state(int balance) {
     _CurrentBalance = balance;
-    _CurrentProgram = program;
     return 0;
 }
 
@@ -126,14 +134,18 @@ int increment_cars() {
 }
 
 int turn_program(void *object, int program) {
-    #ifdef USE_GPIO
-    DiaGpio * gpio = (DiaGpio *)object;
-    // negative number will stop all
-    if (program >= MAX_PROGRAMS_COUNT) {
-        return 1;
+    if (program != _CurrentProgram) {
+        _IntervalsCountProgram = 0;
+        _CurrentProgram = program;
+        _CurrentProgramID = 0;
+        _IntervalsCountPreflight = 0;
+
+        if ((config) && (program>0)){
+            _CurrentProgramID = config->GetProgramID(program);
+            _IntervalsCountPreflight = config->GetPreflightSec(program)*10;
+        }
     }
-    gpio->CurrentProgram = program;
-    #endif
+    _IsPreflight = (_IntervalsCountPreflight>0);
     return 0;
 }
 
@@ -148,11 +160,22 @@ int get_service() {
     return curMoney;
 }
 
+int get_is_preflight() {
+    return _IsPreflight;
+}
+
 int get_openlid() {
     int curOpenLid = _OpenLid;
     _OpenLid = 0;
    
     return curOpenLid;
+}
+
+int get_price(int button) {
+    if (config) {
+        return config->GetPrice(button);
+    }
+    return 0;
 }
 
 int get_coins(void *object) {
@@ -292,6 +315,75 @@ int smart_delay_function(void * arg, int ms) {
 }
 /////// End of Runtime functions ///////
 
+int RunProgram() {
+    if ((_IsServerRelayBoard) && (_IsPreflight == 0)) {
+        _IntervalsCountProgram++;
+    }
+    if(_IntervalsCountProgram < 0) {
+        printf("Memory corruption on _IntervalsCountProgram\n");
+        _IntervalsCountProgram = 0;
+    }
+    if (_IntervalsCountPreflight>0) {
+        _IntervalsCountPreflight --;
+        
+    }
+    if (_CurrentProgram != _OldProgram) {
+        if (_IsPreflight) {
+            if (_IsServerRelayBoard) {
+                int count = 0;
+                int err = 1;
+                while ((err) && (count<4))
+                {
+                    count++;
+                    printf("relay control server board: run program preflight programID=%d\n",_CurrentProgramID);
+                    err = network->RunProgramOnServer(_CurrentProgramID, _IsPreflight);
+                    if (err != 0) {
+                        fprintf(stderr,"relay control server board: run program error\n");
+                        delay(500);
+                    }
+                }
+            } 
+        }
+        _OldProgram = _CurrentProgram;
+    }
+    if ((_IntervalsCountPreflight == 0) && (_IsPreflight)) {
+        _IsPreflight = 0;
+        if (_IsServerRelayBoard) {
+            _IntervalsCountProgram = 1000;
+        } 
+    }
+    // printf("current program %d, preflight %d, count %d\n", _CurrentProgram,_IsPreflight,_IntervalsCountPreflight);
+    if (_IsServerRelayBoard == 0) {
+    #ifdef USE_GPIO
+    DiaGpio * gpio = config->GetGpio();
+    if (_CurrentProgram >= MAX_PROGRAMS_COUNT) {
+        return 1;
+    }
+    gpio->CurrentProgram = _CurrentProgram;
+    gpio->CurrentProgramIsPreflight = _IsPreflight;
+    #endif
+    }
+    
+    if(_IntervalsCountProgram > 20) {
+        int count = 0;
+        int err = 1;
+        while ((err) && (count<4) && (_CurrentProgramID>=0))
+        {
+            count++;
+            printf("relay control server board: run program programID=%d\n",_CurrentProgramID);
+            err = network->RunProgramOnServer(_CurrentProgramID, _IsPreflight);
+            if (err != 0) {
+                fprintf(stderr,"relay control server board: run program error\n");
+                delay(500);
+            }
+            if ((err == 0) && (_CurrentProgramID==0)) {
+                _CurrentProgramID = -1;
+            }
+        }
+        _IntervalsCountProgram = 0;
+    } 
+    return 0;
+}
 
 /////// Central server communication functions //////
 
@@ -363,6 +455,15 @@ void * pinging_func(void * ptr) {
     while(!_to_be_destroyed) {
         CentralServerDialog();
         sleep(1);
+    }
+    pthread_exit(0);
+    return 0;
+}
+
+void * run_program_func(void * ptr) {
+    while(!_to_be_destroyed) {
+        RunProgram();
+        delay(100);
     }
     pthread_exit(0);
     return 0;
@@ -587,10 +688,22 @@ int main(int argc, char ** argv) {
     config = new DiaConfiguration(folder, network);
     int err = config->Init();
     if (err != 0) {
-        printf("Can't run due to the configuration error\n");
+        fprintf(stderr,"Can't run due to the configuration error\n");
         return 1;
     }
-    
+    _IsServerRelayBoard = config->GetServerRelayBoard();
+    if (config->GetServerRelayBoard()) {
+        int err =1;
+        while (err)
+        {
+            printf("check relay control server board\n");
+            err = network->RunProgramOnServer(0, 0);
+            if (err != 0) {
+                fprintf(stderr,"relay control server board not found\n");
+            }
+            sleep(1);
+        }
+    }
     // Get working data from server: money, relays, prices
     RecoverData();
  
@@ -611,9 +724,10 @@ int main(int argc, char ** argv) {
     }
     
     // Program load
-    
+
+/*    
     #ifdef USE_GPIO
-    config->GetRuntime()->AddPrograms(&config->GetGpio()->_ProgramMapping);
+ //   config->GetRuntime()->AddPrograms(&config->GetGpio()->_ProgramMapping);
     #else
     printf("NOT USING GPIO - adding FAKE programs...\n");
     std::map<std::string, int> *fake_programs = new std::map<std::string, int>();
@@ -628,6 +742,7 @@ int main(int argc, char ** argv) {
     fake_programs->insert( std::pair<std::string, int>("p8relay", 8) );
     config->GetRuntime()->AddPrograms(fake_programs);
     #endif
+*/
 
     config->GetRuntime()->AddAnimations();
   
@@ -652,6 +767,7 @@ int main(int argc, char ** argv) {
 
     hardware->electronical_object = manager;
     hardware->get_service_function = get_service;
+    hardware->get_is_preflight_function = get_is_preflight;
     hardware->get_openlid_function = get_openlid;
     hardware->get_electronical_function = get_electronical;    
     hardware->request_transaction_function = request_transaction;  
@@ -666,6 +782,7 @@ int main(int argc, char ** argv) {
     config->GetRuntime()->AddRegistry(config->GetRuntime()->Registry);
     config->GetRuntime()->AddSvcWeather(config->GetSvcWeather());
     config->GetRuntime()->Registry->SetPostID(stationID);
+    config->GetRuntime()->Registry->get_price_function = get_price;
     
     //InitSensorButtons();
 
@@ -685,6 +802,7 @@ int main(int argc, char ** argv) {
     }
 
     pthread_create(&pinging_thread, NULL, pinging_func, NULL);
+    pthread_create(&run_program_thread, NULL, run_program_func, NULL);
     while(!keypress) {
         // Call Lua loop function
         config->GetRuntime()->Loop();

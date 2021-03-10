@@ -113,6 +113,7 @@ public:
     PulseHandler * AdditionalHandler;
 
     int CurrentProgram;
+    int CurrentProgramIsPreflight;
     int AllTurnedOff;
 
     pthread_t WorkingThread;
@@ -120,7 +121,8 @@ public:
 
 
     DiaRelayConfig Programs[MAX_PROGRAMS_COUNT];
-    std::map<std::string, int> _ProgramMapping;
+    DiaRelayConfig PreflightPrograms[MAX_PROGRAMS_COUNT];
+    // std::map<int, int> _ProgramMapping;
     DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage);
     ~DiaGpio();
 private:

@@ -346,6 +346,36 @@ public:
         return serverIP;
     }
 
+    // GetStationConig request to specified URL with method POST. 
+    // Returns 0, if request was OK, other value - in case of failure.
+    int GetStationConig(std::string& answer) {
+	    std::string url = _Host+ _Port + "/station-program-by-hash";
+        
+        int result;
+        std::string json_ping_request = json_create_card_reader_config();
+        result = SendRequest(&json_ping_request, &answer, url);
+        if (result) {
+            return 1;
+        }
+        return 0;
+    }
+
+    // RunProgramOnServer request to specified URL with method POST. 
+    // Returns 0, if request was OK, other value - in case of failure.
+    int RunProgramOnServer(int programID, int preflight) {
+	    std::string url = _Host+ _Port + "/run-program";
+        std::string answer;
+
+        int result;
+        std::string json_run_program_request = json_create_run_program(programID, preflight);
+        result = SendRequest(&json_run_program_request, &answer, url);
+        if ((result) || (answer !="")) {
+            fprintf(stderr, "RunProgramOnServer answer %s\n", answer.c_str());
+            return 1;
+        }
+        return 0;
+    }
+
     // GetCardReaderConig request to specified URL with method POST. 
     // Returns 0, if request was OK, other value - in case of failure.
     int GetCardReaderConig(std::string& cardReaderType, std::string& host, std::string& port) {
@@ -886,6 +916,21 @@ private:
         json_t *object = json_object();
 
         json_object_set_new(object, "Hash", json_string(_PublicKey.c_str()));
+        char *str = json_dumps(object, 0);
+        std::string res = str;
+
+        free(str);
+        str = 0;
+        json_decref(object);
+        return res;
+    }
+
+    std::string json_create_run_program(int programID, int preflight) {
+        json_t *object = json_object();
+
+        json_object_set_new(object, "hash", json_string(_PublicKey.c_str()));
+        json_object_set_new(object, "programID", json_integer(programID));
+        json_object_set_new(object, "preflight", json_boolean(preflight));
         char *str = json_dumps(object, 0);
         std::string res = str;
 
