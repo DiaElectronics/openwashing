@@ -79,6 +79,7 @@ DiaGpio::DiaGpio(int maxButtons, int maxRelays, storage_interface_t * storage) {
     MaxButtons = maxButtons;
     MaxRelays = maxRelays;
     CurrentProgram = -1;
+    CurrentProgramIsPreflight = 0;
     AllTurnedOff = 0;
     if(maxButtons>=PIN_COUNT) {
         printf("ERROR: buttons # is too big\n");
@@ -214,7 +215,12 @@ void DiaGpio_CheckRelays(DiaGpio * gpio, long curTime) {
         }
     } else {
         gpio->AllTurnedOff = 0;
-        DiaRelayConfig * config = &gpio->Programs[gpio->CurrentProgram];
+        DiaRelayConfig * config;
+        if (gpio->CurrentProgramIsPreflight) {
+            config = &gpio->PreflightPrograms[gpio->CurrentProgram];
+        } else {
+            config = &gpio->Programs[gpio->CurrentProgram];
+        }
         //printf("cur_prog:%d\n", gpio->CurrentProgram);
         for(int i=0;i<PIN_COUNT;i++) {
             if(gpio->RelayPin[i]<0) {

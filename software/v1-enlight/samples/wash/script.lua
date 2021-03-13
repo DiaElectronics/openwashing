@@ -79,22 +79,22 @@ update_post = function()
 end
 
 init_prices = function()
-    price_p[1] = get_price("price1")
+    price_p[1] = get_price(1)
     if price_p[1] == 0 then price_p[1] = 18 end
 
-    price_p[2] = get_price("price2")
+    price_p[2] = get_price(2)
     if price_p[2] == 0 then price_p[2] = 18 end
 
-    price_p[3] = get_price("price3")
+    price_p[3] = get_price(3)
     if price_p[3] == 0 then price_p[3] = 18 end
 
-    price_p[4] = get_price("price4")
+    price_p[4] = get_price(4)
     if price_p[4] == 0 then price_p[4] = 18 end
 
-    price_p[5] = get_price("price5")
+    price_p[5] = get_price(5)
     if price_p[5] == 0 then price_p[5] = 18 end
     
-    price_p[6] = get_price("price6")
+    price_p[6] = get_price(6)
     if price_p[6] == 0 then price_p[6] = 18 end
 end
 
@@ -269,8 +269,10 @@ program_mode = function(working_mode)
     run_sub_program(sub_mode)
     turn_light(sub_mode, animation.one_button)
   end
-  charge_balance(price_p[sub_mode])
-  set_current_state(balance,sub_mode)
+  if get_is_preflight() == 0 then
+    charge_balance(price_p[sub_mode])
+  end
+  set_current_state(balance)
   if balance <= 0.01 then
     return mode_thanks 
   end
@@ -280,15 +282,8 @@ program_mode = function(working_mode)
   return working_mode
 end
 
-run_sub_program = function(program_index) 
-    if program_index == 1 then return run_program(program.p1relay) end
-    if program_index == 2 then return run_program(program.p2relay) end
-    if program_index == 3 then return run_program(program.p3relay) end
-    if program_index == 4 then return run_program(program.p4relay) end
-    if program_index == 5 then return run_program(program.p5relay) end
-    if program_index == 6 then return run_program(program.p6relay) end
-    printMessage("WARNING WRONG PROGRAM PASSED") 
-    printMessage(program_index)
+run_sub_program = function(program_index)
+    run_program(program_index)
 end
 
 pause_mode = function()
@@ -315,7 +310,7 @@ pause_mode = function()
 end
 
 thanks_mode = function()
-    set_current_state(0,0)
+    set_current_state(0)
     if is_waiting_receipt == false then
         balance = 0
         show_thanks(thanks_mode_seconds)
@@ -436,7 +431,7 @@ smart_delay = function(ms)
 end
 
 get_price = function(key)
-    return registry:ValueInt(key)
+    return registry:GetPrice(key)
 end
 
 set_value_if_not_exists = function(key, value)
@@ -456,11 +451,11 @@ increment_cars = function()
 end
 
 run_pause = function()
-    run_program(program.p6relay)
+    run_program(6)
 end
 
 run_stop = function()
-    run_program(program.stop)
+    run_program(-1)
 end
 
 run_program = function(program_num)
@@ -479,8 +474,12 @@ abort_transaction = function()
     return hardware:AbortTransaction()
 end
 
-set_current_state = function(current_balance, current_program)
-    return hardware:SetCurrentState(math.floor(current_balance), current_program)
+set_current_state = function(current_balance)
+    return hardware:SetCurrentState(math.floor(current_balance))
+end
+
+get_is_preflight = function()
+    return hardware:GetIsPreflight()
 end
 
 update_balance = function()

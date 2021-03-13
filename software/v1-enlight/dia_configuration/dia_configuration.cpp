@@ -45,6 +45,10 @@ int DiaConfiguration::Init() {
     if(err) {
         return err;
     }
+    err = LoadConfig();
+    if(err) {
+        return err;
+    }
     _Gpio =0;
     if (!err) {
         int hideMouse = 0;
@@ -70,33 +74,25 @@ int DiaConfiguration::Init() {
         }
 
         // Let's copy programs
-        std::map<std::string, DiaProgram *>::iterator it;
+        std::map<int, DiaProgram *>::iterator it;
         int programNum = 0;
         for(it=_Programs.begin();it!=_Programs.end();it++) {
             programNum++;
             DiaProgram * curProgram = it->second;
             for(int i=0;i<PIN_COUNT_CONFIG;i++) {
-                if (curProgram->Config.RelayNum[i]>0) {
-                    int id = curProgram->Config.RelayNum[i];
-                    int ontime = curProgram->Config.OnTime[i];
-                    int offtime = curProgram->Config.OffTime[i];
-                    _Gpio->Programs[programNum].InitRelay(id, ontime, offtime);
+                if (curProgram->Relays.RelayNum[i]>0) {
+                    int id = curProgram->Relays.RelayNum[i];
+                    int ontime = curProgram->Relays.OnTime[i];
+                    int offtime = curProgram->Relays.OffTime[i];
+                    _Gpio->Programs[curProgram->ButtonID].InitRelay(id, ontime, offtime);
+                }
+                if (curProgram->PreflightRelays.RelayNum[i]>0) {
+                    int id = curProgram->PreflightRelays.RelayNum[i];
+                    int ontime = curProgram->PreflightRelays.OnTime[i];
+                    int offtime = curProgram->PreflightRelays.OffTime[i];
+                    _Gpio->PreflightPrograms[curProgram->ButtonID].InitRelay(id, ontime, offtime);
                 }
             }
-
-            printf("PROGRAM CONFIG UPDATED:[%s]->[%d]\n", it->first.c_str(), programNum);
-            //_Gpio->Programs[1].OnTime[1] = 250;
-            //_Gpio->Programs[1].OffTime[1] = 250;
-            //_Gpio->Programs[1].InitRelay(3,1000, 1000);
-            printf("program 1-1: %ld,%ld\n",
-                _Gpio->Programs[1].OnTime[1],
-                _Gpio->Programs[1].OffTime[1]);
-            printf("program 1-3: %ld,%ld\n",
-                _Gpio->Programs[1].OnTime[3],
-                _Gpio->Programs[1].OffTime[3]);
-
-
-            _Gpio->_ProgramMapping[it->first] = programNum;
         }
         #endif
     }
@@ -110,6 +106,8 @@ DiaConfiguration::DiaConfiguration(std::string folder, DiaNetwork *newNet) {
     _ResY = 0;
     _ButtonsNumber = 0;
     _RelaysNumber = 0;
+    _PreflightSec = 0;
+    _ServerRelayBoard = 0;
 
     // Must be rearranged
     registry = new DiaRuntimeRegistry(newNet);
@@ -119,6 +117,7 @@ DiaConfiguration::DiaConfiguration(std::string folder, DiaNetwork *newNet) {
     _svcWeather = new DiaRuntimeSvcWeather(newNet);
 
     _Storage = CreateEmptyInterface();
+    _Net = newNet;
 }
 int DiaConfiguration::InitFromJson(json_t * configuration_json) {
     if (configuration_json == 0) {
@@ -140,13 +139,6 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
     json_t * screens_json = json_object_get(configuration_json, "screens");
     if(!json_is_array(screens_json)) {
         fprintf(stderr, "error: screens is not an array\n");
-        return 1;
-    }
-
-    // Let's unpack programs
-    json_t *programs_json = json_object_get(configuration_json, "programs");
-    if(!json_is_array(programs_json)) {
-        fprintf(stderr, "error: programs is not an array\n");
         return 1;
     }
 
@@ -238,6 +230,50 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
         ScreenConfigs[id]->Init(_Folder, screen_json);
     }
 
+    json_t * script_json = json_object_get(configuration_json, "script");
+    json_t * include_json = json_object_get(configuration_json, "include");
+    return GetRuntime()->Init(_Folder, script_json, include_json);
+}
+
+int DiaConfiguration::LoadConfig() {
+    std::string answer;
+    int err = _Net->GetStationConig(answer);
+    if (err !=0) {
+        fprintf(stderr, "error: load config\n");
+        return 1;
+    }
+    json_error_t error;
+    json_t * configuration_json;
+    configuration_json = json_loads(answer.c_str(), 0, &error);
+    if (!configuration_json) {
+        printf("Error in LoadConfig: %d: %s\n", error.line, error.text );
+        return 1;
+    }
+
+    if(!json_is_object(configuration_json)) {
+	    printf("LoadConfig not a JSON\n");
+                return 1;
+        }
+
+    json_t *preflight_json = json_object_get(configuration_json, "preflightSec");
+    if(json_is_integer(preflight_json)) {
+        _PreflightSec = json_integer_value(preflight_json);
+    }
+    json_t *relay_board_json = json_object_get(configuration_json, "relayBoard");
+    if(json_is_string(relay_board_json)) {
+        std::string board = json_string_value(relay_board_json);
+        printf("LoadConfig relay board %s\n", board.c_str());
+        if (board == "danBoard") {
+            _ServerRelayBoard = 1;
+        }
+    }
+
+    // Let's unpack programs
+    json_t *programs_json = json_object_get(configuration_json, "programs");
+    if(!json_is_array(programs_json)) {
+        fprintf(stderr, "error: programs is not an array\n");
+        return 1;
+    }
     for (unsigned int i=0;i< json_array_size(programs_json); i++) {
         //printf("programs reading loop\n");
         json_t * program_json = json_array_get(programs_json, i);
@@ -246,17 +282,20 @@ int DiaConfiguration::InitFromJson(json_t * configuration_json) {
             return 1;
         }
         // XXX rebuild
-        DiaProgram * program = new DiaProgram(program_json, _Folder);
+        DiaProgram * program = new DiaProgram(program_json);
         if(!program->_InitializedOk) {
             printf("Something's wrong with the program");
             return 1;
         }
-        // TODO: an error here... programs must be alphabetically sorted with this code
-        this->_Programs[program->ID] = program;
+        this->_Programs[program->ButtonID] = program;
     }
-    json_t * script_json = json_object_get(configuration_json, "script");
-    json_t * include_json = json_object_get(configuration_json, "include");
-    return GetRuntime()->Init(_Folder, script_json, include_json);
+        for (int i=1;i<= _ButtonsNumber; i++) {
+            if (!this->_Programs[i]) {
+            fprintf(stderr, "error: LoadConfig buttonID %d not found\n", i);
+            return 1;
+            }
+        }
+    return 0;
 }
 
 DiaConfiguration::~DiaConfiguration() {
