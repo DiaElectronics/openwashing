@@ -45,10 +45,6 @@ int DiaConfiguration::Init() {
     if(err) {
         return err;
     }
-    err = LoadConfig();
-    if(err) {
-        return err;
-    }
     _Gpio =0;
     if (!err) {
         int hideMouse = 0;
@@ -71,28 +67,6 @@ int DiaConfiguration::Init() {
         if (!_Gpio->InitializedOk) {
             printf("ERROR: GPIO INIT");
             return 1;
-        }
-
-        // Let's copy programs
-        std::map<int, DiaProgram *>::iterator it;
-        int programNum = 0;
-        for(it=_Programs.begin();it!=_Programs.end();it++) {
-            programNum++;
-            DiaProgram * curProgram = it->second;
-            for(int i=0;i<PIN_COUNT_CONFIG;i++) {
-                if (curProgram->Relays.RelayNum[i]>0) {
-                    int id = curProgram->Relays.RelayNum[i];
-                    int ontime = curProgram->Relays.OnTime[i];
-                    int offtime = curProgram->Relays.OffTime[i];
-                    _Gpio->Programs[curProgram->ButtonID].InitRelay(id, ontime, offtime);
-                }
-                if (curProgram->PreflightRelays.RelayNum[i]>0) {
-                    int id = curProgram->PreflightRelays.RelayNum[i];
-                    int ontime = curProgram->PreflightRelays.OnTime[i];
-                    int offtime = curProgram->PreflightRelays.OffTime[i];
-                    _Gpio->PreflightPrograms[curProgram->ButtonID].InitRelay(id, ontime, offtime);
-                }
-            }
         }
         #endif
     }
@@ -267,7 +241,8 @@ int DiaConfiguration::LoadConfig() {
             _ServerRelayBoard = 1;
         }
     }
-
+    
+    std::map<int, DiaProgram*> tmpPrograms;
     // Let's unpack programs
     json_t *programs_json = json_object_get(configuration_json, "programs");
     if(!json_is_array(programs_json)) {
@@ -287,14 +262,39 @@ int DiaConfiguration::LoadConfig() {
             printf("Something's wrong with the program");
             return 1;
         }
-        this->_Programs[program->ButtonID] = program;
+        tmpPrograms[program->ButtonID] = program;
     }
         for (int i=1;i<= _ButtonsNumber; i++) {
-            if (!this->_Programs[i]) {
+            if (!tmpPrograms[i]) {
             fprintf(stderr, "error: LoadConfig buttonID %d not found\n", i);
             return 1;
             }
         }
+        this->_Programs = tmpPrograms;
+
+        #ifdef USE_GPIO
+        // Let's copy programs
+        std::map<int, DiaProgram *>::iterator it;
+        int programNum = 0;
+        for(it=this->_Programs.begin();it!=this->_Programs.end();it++) {
+            programNum++;
+            DiaProgram * curProgram = it->second;
+            for(int i=0;i<PIN_COUNT_CONFIG;i++) {
+                if (curProgram->Relays.RelayNum[i]>0) {
+                    int id = curProgram->Relays.RelayNum[i];
+                    int ontime = curProgram->Relays.OnTime[i];
+                    int offtime = curProgram->Relays.OffTime[i];
+                    _Gpio->Programs[curProgram->ButtonID].InitRelay(id, ontime, offtime);
+                }
+                if (curProgram->PreflightRelays.RelayNum[i]>0) {
+                    int id = curProgram->PreflightRelays.RelayNum[i];
+                    int ontime = curProgram->PreflightRelays.OnTime[i];
+                    int offtime = curProgram->PreflightRelays.OffTime[i];
+                    _Gpio->PreflightPrograms[curProgram->ButtonID].InitRelay(id, ontime, offtime);
+                }
+            }
+        }
+        #endif
     return 0;
 }
 
