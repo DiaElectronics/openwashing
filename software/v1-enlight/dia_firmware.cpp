@@ -682,6 +682,7 @@ int main(int argc, char ** argv) {
     if (errCardReader !=0) {
        return errCardReader;
     }
+    pthread_create(&pinging_thread, NULL, pinging_func, NULL);
 
     SDL_Event event;
 
@@ -690,6 +691,14 @@ int main(int argc, char ** argv) {
     if (err != 0) {
         fprintf(stderr,"Can't run due to the configuration error\n");
         return 1;
+    }
+    err = 1;
+    while (err != 0) {
+        err = config->LoadConfig();
+        if(err) {
+            fprintf(stderr,"Error loading settings from server\n");
+            sleep(1);
+        }
     }
     _IsServerRelayBoard = config->GetServerRelayBoard();
     if (config->GetServerRelayBoard()) {
@@ -780,7 +789,6 @@ int main(int argc, char ** argv) {
         printf("no additional coin handler\n");
     }
 
-    pthread_create(&pinging_thread, NULL, pinging_func, NULL);
     pthread_create(&run_program_thread, NULL, run_program_func, NULL);
     while(!keypress) {
         // Call Lua loop function
