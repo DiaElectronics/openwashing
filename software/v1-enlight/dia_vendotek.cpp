@@ -25,9 +25,9 @@ typedef struct stage_req_s {
 typedef struct stage_resp_s {
     uint16_t  id;
     char     *valstr;
-    ssize_t  *valint;
+    long     *valint;
     char     *expstr;
-    ssize_t  *expint;
+    long     *expint;
     int       optional;
 } stage_resp_t;
 
