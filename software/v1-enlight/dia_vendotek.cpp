@@ -19,15 +19,15 @@
 typedef struct stage_req_s {
     uint16_t  id;
     char     *valstr;
-    long int  *valint;
+    long     *valint;
 } stage_req_t;
 
 typedef struct stage_resp_s {
     uint16_t  id;
     char     *valstr;
-    ssize_t  *valint;
+    long     *valint;
     char     *expstr;
-    ssize_t  *expint;
+    long     *expint;
     int       optional;
 } stage_resp_t;
 
@@ -148,21 +148,22 @@ int do_payment(void * driverPtr, payment_opts_t *opts)
      * common state
      */
     struct payment_s {
-        ssize_t  opnum;
-        ssize_t  evnum;
+        long    opnum;
+        long    evnum;
         char    *evname;
-        ssize_t  prodid;
+        long    prodid;
         char    *prodname;
-        ssize_t  price;
-        ssize_t  price_confirmed;
-        ssize_t  timeout;
+        long    price;
+        long    price_confirmed;
+        long    timeout;
     } payment;
-        payment.evnum     = opts->evnum;
-        payment.evname    = opts->evname;
-        payment.prodid    = opts->prodid;
-        payment.prodname  = opts->prodname;
-        payment.price     = opts->price;
-        payment.timeout   = opts->timeout;
+
+    payment.evnum     = opts->evnum;
+    payment.evname    = opts->evname;
+    payment.prodid    = opts->prodid;
+    payment.prodname  = opts->prodname;
+    payment.price     = opts->price;
+    payment.timeout   = opts->timeout;
     
     int rc_idl = 0, rc_vrp = 0, rc_fin = 0;
 
