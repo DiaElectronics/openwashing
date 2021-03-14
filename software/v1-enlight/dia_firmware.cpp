@@ -139,7 +139,6 @@ int turn_program(void *object, int program) {
         _CurrentProgram = program;
         _CurrentProgramID = 0;
         _IntervalsCountPreflight = 0;
-
         if ((config) && (program>0)){
             _CurrentProgramID = config->GetProgramID(program);
             _IntervalsCountPreflight = config->GetPreflightSec(program)*10;
@@ -408,7 +407,7 @@ int CentralServerDialog() {
 
     int serviceMoney = 0;
     bool openStation = false;
-    network->SendPingRequest(serviceMoney, openStation, _CurrentBalance, _CurrentProgram);
+    network->SendPingRequest(serviceMoney, openStation, _CurrentBalance, _CurrentProgramID);
     
     if (serviceMoney > 0) {
         // TODO protect with mutex
