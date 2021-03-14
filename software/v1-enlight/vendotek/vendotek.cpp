@@ -340,6 +340,12 @@ static int
 vtk_varint_deserialize(vtk_stream_t *stream, uint16_t *value)
 {
     uint8_t varint[3];
+
+    // These 3 init lines just to fix false positive linter warns
+    varint[0] = 0;
+    varint[1] = 0;
+    varint[2] = 0;
+    
     vtk_stream_read(stream, 1, &varint[0], 1);
 
     if (varint[0] <= 127) {
